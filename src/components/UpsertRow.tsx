@@ -454,7 +454,7 @@ export default ({ params: { tableName, pk } }: UpsertRowProps) => {
           })?.then?.(() => notifyTableUpdate(tableName)))
       )}
     >
-      <div className="flex gap-4 flex-col max-w-md">
+      <div className="flex gap-4 flex-col max-w-3xl">
         {columns.map((column, i) => (
           <Field
             key={i}
