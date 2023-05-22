@@ -5,6 +5,7 @@ import { render } from "https://esm.sh/*preact-render-to-string@5.2.0";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
 import { h } from "https://esm.sh/preact@10.13.2";
 import { twind, virtual } from "https://esm.sh/v103/@twind/core@1.1.2";
+import { lookup } from "https://deno.land/x/mrmime@v1.0.1/mod.ts";
 
 import * as Client from "./src/islands/Client.tsx";
 import * as ApiMedias from "./src/routes/api/medias.ts";
@@ -55,16 +56,29 @@ export default async (
       new Response(await islands.get(req.url), {
         headers: { "content-type": "text/javascript" },
       }),
-    "GET@/static/*": async (req: Request) => {
-      const path = await Deno.realPath(
-        decodeURIComponent(`.${new URL(req.url).pathname}`)
-      )
-        .then((path) => (path.startsWith(Deno.cwd() + "/static") ? path : null))
-        .catch(() => null);
-      return path
-        ? new Response(await Deno.readFile(path))
-        : new Response(null, { status: 404 });
-    },
+      "GET@/static/*": async (req: Request) => {
+        const url = new URL(
+          "." + decodeURIComponent(new URL(req.url).pathname),
+          import.meta.url
+        );
+        const resp = url ? await fetch(url) : null;
+        const size = resp?.headers.get("content-length");
+        return resp && url
+          ? new Response(resp.body, {
+              headers: {
+                "content-type": lookup(url.href),
+                ...(size ? { "content-length": String(size) } : {}),
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods":
+                  "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+                "Access-Control-Allow-Headers": "*",
+                "Cache-Control":
+                  "public, max-age=604800, must-revalidate, immutable",
+              },
+            })
+          : new Response(null, { status: 404 });
+      },
     "GET@/*": rotten({
       default: (req: Request) => {
         const apiKey = req.headers.get("authorization");
