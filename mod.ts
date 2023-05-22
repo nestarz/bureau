@@ -1,6 +1,6 @@
 import pipe from "https://deno.land/x/pipe@0.3.0/mod.ts";
-import doctype from "https://deno.land/x/rotten@0.2.2/doctype.ts";
-import { setup } from "https://deno.land/x/rotten@0.2.2/islands.ts";
+import doctype from "https://deno.land/x/rotten@0.2.3/doctype.ts";
+import { setup } from "https://deno.land/x/rotten@0.2.3/islands.ts";
 import { render } from "https://esm.sh/*preact-render-to-string@5.2.0";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
 import { h } from "https://esm.sh/preact@10.13.2";
@@ -23,8 +23,10 @@ export default async (
   gqlWebsocketUrl: string
 ): Promise<Routes> => {
   const { register, ...islands } = await setup({
-    baseUrl: import.meta.url,
-    islands: "./src/islands",
+    baseUrl: new URL(import.meta.url),
+    islands: ["./src/islands/Client.tsx"].map(
+      (v) => new URL(v, new URL(".", import.meta.url))
+    ),
     prefix: `${prefix}/islands/`,
   });
 
