@@ -64,7 +64,7 @@ export default ({ params: { tableName } }: TableProps) => {
   const addNotifyTableListener = useStore().addNotifyListener;
 
   const { columns = [] } = tables.find(({ name }) => name === tableName) ?? {};
-  const sortColumn = columns.find((d) => /order/g.test(d.name));
+  const sortColumn = columns.find((d) => /^order$/gi.test(d.name));
   const {
     data: { [tableName]: table = [] } = {},
     error,
