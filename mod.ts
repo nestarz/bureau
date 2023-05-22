@@ -58,7 +58,8 @@ export default async (
       }),
     "GET@/static/*": async (req: Request) => {
       const url = new URL(
-        "." + decodeURIComponent(new URL(req.url).pathname),
+        "." +
+          decodeURIComponent(new URL(req.url).pathname).slice(prefix.length),
         import.meta.url
       );
       console.log(url, import.meta.url);
