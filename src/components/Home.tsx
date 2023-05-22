@@ -19,7 +19,7 @@ const Nav = () => {
   return (
     <div className="flex flex-col sticky top-0 self-start overflow-y-auto bg-slate-50 border-solid border-r border-[#e8eaee] min-w-fit">
       <nav className="sticky top-0 h-screen px-5 py-4 mt-[2px] max-w-full max-h-screen overflow-y-auto">
-        <ul className="space-y-1 h-full flex flex-col">
+        <ul className="h-full flex flex-col">
           <Link href="/">
             <a className="flex items-center font-medium text-slate-800 capitalize gap-2 py-2 mb-4">
               <span className="font-icon text-[#46daa7]">
