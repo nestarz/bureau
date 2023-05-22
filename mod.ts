@@ -1,16 +1,17 @@
 import pipe from "https://deno.land/x/pipe@0.3.0/mod.ts";
 import doctype from "https://deno.land/x/rotten@0.2.1/doctype.ts";
+import { setup } from "https://deno.land/x/rotten@0.2.1/islands.ts";
 import { render } from "https://esm.sh/*preact-render-to-string@5.2.0";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
 import { h } from "https://esm.sh/preact@10.13.2";
 import { twind, virtual } from "https://esm.sh/v103/@twind/core@1.1.2";
-import { setup } from "https://deno.land/x/rotten@0.2.1/islands.ts";
 
 import * as Client from "./src/islands/Client.tsx";
 import * as ApiMedias from "./src/routes/api/medias.ts";
 import { twindOptions } from "./twind.ts";
 
 import type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
+export type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
 
 export default async (
   prefix: string,
