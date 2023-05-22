@@ -41,7 +41,9 @@ export default async (
           },
         }),
       (stream: ReadableStream) =>
-        stream.pipeThrough(new TwindStream(twind(twindOptions, virtual(true)))),
+        stream.pipeThrough(
+          new TwindStream(twind(twindOptions(prefix), virtual(true)))
+        ),
       islands.inject,
       doctype(["html"]),
       (body) => new Response(body, { headers: { "content-type": "text/html" } })

@@ -7,20 +7,28 @@ import presetTailwind from "https://esm.sh/@twind/preset-tailwind@1.1.4";
 import presetAutoprefix from "https://esm.sh/@twind/preset-autoprefix@1.0.7";
 import presetTypography from "https://esm.sh/@twind/preset-typography@1.0.7";
 
-export const twindOptions = {
+const join = (...str: string[]) => str.join("/").replace(/\/\//g, "/");
+
+export const twindOptions = (prefix: string) => ({
   presets: [presetAutoprefix(), presetTailwind(), presetTypography()],
   rules: [["drag-none", { "user-drag": "none", "-webkit-user-drag": "none" }]],
   preflight: {
     "@font-face": [
       {
         fontFamily: '"Inter"',
-        src: 'url("/static/assets/fonts/Inter/Inter.var.woff2") format("woff2")',
+        src: `url("${join(
+          prefix,
+          "/static/assets/fonts/Inter/Inter.var.woff2"
+        )}") format("woff2")`,
         fontStyle: "normal",
         fontDisplay: "swap",
       },
       {
         fontFamily: '"Remix Icon"',
-        src: 'url("/static/assets/fonts/RemixIcon/remixicon.woff2") format("woff2")',
+        src: `url("${join(
+          prefix,
+          "/static/assets/fonts/RemixIcon/remixicon.woff2"
+        )}") format("woff2")`,
         fontStyle: "normal",
         fontDisplay: "swap",
       },
@@ -66,12 +74,12 @@ export const twindOptions = {
       },
     },
   },
-};
+});
 
 let done = false;
-export default () => {
+export default (prefix: string) => {
   if (done) return;
   done = true;
-  install(defineConfig(twindOptions));
+  install(defineConfig(twindOptions(prefix)));
   observe();
 };

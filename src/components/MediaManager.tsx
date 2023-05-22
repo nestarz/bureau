@@ -240,7 +240,7 @@ export default ({ onClose, onChange, value, multiple }) => {
                     "No"
                   );
                   if (reply?.toLowerCase()?.trim() === "yes")
-                    fetch(router.base + "./api/medias", {
+                    fetch(router.base + "/api/medias", {
                       method: "DELETE",
                       body: JSON.stringify({
                         medias: [...selected.peek().values()],
