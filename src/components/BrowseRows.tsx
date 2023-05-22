@@ -38,7 +38,7 @@ export const findNested = (
 ) => {
   const ftable = findTable(tables, column.references);
   const fcolumn = ftable ? findKeyColumn(ftable.columns) : null;
-  const nestedCell = cell[`${column.name}_by_fk`];
+  const nestedCell = cell?.[`${column.name}_by_fk`];
   const nestedCellValue = fcolumn ? nestedCell?.[fcolumn?.name] : null;
   return {
     column: fcolumn,
