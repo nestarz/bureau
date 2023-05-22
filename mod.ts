@@ -56,29 +56,30 @@ export default async (
       new Response(await islands.get(req.url), {
         headers: { "content-type": "text/javascript" },
       }),
-      "GET@/static/*": async (req: Request) => {
-        const url = new URL(
-          "." + decodeURIComponent(new URL(req.url).pathname),
-          import.meta.url
-        );
-        const resp = url ? await fetch(url) : null;
-        const size = resp?.headers.get("content-length");
-        return resp && url
-          ? new Response(resp.body, {
-              headers: {
-                "content-type": lookup(url.href),
-                ...(size ? { "content-length": String(size) } : {}),
-                "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods":
-                  "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-                "Access-Control-Allow-Headers": "*",
-                "Cache-Control":
-                  "public, max-age=604800, must-revalidate, immutable",
-              },
-            })
-          : new Response(null, { status: 404 });
-      },
+    "GET@/static/*": async (req: Request) => {
+      const url = new URL(
+        "." + decodeURIComponent(new URL(req.url).pathname),
+        import.meta.url
+      );
+      console.log(url, import.meta.url);
+      const resp = await fetch(url);
+      const size = resp?.headers.get("content-length");
+      return resp.status === 200
+        ? new Response(resp.body, {
+            headers: {
+              "content-type": lookup(url.href),
+              ...(size ? { "content-length": String(size) } : {}),
+              "Access-Control-Allow-Credentials": "true",
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods":
+                "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+              "Access-Control-Allow-Headers": "*",
+              "Cache-Control":
+                "public, max-age=604800, must-revalidate, immutable",
+            },
+          })
+        : new Response(null, { status: 404 });
+    },
     "GET@/*": rotten({
       default: (req: Request) => {
         const apiKey = req.headers.get("authorization");
