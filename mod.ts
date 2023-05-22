@@ -12,6 +12,8 @@ import { twindOptions } from "./twind.ts";
 
 import type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
 export type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
+import type { Routes } from "https://deno.land/x/rutt@0.1.0/mod.ts";
+export type { Routes } from "https://deno.land/x/rutt@0.1.0/mod.ts";
 
 export default async (
   prefix: string,
@@ -19,7 +21,7 @@ export default async (
   getS3Uri: (key: string) => string | URL,
   gqlHttpUrl: string,
   gqlWebsocketUrl: string
-) => {
+): Promise<Routes> => {
   const { register, ...islands } = await setup({
     baseUrl: import.meta.url,
     islands: new URL("./src/islands", import.meta.url),
