@@ -52,7 +52,7 @@ export function withDialog<P extends WithDialogProps>(
     return (
       <Modal
         initialOpen
-        className="h-full ml-auto m-0 p-0 max-h-screen bg-transparent w-full max-w-md outline-none"
+        className="h-full ml-auto m-0 p-0 max-h-screen bg-transparent w-full max-w-3xl outline-none"
         onClose={onClose}
       >
         <div className="h-auto min-h-full w-full bg-white py-4 border-solid border-l border-[#e8eaee] outline-none">

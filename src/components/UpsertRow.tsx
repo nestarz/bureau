@@ -242,7 +242,7 @@ const ForeignInput = ({ tables, references, to, register, name, control }) => {
               })}
           </div>
         </div>
-        <ComboboxOptions className="hidden top-full group-focus-within:(absolute min-w-max z-10 flex flex-col mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm)">
+        <ComboboxOptions className="hidden top-full group-focus-within:(absolute min-w-max left-0 z-10 flex flex-col mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm)">
           {options
             .filter(
               (v) =>
