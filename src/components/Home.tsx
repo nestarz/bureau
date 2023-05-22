@@ -21,7 +21,7 @@ const Nav = () => {
       <nav className="sticky top-0 h-screen px-5 py-4 mt-[2px] max-w-full max-h-screen overflow-y-auto">
         <ul className="h-full flex flex-col">
           <Link href="/">
-            <a className="flex items-center font-medium text-slate-800 capitalize gap-2 py-2 mb-4">
+            <a className="flex items-center font-medium text-slate-800 capitalize gap-2 py-2 mb-4 sticky top-0">
               <span className="font-icon text-[#46daa7]">
                 {String.fromCodePoint(0xebf0)}
               </span>
