@@ -1,6 +1,6 @@
 import { h, hydrate } from "preact";
 import clsx from "clsx";
-import { Link, Switch, Route, useRoute, Router } from "wouter";
+import { Link, Route, useRoute, Router } from "wouter";
 import { useEffect } from "preact/hooks";
 import Table from "../components/Table.tsx";
 import SqlEditor from "../components/SqlEditor.tsx";

@@ -1,3 +1,4 @@
+/** @jsxImportSource https://esm.sh/preact@10.15.0?target=es2022 */
 import {
   useEffect,
   useState,
