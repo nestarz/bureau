@@ -1,8 +1,8 @@
 import pipe from "https://deno.land/x/pipe@0.3.0/mod.ts";
 import { setup } from "https://deno.land/x/rotten@0.2.6/islands.ts";
-import { render } from "https://esm.sh/preact-render-to-string@6.0.3&deps=preact@10.15.0";
+import { render } from "https://esm.sh/preact-render-to-string@6.0.3&deps=preact@10.15.0&target=es2022";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
-import { h } from "https://esm.sh/preact@10.15.0";
+import { h } from "https://esm.sh/preact@10.15.0?target=es2022";
 import { twind, virtual } from "https://esm.sh/@twind/core@1.1.3";
 import { lookup } from "https://deno.land/x/mrmime@v1.0.1/mod.ts";
 
