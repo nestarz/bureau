@@ -1,4 +1,4 @@
-import { Fragment, h, hydrate } from "preact";
+import { h, hydrate } from "preact";
 import clsx from "clsx";
 import { Link, Switch, Route, useRoute, Router } from "wouter";
 import { useEffect } from "preact/hooks";
@@ -7,7 +7,6 @@ import SqlEditor from "../components/SqlEditor.tsx";
 import { useStore } from "../utils/useStore.ts";
 import { ApiContext } from "../utils/useHttp.ts";
 import twind from "../../twind.ts";
-import Alert from "./Alert.tsx";
 export { h, hydrate };
 
 await twind();
