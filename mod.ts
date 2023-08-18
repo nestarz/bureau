@@ -1,5 +1,5 @@
 import pipe from "https://deno.land/x/pipe@0.3.0/mod.ts";
-import * as Islands from "https://deno.land/x/islet@0.0.8/mod.ts";
+import * as Islands from "https://deno.land/x/islet@0.0.8/server.ts";
 import { render as renderToString } from "https://esm.sh/preact-render-to-string@6.2.0&deps=preact@10.15.1&target=es2022";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
 import { twind, virtual } from "https://esm.sh/@twind/core@1.1.3";
