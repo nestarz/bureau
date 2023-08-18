@@ -1,7 +1,7 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
 import { jsx } from "../jsx-runtime.ts";
-import Client from "@/deps/cms/src/components/Client.tsx";
+import Client from "../components/Client.tsx";
 
 export const handler = {
   GET: (req: Request, ctx) =>
