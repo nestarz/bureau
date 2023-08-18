@@ -1,9 +1,9 @@
 import { Fragment, h, hydrate } from "preact";
 export { h, hydrate };
 import { useEffect, useRef } from "preact/hooks";
-import twind from "../../twind.ts";
+import { twind, default as twindConfig } from "../../twind.config.ts";
 
-twind();
+await twind(twindConfig("/admin/"));
 
 export default ({
   button,

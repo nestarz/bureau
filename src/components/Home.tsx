@@ -1,3 +1,4 @@
+/** @jsxImportSource https://esm.sh/preact@10.15.1?target=es2022 */
 import { h, hydrate } from "preact";
 import clsx from "clsx";
 import { Link, Route, useRoute, Router } from "wouter";
@@ -6,10 +7,10 @@ import Table from "../components/Table.tsx";
 import SqlEditor from "../components/SqlEditor.tsx";
 import { useStore } from "../utils/useStore.ts";
 import { ApiContext } from "../utils/useHttp.ts";
-import twind from "../../twind.ts";
+import { twind, default as twindConfig } from "../../twind.config.ts";
 export { h, hydrate };
 
-await twind();
+await twind(twindConfig("/admin/"));
 
 const Nav = () => {
   const { tables } = useStore();
