@@ -3,9 +3,9 @@ import type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
 
 export const handler = async (
   req: Request,
-  ctx: { s3: S3Client; getS3Uri: (key: string) => string | URL }
+  ctx: { s3Client: S3Client; getS3Uri: (key: string) => string | URL }
 ) => {
-  const { getS3Uri, s3 } = ctx;
+  const { getS3Uri, s3Client: s3 } = ctx;
   if (req.method === "PUT") {
     const objectName = new URL(req.url).searchParams.get("object_name");
     return typeof objectName !== "string"

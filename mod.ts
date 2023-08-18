@@ -46,27 +46,33 @@ const createRotten =
     );
   };
 
-export default (
-  prefix: string,
-  s3: S3Client,
-  getS3Uri: (key: string) => string | URL,
-  gqlHttpUrl: string,
-  gqlWebsocketUrl: string
-): Promise<Routes> => {
-  const rotten = createRotten(prefix);
+export interface ContentManagmentSystemOptions {
+  base: string;
+  s3Client: S3Client;
+  getS3Uri: (key: string) => string | URL;
+  graphqlPath: string;
+}
+
+export default ({
+  base,
+  s3Client,
+  getS3Uri,
+  graphqlPath,
+}: ContentManagmentSystemOptions): Promise<Routes> => {
+  const rotten = createRotten(base);
   return {
-    "/api/medias": (req) => ApiMedias.handler(req, { s3, getS3Uri }),
+    "/api/medias": (req: Request) =>
+      ApiMedias.handler(req, { s3Client, getS3Uri }),
     [Islands.config.routeOverride]: Islands.createHandler({
       key: "cms",
       jsxImportSource: "preact",
       baseUrl: new URL(import.meta.url),
-      prefix: `${prefix}/islands/`,
+      prefix: `${base}/islands/`,
       importMapFileName: "import_map.json",
     }),
     "GET@/static/*": async (req: Request) => {
       const url = new URL(
-        "." +
-          decodeURIComponent(new URL(req.url).pathname).slice(prefix.length),
+        "." + decodeURIComponent(new URL(req.url).pathname).slice(base.length),
         import.meta.url
       );
       const resp = await fetch(url);
@@ -88,8 +94,8 @@ export default (
         : new Response(null, { status: 404 });
     },
     "GET@/*": middleware((_, ctx) => {
-      ctx.state.gqlHttpUrl = gqlHttpUrl;
-      ctx.state.gqlWebsocketUrl = gqlWebsocketUrl;
+      ctx.state.gqlHttpUrl = graphqlPath;
+      ctx.state.gqlWebsocketUrl = graphqlPath;
       return ctx.next();
     }, rotten(Home)),
   };
