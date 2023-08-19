@@ -1,7 +1,9 @@
 /** @jsxRuntime classic */
 /** @jsx jsx */
-import { jsx } from "../jsx-runtime.ts";
+import { jsx as _jsx } from "../jsx-runtime.ts";
 import Client from "../components/Client.tsx";
+
+const jsx = (a, b, ...c: unknown[]) => _jsx(a, { children: c, ...b ?? {} });
 
 export const handler = {
   GET: (req: Request, ctx) =>

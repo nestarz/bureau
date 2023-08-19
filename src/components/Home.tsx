@@ -1,4 +1,4 @@
-/** @jsxImportSource https://esm.sh/preact@10.15.1?target=es2022 */
+/** @jsxImportSource https://esm.sh/preact@10.17.1&target=es2022 */
 import { h, hydrate } from "preact";
 import clsx from "clsx";
 import { Link, Route, useRoute, Router } from "wouter";
