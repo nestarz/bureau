@@ -54,7 +54,7 @@ export const useStore = () => {
 
   const fetch = async () => {
     const value = await query();
-    tables.value = value.data?._tables as TableInfo[];
+    tables.value = value.data?._tables ?? [] as TableInfo[];
   };
 
   return {
