@@ -1,5 +1,5 @@
 import pipe from "https://deno.land/x/pipe@0.3.0/mod.ts";
-import * as Islands from "@/deps/islet/server.ts";
+import * as Islands from "https://deno.land/x/islet@0.0.9/server.ts";
 import { render as renderToString } from "https://esm.sh/preact-render-to-string@6.2.1&deps=preact@10.17.1&target=es2022";
 import TwindStream from "https://esm.sh/@twind/with-react@1.1.3/readableStream.js";
 import { twind, virtual } from "https://esm.sh/@twind/core@1.1.3";
@@ -66,7 +66,7 @@ export default ({
     "/api/medias": (req: Request) =>
       ApiMedias.handler(req, { s3Client, getS3Uri }),
     [Islands.config.routeOverride]: Islands.createHandler({
-      key: "cms",
+      key: "@bureaudouble/bureau",
       jsxImportSource: "preact",
       baseUrl: new URL(import.meta.url),
       prefix: `${base}/islands/`,
