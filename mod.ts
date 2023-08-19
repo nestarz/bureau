@@ -25,11 +25,9 @@ const createRotten =
   (req: Request, ctx: HandlerContext, matcher?: Record<string, string>) => {
     const newCtx = matcher ? { ...ctx, params: matcher } : ctx;
     const props = { url: new URL(req.url), ctx: newCtx };
-    console.log(route.default.toString())
     const render = route.default
       ? pipe(
           (data?: unknown) => route.default({ ...props, data }),
-          (vn) => console.log(1, vn) ?? vn,
           (vn) => "<!DOCTYPE html>".concat(renderToString(vn)),
           (str: string) => new TextEncoder().encode(str),
           toReadableStream,
