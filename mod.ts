@@ -18,7 +18,7 @@ import type { Routes } from "https://deno.land/x/rutt@0.2.0/mod.ts";
 export type { Routes } from "https://deno.land/x/rutt@0.2.0/mod.ts";
 
 export interface ContentManagmentSystemOptions {
-  base: string;
+  prefix: string;
   s3Client: S3Client;
   getS3Uri: (key: string) => string | URL;
   graphqlPath: string;
@@ -28,7 +28,7 @@ export interface ContentManagmentSystemOptions {
 }
 
 export default ({
-  base,
+  prefix,
   s3Client,
   getS3Uri,
   graphqlPath,
@@ -42,7 +42,7 @@ export default ({
     Islands.addScripts,
     (stream: ReadableStream) =>
       stream.pipeThrough(
-        new TwindStream(twind(twindConfig(base), virtual(true)))
+        new TwindStream(twind(twindConfig(prefix), virtual(true)))
       )
   );
 
@@ -69,11 +69,12 @@ export default ({
       key: "@bureaudouble/bureau",
       jsxImportSource: "preact",
       baseUrl: new URL(import.meta.url),
-      prefix: `${base}/islands/`,
+      prefix: `${prefix}/islands/`,
       importMapFileName: "import_map.json",
     }),
     [staticFileRoute.config.routeOverride!]: staticFileRoute.createHandler({
       baseUrl: import.meta.url,
+      prefix,
     }),
     "GET@/*": withMiddlewares(renderPipe(Home)),
   };
