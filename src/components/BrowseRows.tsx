@@ -1,5 +1,5 @@
-import { useComputed, useSignal, useSignalEffect } from "@preact/signals";
-import { useCallback, useEffect } from "preact/hooks";
+import { useComputed, useSignal } from "@preact/signals";
+import { useCallback, useEffect, useState } from "preact/hooks";
 import { Fragment, h, hydrate } from "preact";
 import { Link } from "wouter";
 export { h, hydrate };
@@ -152,21 +152,62 @@ export default ({ params: { tableName } }: TableProps) => {
     if (yesOrNo) remove({ variables: { in: row?.[pk.name] } });
   };
 
+  const [selectedColumns, setSelectedColumns] = useState();
+  useEffect(
+    () => void setSelectedColumns(columns.slice(0, 8).map((d) => d.cid)),
+    [JSON.stringify(columns)]
+  );
+  const filteredColumns = columns.filter((v) =>
+    selectedColumns.includes(v.cid)
+  );
+
   return loading ? (
     <Alert loading={loading} error={error} />
   ) : (
     <Fragment>
       <div
-        className={`bg-white grid grid-cols-[${
+        className={`relative bg-white grid grid-cols-[${
           hasOrder ? "min-content_" : ""
         }min-content_repeat(${
-          columns.length - 1
+          filteredColumns.length - 1
         },_auto)_min-content] overflow-hidden w-full rounded-md border border-slate-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600`}
       >
+        <details
+          role="fieldset"
+          className="absolute top-3 right-6"
+          onChange={(v) => {
+            setSelectedColumns(
+              columns
+                .filter((column) =>
+                  [...v.currentTarget.querySelectorAll("input")]
+                    .filter((v) => v.checked)
+                    .map((d) => parseInt(d.value))
+                    .includes(column.cid)
+                )
+                .map((column) => column.cid)
+            );
+          }}
+        >
+          <summary className="text-sm font-icon text-slate-600 flex cursor-pointer">
+            <span className="ml-auto -mt-[1px] block">{String.fromCharCode(0xeebd)}</span>
+          </summary>
+          <div className="bg-white max-h-[15rem] border-1 rounded border-slate-100 overflow-y-scroll flex flex-col py-1 divide-y-1 divide-slate-50">
+            {columns.map((column) => (
+              <label className="text-xs flex items-center gap-1 px-2 py-1">
+                <input
+                  type="checkbox"
+                  value={column.cid}
+                  defaultChecked={selectedColumns.includes(column.cid)}
+                />
+                {column.name}
+              </label>
+            ))}
+          </div>
+        </details>
         {hasOrder && (
           <div className="flex items-start justify-center px-6 py-3 border-b-1 border-slate-200 leading-none"></div>
         )}
-        {columns.map(({ name }) => {
+        {filteredColumns.map(({ name }) => {
           const displayName = name
             .replace(/_json/gi, "")
             .replace(/_/, " ")
@@ -194,7 +235,7 @@ export default ({ params: { tableName } }: TableProps) => {
                 className="group contents"
                 href={`/table/${tableName}/update/${row?.id}`}
               >
-                {columns.map((column) => {
+                {filteredColumns.map((column) => {
                   const cellValue = row[column.name];
                   const { value, children } = findNested(
                     tables,
