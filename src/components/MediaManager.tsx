@@ -199,7 +199,7 @@ export default ({ onClose, onChange, value, multiple }) => {
                   Create folder
                 </button>
               </div>
-              <ul className="flex flex-col bg-slate-100 gap-1 p-1 flex-1 w-full rounded">
+              <ul className="flex flex-col bg-slate-100 gap-1 p-1 flex-1 w-full rounded max-h-[60vh] overflow-y-scroll">
                 {[...selected.value].map(([key, value]) => (
                   <label
                     className="flex relative bg-white p-1 items-center gap-2 rounded"
