@@ -157,9 +157,10 @@ export default ({ params: { tableName } }: TableProps) => {
     () => void setSelectedColumns(columns.slice(0, 8).map((d) => d.cid)),
     [JSON.stringify(columns)]
   );
-  const filteredColumns = columns.filter((v) =>
-    selectedColumns.includes(v.cid)
-  );
+  const filteredColumns =
+    (selectedColumns?.length ?? 0) > 0
+      ? columns.filter((v) => selectedColumns.includes(v.cid))
+      : columns;
 
   return loading ? (
     <Alert loading={loading} error={error} />
@@ -189,7 +190,9 @@ export default ({ params: { tableName } }: TableProps) => {
           }}
         >
           <summary className="text-sm font-icon text-slate-600 flex cursor-pointer">
-            <span className="ml-auto -mt-[1px] block">{String.fromCharCode(0xeebd)}</span>
+            <span className="ml-auto -mt-[1px] block">
+              {String.fromCharCode(0xeebd)}
+            </span>
           </summary>
           <div className="bg-white max-h-[15rem] border-1 rounded border-slate-100 overflow-y-scroll flex flex-col py-1 divide-y-1 divide-slate-50">
             {columns.map((column) => (
