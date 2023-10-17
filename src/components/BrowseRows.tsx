@@ -146,13 +146,14 @@ export default ({ params: { tableName } }: TableProps) => {
 
   const onDelete = (row: Row) => () => {
     if (!pk) return;
+
     const yesOrNo = window
       .prompt(`Remove ${pk.name}: ${row?.[pk.name]}`, "yes")
       ?.includes("y");
     if (yesOrNo) remove({ variables: { in: row?.[pk.name] } });
   };
-
   const [selectedColumns, setSelectedColumns] = useState();
+
   useEffect(
     () => void setSelectedColumns(columns.slice(0, 8).map((d) => d.cid)),
     [JSON.stringify(columns)]
