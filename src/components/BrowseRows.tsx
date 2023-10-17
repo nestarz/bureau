@@ -159,7 +159,7 @@ export default ({ params: { tableName } }: TableProps) => {
   );
   const filteredColumns =
     (selectedColumns?.length ?? 0) > 0
-      ? columns.filter((v) => selectedColumns.includes(v.cid))
+      ? columns.filter((v) => selectedColumns?.includes(v.cid))
       : columns;
 
   return loading ? (
@@ -200,7 +200,7 @@ export default ({ params: { tableName } }: TableProps) => {
                 <input
                   type="checkbox"
                   value={column.cid}
-                  defaultChecked={selectedColumns.includes(column.cid)}
+                  defaultChecked={selectedColumns?.includes(column.cid)}
                 />
                 {column.name}
               </label>

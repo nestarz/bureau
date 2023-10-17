@@ -88,6 +88,8 @@ export type About = {
   email?: Maybe<Scalars['String']['output']>;
   logo_image_json?: Maybe<Scalars['JSON']['output']>;
   url?: Maybe<Scalars['String']['output']>;
+  newsletter_url?: Maybe<Scalars['String']['output']>;
+  image_json?: Maybe<Scalars['JSON']['output']>;
 };
 
 
@@ -115,6 +117,16 @@ export type AboutUrlArgs = {
   path?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type AboutNewsletter_UrlArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type AboutImage_JsonArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type About_Bool_Exp = {
   id?: InputMaybe<Int_Comparison_Exp>;
   title?: InputMaybe<String_Comparison_Exp>;
@@ -122,6 +134,8 @@ export type About_Bool_Exp = {
   email?: InputMaybe<String_Comparison_Exp>;
   logo_image_json?: InputMaybe<String_Comparison_Exp>;
   url?: InputMaybe<String_Comparison_Exp>;
+  newsletter_url?: InputMaybe<String_Comparison_Exp>;
+  image_json?: InputMaybe<String_Comparison_Exp>;
   _or?: InputMaybe<Array<About_Bool_Exp>>;
   _and?: InputMaybe<Array<About_Bool_Exp>>;
 };
@@ -151,6 +165,8 @@ export type About_Order_By = {
   email?: InputMaybe<Order_By>;
   logo_image_json?: InputMaybe<Order_By>;
   url?: InputMaybe<Order_By>;
+  newsletter_url?: InputMaybe<Order_By>;
+  image_json?: InputMaybe<Order_By>;
 };
 
 export enum Order_By {
@@ -489,6 +505,8 @@ export type About_Set_Input = {
   email?: InputMaybe<Scalars['String']['input']>;
   logo_image_json?: InputMaybe<Scalars['JSON']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
+  newsletter_url?: InputMaybe<Scalars['String']['input']>;
+  image_json?: InputMaybe<Scalars['JSON']['input']>;
 };
 
 export type About_Pk_Columns_Input = {
@@ -502,6 +520,8 @@ export type About_Insert_Input = {
   email?: InputMaybe<Scalars['String']['input']>;
   logo_image_json?: InputMaybe<Scalars['JSON']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
+  newsletter_url?: InputMaybe<Scalars['String']['input']>;
+  image_json?: InputMaybe<Scalars['JSON']['input']>;
 };
 
 export type About_On_Conflict = {
