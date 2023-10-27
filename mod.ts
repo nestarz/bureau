@@ -27,7 +27,7 @@ export interface ContentManagmentSystemOptions {
     | Parameters<typeof middleware>[0][];
 }
 
-export default ({
+export default async ({
   prefix,
   s3Client,
   getS3Uri,
