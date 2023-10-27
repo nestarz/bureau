@@ -65,7 +65,7 @@ export default ({
     "/api/medias": withMiddlewares((req: Request) =>
       ApiMedias.handler(req, { s3Client, getS3Uri })
     ),
-    [Islands.config.routeOverride]: Islands.createHandler({
+    [Islands.config.routeOverride]: await Islands.createHandler({
       key: "@bureaudouble/bureau",
       jsxImportSource: "preact",
       baseUrl: new URL(import.meta.url),
