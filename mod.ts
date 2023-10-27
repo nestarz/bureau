@@ -1,4 +1,4 @@
-import * as Islands from "https://deno.land/x/islet@0.0.29/server.ts";
+import * as Islands from "https://deno.land/x/islet@0.0.30/server.ts";
 import createRenderPipe from "https://deno.land/x/outils@0.0.48/createRenderPipe.ts";
 import middleware from "https://deno.land/x/outils@0.0.48/fresh/middleware.ts";
 import * as staticFileRoute from "https://deno.land/x/outils@0.0.48/staticFileRoute.ts";
