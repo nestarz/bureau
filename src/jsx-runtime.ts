@@ -4,7 +4,7 @@ import {
   cloneElement,
   Fragment,
 } from "https://esm.sh/preact@10.17.1&target=es2020";
-import { createJsx } from "https://deno.land/x/islet@0.0.38/server.ts";
+import { createJsx } from "https://deno.land/x/islet@0.0.37/server.ts";
 
 export const jsx = createJsx({
   jsx: _jsx,
