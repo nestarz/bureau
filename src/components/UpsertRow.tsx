@@ -170,7 +170,7 @@ const ForeignInput = ({ tables, references, to, register, name, control }) => {
             table.columns
               .filter((column) => column.references)
               .map((column) => {
-                const table = tables.find((table) => table.name === references);
+                const table = tables.find((table) => table.name === column.references);
                 const fcolumn = table.columns.find(({ name }) =>
                   /title|name|key/.test(name)
                 );
