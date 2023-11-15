@@ -220,8 +220,8 @@ export default ({ params: { tableName } }: TableProps) => {
         {filteredColumns.map(({ name }) => {
           const displayName = name
             .replace(/_json/gi, "")
-            .replace(/(^|_)id($|_)/, "$1ID$2")
-            .replace(/_/, " ");
+            .replace(/(^|_)id($|_)/gi, "$1ID$2")
+            .replace(/_/gi, " ");
           return (
             <div
               key={name}
