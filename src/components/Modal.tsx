@@ -1,7 +1,7 @@
 import { Fragment, h, hydrate } from "preact";
 export { h, hydrate };
 import { useEffect, useRef } from "preact/hooks";
-import { twind, default as twindConfig } from "../../twind.config.ts";
+import { default as twindConfig, twind } from "../../twind.config.ts";
 
 await twind(twindConfig("/admin/"));
 
@@ -20,6 +20,27 @@ export default ({
     onClose?.();
   };
   useEffect(() => initialOpen && open(), []);
+
+  useEffect(() => {
+    let mouseDownInside = false;
+    const dialog = ref.current;
+    if (!dialog) return;
+
+    const handleMouseDown = (e: MouseEvent) =>
+      mouseDownInside = e.target === dialog;
+    dialog.addEventListener("mousedown", handleMouseDown);
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (mouseDownInside && e.target === dialog) close();
+    };
+    dialog.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      dialog.removeEventListener("mousedown", handleMouseDown);
+      dialog.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [ref, close]);
+
   return (
     <Fragment>
       {button?.({ open, close })}
@@ -28,9 +49,6 @@ export default ({
         className={className}
         onClose={close}
         onCancel={close}
-        onClick={(e: EventHandler<TargetedMouseEvent<HTMLDialogElement>>) => {
-          e.target.tagName === "DIALOG" && close();
-        }}
         {...(props ?? {})}
       >
         {typeof children === "function" ? children({ open, close }) : children}

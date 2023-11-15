@@ -1,5 +1,5 @@
 import { lookup } from "https://deno.land/x/mrmime@v1.0.1/mod.ts";
-import type { S3Client } from "https://deno.land/x/s3_lite_client@0.5.0/mod.ts";
+import type { S3Client } from "https://deno.land/x/s3_lite_client@0.6.1/mod.ts";
 
 export const handler = async (
   req: Request,

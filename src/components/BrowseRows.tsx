@@ -4,16 +4,16 @@ import { Fragment, h, hydrate } from "preact";
 import { Link } from "wouter";
 export { h, hydrate };
 
-import type { Column, TableInfo, Row } from "../utils/useStore.ts";
+import type { Column, Row, TableInfo } from "../utils/useStore.ts";
 import findForeignKeyFields, {
   findKeyColumn,
   findTable,
 } from "../utils/findForeignKeyFields.ts";
-import { useQuery, gqlify, useLazyQuery, debounce } from "../utils/useHttp.ts";
+import { debounce, gqlify, useLazyQuery, useQuery } from "../utils/useHttp.ts";
 import { toArray } from "../utils/utils.ts";
 import DisplayObject from "./DisplayObject.tsx";
 import DraggableList from "./DraggableList.tsx";
-import { useStore, useSignalEffectWithInputs } from "../utils/useStore.ts";
+import { useSignalEffectWithInputs, useStore } from "../utils/useStore.ts";
 import Alert from "./Alert.tsx";
 
 interface InfoRecordProps {
@@ -34,7 +34,7 @@ export const findNested = (
   tables: TableInfo[],
   column: Column,
   cell: Record<string, any>,
-  depth: number
+  depth: number,
 ) => {
   const ftable = findTable(tables, column.references);
   const fcolumn = ftable ? findKeyColumn(ftable.columns) : null;
@@ -73,15 +73,17 @@ export default ({ params: { tableName } }: TableProps) => {
   } = useQuery(
     gqlify({
       query: {
-        [gqlify(tableName, {
-          limit: 500,
-          ...(sortColumn ? { order_by: { [sortColumn.name]: "asc" } } : {}),
-        })]: {
+        [
+          gqlify(tableName, {
+            limit: 500,
+            ...(sortColumn ? { order_by: { [sortColumn.name]: "asc" } } : {}),
+          })
+        ]: {
           ...Object.fromEntries(columns.map(({ name }) => [name, true])),
           ...columns.reduce(findForeignKeyFields(tables, 2), {}),
         },
       },
-    })
+    }),
   );
 
   useSignalEffectWithInputs(() => {
@@ -93,13 +95,15 @@ export default ({ params: { tableName } }: TableProps) => {
   const [remove, removeState] = useLazyQuery(
     gqlify({
       [gqlify("mutation", { $in: "[Int!]" })]: {
-        [gqlify("delete_".concat(tableName), {
-          where: { [pk?.name]: { _in: "$in" } },
-        })]: {
+        [
+          gqlify("delete_".concat(tableName), {
+            where: { [pk?.name]: { _in: "$in" } },
+          })
+        ]: {
           [pk?.name]: true,
         },
       },
-    })
+    }),
   );
 
   const [reorder, reorderState] = useLazyQuery(
@@ -108,7 +112,7 @@ export default ({ params: { tableName } }: TableProps) => {
         [gqlify("update_".concat(tableName, "_many"), { updates: "$updates" })]:
           { affected_rows: true },
       },
-    })
+    }),
   );
 
   const indices = useSignal<number[]>([]);
@@ -121,7 +125,7 @@ export default ({ params: { tableName } }: TableProps) => {
 
   const saveReorder = useCallback(
     debounce(() => {
-      if (pk && sortColumn)
+      if (pk && sortColumn) {
         return reorder({
           variables: {
             updates: indices.peek().map((idx) => ({
@@ -132,8 +136,9 @@ export default ({ params: { tableName } }: TableProps) => {
             })),
           },
         });
+      }
     }),
-    [reorder, JSON.stringify({ pk, table })]
+    [reorder, JSON.stringify({ pk, table })],
   );
 
   const hasOrder = !!sortColumn;
@@ -155,17 +160,17 @@ export default ({ params: { tableName } }: TableProps) => {
   const [selectedColumns, setSelectedColumns] = useState();
 
   useEffect(
-    () => void setSelectedColumns(columns.slice(0, 8).map((d) => d.cid)),
-    [JSON.stringify(columns)]
+    () =>
+      void setSelectedColumns(
+        columns.filter((d) => d.name !== "order").slice(0, 8).map((d) => d.cid),
+      ),
+    [JSON.stringify(columns)],
   );
-  const filteredColumns =
-    (selectedColumns?.length ?? 0) > 0
-      ? columns.filter((v) => selectedColumns?.includes(v.cid))
-      : columns;
+  const filteredColumns = (selectedColumns?.length ?? 0) > 0
+    ? columns.filter((v) => selectedColumns?.includes(v.cid))
+    : columns;
 
-  return loading ? (
-    <Alert loading={loading} error={error} />
-  ) : (
+  return loading ? <Alert loading={loading} error={error} /> : (
     <Fragment>
       <div
         className={`relative bg-white grid grid-cols-[${
@@ -186,7 +191,7 @@ export default ({ params: { tableName } }: TableProps) => {
                     .map((d) => parseInt(d.value))
                     .includes(column.cid)
                 )
-                .map((column) => column.cid)
+                .map((column) => column.cid),
             );
           }}
         >
@@ -209,13 +214,14 @@ export default ({ params: { tableName } }: TableProps) => {
           </div>
         </details>
         {hasOrder && (
-          <div className="flex items-start justify-center px-6 py-3 border-b-1 border-slate-200 leading-none"></div>
+          <div className="flex items-start justify-center px-6 py-3 border-b-1 border-slate-200 leading-none">
+          </div>
         )}
         {filteredColumns.map(({ name }) => {
           const displayName = name
             .replace(/_json/gi, "")
-            .replace(/_/, " ")
-            .replace(/^id$/, "ID");
+            .replace(/(^|_)id($|_)/, "$1ID$2")
+            .replace(/_/, " ");
           return (
             <div
               key={name}
@@ -225,7 +231,8 @@ export default ({ params: { tableName } }: TableProps) => {
             </div>
           );
         })}
-        <div className="flex items-start justify-center px-6 py-3 border-b-1 border-slate-200"></div>
+        <div className="flex items-start justify-center px-6 py-3 border-b-1 border-slate-200">
+        </div>
         <DraggableList onMove={move}>
           {reorderedTable.value.map((row, index) => (
             <Fragment>
@@ -245,10 +252,10 @@ export default ({ params: { tableName } }: TableProps) => {
                     tables,
                     column,
                     row,
-                    1
+                    1,
                   );
                   const renderChildren = (
-                    children: ReturnType<typeof findNested>["children"]
+                    children: ReturnType<typeof findNested>["children"],
                   ) => {
                     return children?.map(({ name, value, children }, index) => (
                       <Fragment key={index}>
@@ -266,18 +273,18 @@ export default ({ params: { tableName } }: TableProps) => {
                       className="truncate flex flex-col gap-1 px-6 py-3 whitespace-no-wrap text-sm leading-5 text-gray-500 group-hover:bg-gray-50 border-b-1 border-slate-50"
                     >
                       <div className="flex gap-1">
-                        {column.references || column.pk ? (
-                          <InfoRecord label={cellValue} />
-                        ) : (
-                          toArray(cellValue).map((value, i) => (
-                            <DisplayObject
-                              key={i}
-                              className="w-5 h-5 object-cover rounded-sm ring-1 ring-slate-200"
-                              value={value}
-                              asAsset
-                            />
-                          ))
-                        )}
+                        {column.references || column.pk
+                          ? <InfoRecord label={cellValue} />
+                          : (
+                            toArray(cellValue).map((value, i) => (
+                              <DisplayObject
+                                key={i}
+                                className="w-5 h-5 object-cover rounded-sm ring-1 ring-slate-200"
+                                value={value}
+                                asAsset
+                              />
+                            ))
+                          )}
                         <span>{value}</span>
                       </div>
                       <div>{renderChildren(children)}</div>

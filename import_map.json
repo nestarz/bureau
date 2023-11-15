@@ -1,20 +1,20 @@
 {
   "imports": {
-    "wouter": "https://esm.sh/wouter@2.11.0/preact?deps=preact@10.17.1&target=es2022",
-    "preact": "https://esm.sh/preact@10.17.1?target=es2022",
-    "preact/hooks": "https://esm.sh/preact@10.17.1/hooks.js?target=es2022",
-    "@preact/signals-core": "https://esm.sh/@preact/signals-core@1.4.0",
-    "@preact/signals": "https://esm.sh/@preact/signals@1.2.1?deps=preact@10.17.1&target=es2022",
+    "wouter": "https://esm.sh/wouter@2.12.1/preact?deps=preact@10.19.2&target=es2022",
+    "preact": "https://esm.sh/preact@10.19.2?target=es2022",
+    "preact/hooks": "https://esm.sh/preact@10.19.2/hooks.js?target=es2022",
+    "@preact/signals-core": "https://esm.sh/@preact/signals-core@1.5.0",
+    "@preact/signals": "https://esm.sh/@preact/signals@1.2.1?deps=preact@10.19.2&target=es2022",
     "clsx": "https://esm.sh/clsx@1.2.1",
     "generic/": "https://gist.githubusercontent.com/nestarz/00d675775afd040a4c768c1c45bc04ee/raw/e783e3d1c2e59326e4edce3591d4e3111458d1d0/",
     "generic": "https://gist.githubusercontent.com/nestarz/75152033d6bbbddc1dc573f5c228ad24/raw/db00173e3792ccd621c7a9f2602d48298ca09d06/Test.tsx",
-    "@tiptap/core": "https://esm.sh/@tiptap/core@2.0.3",
-    "@tiptap/starter-kit": "https://esm.sh/@tiptap/starter-kit@2.0.3",
-    "@tiptap/extension-link": "https://esm.sh/@tiptap/extension-link@2.0.3",
-    "@tiptap/extension-underline": "https://esm.sh/@tiptap/extension-underline@2.0.3",
-    "tailwindcss-classnames": "https://esm.sh/v103/tailwindcss-classnames@3.0.7/es2022/tailwindcss-classnames.js",
-    "preact/": "https://esm.sh/preact@10.17.1&target=es2022/",
-    "preact/jsx-runtime": "https://esm.sh/*preact@10.17.1/jsx-runtime.js?target=es2022",
-    "preact/jsx-dev-runtime": "https://esm.sh/*preact@10.17.1/jsx-dev-runtime.js?target=es2022"
+    "@tiptap/core": "https://esm.sh/@tiptap/core@2.1.12",
+    "@tiptap/starter-kit": "https://esm.sh/@tiptap/starter-kit@2.1.12",
+    "@tiptap/extension-link": "https://esm.sh/@tiptap/extension-link@2.1.12",
+    "@tiptap/extension-underline": "https://esm.sh/@tiptap/extension-underline@2.1.12",
+    "tailwindcss-classnames": "https://esm.sh/v134/tailwindcss-classnames@3.1.0/es2022/tailwindcss-classnames.js",
+    "preact/": "https://esm.sh/preact@10.19.2&target=es2022/",
+    "preact/jsx-runtime": "https://esm.sh/*preact@10.19.2/jsx-runtime.js?target=es2022",
+    "preact/jsx-dev-runtime": "https://esm.sh/*preact@10.19.2/jsx-dev-runtime.js?target=es2022"
   }
 }

@@ -1,4 +1,4 @@
-/** @jsxImportSource https://esm.sh/preact@10.17.1&target=es2022 */
+/** @jsxImportSource https://esm.sh/preact@10.19.2&target=es2022 */
 import { h, hydrate } from "preact";
 import clsx from "clsx";
 import { Link, Route, useRoute, Router } from "wouter";
@@ -42,7 +42,7 @@ const Nav = () => {
               isTable: true,
               active: params?.table === name,
             })),
-            { name: "SQL Editor", href: "/sql", className: "!mt-auto" },
+            { name: "SQL Editor", href: "/sql", className: "!mt-auto opacity-0 hover:opacity-100" },
           ].map(({ className, name, href, active }) => (
             <li
               className={clsx(
