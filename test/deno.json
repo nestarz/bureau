@@ -10,9 +10,9 @@
   },
   "imports": {
     "@/": "./",
-    "islet/server": "https://deno.land/x/islet@0.0.20/server.ts",
-    "islet/client": "https://deno.land/x/islet@0.0.20/client.ts",
-    "islet/preact/jsx-runtime": "https://deno.land/x/islet@0.0.20/src/preact/jsx-runtime.ts",
+    "islet/server": "https://deno.land/x/islet@0.0.58/server.ts",
+    "islet/client": "https://deno.land/x/islet@0.0.58/client.ts",
+    "islet/preact/jsx-runtime": "https://deno.land/x/islet@0.0.58/src/preact/jsx-runtime.ts",
     "preact": "https://esm.sh/preact@10.19.2&target=es2022",
     "preact/": "https://esm.sh/preact@10.19.2&target=es2022/",
     "preact-render-to-string": "https://esm.sh/preact-render-to-string@6.2.1?target=es2022&external=preact",
@@ -21,7 +21,7 @@
     "$fresh/": "https://deno.land/x/fresh@1.4.2/",
     "rutt": "https://deno.land/x/rutt@0.1.0/mod.ts",
     "std/": "https://deno.land/std@0.201.0/",
-    "outils/": "https://deno.land/x/outils@0.0.81/",
+    "outils/": "https://deno.land/x/outils@0.0.103/",
     "s3_lite_client": "https://deno.land/x/s3_lite_client@0.6.1/mod.ts"
   }
 }

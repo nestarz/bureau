@@ -1,26 +1,27 @@
 export const sharp = (url, { w = 200, q = 60 } = {}) =>
   url.includes(".svg")
     ? url
-    : `https://image-transformer.vercel.app/api/transformer?w=${w}&q=${q}&format=jpg&src=${encodeURIComponent(
-        url
-      )}`;
+    : `https://image-transformer.vercel.app/api/transformer?w=${w}&q=${q}&format=jpg&src=${
+      encodeURIComponent(
+        url,
+      )
+    }`;
 
 export const unique =
   (fn: (args: any) => any) => (a: any, i: number, arr: Array<any>) =>
     i === arr.findIndex((b: any) => fn(a) === fn(b));
 
 export const convertToPlain = (obj: any) => {
-  const innerHTML =
-    typeof obj === "string"
-      ? obj
-      : String(obj).length > 0
-      ? JSON.stringify(obj)
-      : null;
+  const innerHTML = typeof obj === "string"
+    ? obj
+    : String(obj).length > 0
+    ? JSON.stringify(obj)
+    : null;
   return typeof innerHTML === "string" && innerHTML?.trim()
     ? globalThis.document
       ? Object.assign(globalThis.document.createElement("fragment"), {
-          innerHTML,
-        }).textContent
+        innerHTML,
+      }).textContent
       : innerHTML.replace(/<[^>]+>/g, "")
     : "";
 };
@@ -40,6 +41,18 @@ export const isOutside =
       e.offsetX > e.target.offsetWidth ||
       e.offsetY < 0 ||
       e.offsetY > e.target.offsetHeight
-    )
+    ) {
       fn(e);
+    }
   };
+
+export const slugify = (text: string | undefined) =>
+  text
+    ?.toString()
+    ?.normalize("NFD")
+    ?.replace(/[\u0300-\u036f]/g, "")
+    ?.toLowerCase()
+    ?.trim()
+    ?.replace(/\s+/g, "-")
+    ?.replace(/[^\w-]+/g, "")
+    ?.replace(/--+/g, "-");

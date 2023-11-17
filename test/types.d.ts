@@ -53,6 +53,9 @@ export type Query = {
   product_variant_stocks_by_pk?: Maybe<Product_Variant_Stocks>;
   product_variant_stocks?: Maybe<Array<Maybe<Product_Variant_Stocks>>>;
   product_variant_stocks_aggregate?: Maybe<Product_Variant_Stocks_Aggregate>;
+  product_variant_fabrics_by_pk?: Maybe<Product_Variant_Fabrics>;
+  product_variant_fabrics?: Maybe<Array<Maybe<Product_Variant_Fabrics>>>;
+  product_variant_fabrics_aggregate?: Maybe<Product_Variant_Fabrics_Aggregate>;
 };
 
 
@@ -204,6 +207,19 @@ export type QueryProduct_Variant_Stocks_By_PkArgs = {
 export type QueryProduct_Variant_StocksArgs = {
   where?: InputMaybe<Product_Variant_Stocks_Bool_Exp>;
   order_by?: InputMaybe<Product_Variant_Stocks_Order_By>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryProduct_Variant_Fabrics_By_PkArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryProduct_Variant_FabricsArgs = {
+  where?: InputMaybe<Product_Variant_Fabrics_Bool_Exp>;
+  order_by?: InputMaybe<Product_Variant_Fabrics_Order_By>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -373,6 +389,7 @@ export type Products = {
   description?: Maybe<Scalars['String']['output']>;
   collection_id?: Maybe<Scalars['Int']['output']>;
   type_id?: Maybe<Scalars['Int']['output']>;
+  price?: Maybe<Scalars['Int']['output']>;
   category_id_by_fk?: Maybe<Categories>;
   collection_id_by_fk?: Maybe<Collections>;
   type_id_by_fk?: Maybe<Types>;
@@ -510,7 +527,9 @@ export type Product_Variants = {
   color_id_by_fk?: Maybe<Colors>;
   material_id_by_fk?: Maybe<Materials>;
   product_variant_stocks_by_product_variant_id?: Maybe<Array<Maybe<Product_Variant_Stocks>>>;
+  product_variant_fabrics_by_product_variant_id?: Maybe<Array<Maybe<Product_Variant_Fabrics>>>;
   product_variant_stocks_aggregate?: Maybe<Product_Variant_Stocks_Aggregate>;
+  product_variant_fabrics_aggregate?: Maybe<Product_Variant_Fabrics_Aggregate>;
 };
 
 
@@ -531,13 +550,24 @@ export type Product_VariantsProduct_Variant_Stocks_By_Product_Variant_IdArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
+export type Product_VariantsProduct_Variant_Fabrics_By_Product_Variant_IdArgs = {
+  order_by?: InputMaybe<Product_Variants_Order_By>;
+  where?: InputMaybe<Product_Variants_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Colors = {
   __typename?: 'colors';
   id?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   image_json?: Maybe<Scalars['JSON']['output']>;
+  color_hex?: Maybe<Scalars['String']['output']>;
   product_variants_by_color_id?: Maybe<Array<Maybe<Product_Variants>>>;
+  product_variant_fabrics_by_color_id?: Maybe<Array<Maybe<Product_Variant_Fabrics>>>;
   product_variants_aggregate?: Maybe<Product_Variants_Aggregate>;
+  product_variant_fabrics_aggregate?: Maybe<Product_Variant_Fabrics_Aggregate>;
 };
 
 
@@ -551,7 +581,20 @@ export type ColorsImage_JsonArgs = {
 };
 
 
+export type ColorsColor_HexArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type ColorsProduct_Variants_By_Color_IdArgs = {
+  order_by?: InputMaybe<Colors_Order_By>;
+  where?: InputMaybe<Colors_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type ColorsProduct_Variant_Fabrics_By_Color_IdArgs = {
   order_by?: InputMaybe<Colors_Order_By>;
   where?: InputMaybe<Colors_Bool_Exp>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -562,19 +605,33 @@ export type Colors_Order_By = {
   id?: InputMaybe<Order_By>;
   name?: InputMaybe<Order_By>;
   image_json?: InputMaybe<Order_By>;
+  color_hex?: InputMaybe<Order_By>;
 };
 
 export type Colors_Bool_Exp = {
   id?: InputMaybe<Int_Comparison_Exp>;
   name?: InputMaybe<String_Comparison_Exp>;
   image_json?: InputMaybe<String_Comparison_Exp>;
+  color_hex?: InputMaybe<String_Comparison_Exp>;
   _or?: InputMaybe<Array<Colors_Bool_Exp>>;
   _and?: InputMaybe<Array<Colors_Bool_Exp>>;
 };
 
-export type Product_Variants_Aggregate = {
-  __typename?: 'product_variants_aggregate';
-  aggregate?: Maybe<Aggregate>;
+export type Product_Variant_Fabrics = {
+  __typename?: 'product_variant_fabrics';
+  id?: Maybe<Scalars['Int']['output']>;
+  product_variant_id: Scalars['Int']['output'];
+  material_id: Scalars['Int']['output'];
+  color_id: Scalars['Int']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  product_variant_id_by_fk?: Maybe<Product_Variants>;
+  material_id_by_fk?: Maybe<Materials>;
+  color_id_by_fk?: Maybe<Colors>;
+};
+
+
+export type Product_Variant_FabricsDescriptionArgs = {
+  path?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Materials = {
@@ -582,7 +639,9 @@ export type Materials = {
   id?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
   product_variants_by_material_id?: Maybe<Array<Maybe<Product_Variants>>>;
+  product_variant_fabrics_by_material_id?: Maybe<Array<Maybe<Product_Variant_Fabrics>>>;
   product_variants_aggregate?: Maybe<Product_Variants_Aggregate>;
+  product_variant_fabrics_aggregate?: Maybe<Product_Variant_Fabrics_Aggregate>;
 };
 
 
@@ -592,6 +651,14 @@ export type MaterialsNameArgs = {
 
 
 export type MaterialsProduct_Variants_By_Material_IdArgs = {
+  order_by?: InputMaybe<Materials_Order_By>;
+  where?: InputMaybe<Materials_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MaterialsProduct_Variant_Fabrics_By_Material_IdArgs = {
   order_by?: InputMaybe<Materials_Order_By>;
   where?: InputMaybe<Materials_Bool_Exp>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -608,6 +675,16 @@ export type Materials_Bool_Exp = {
   name?: InputMaybe<String_Comparison_Exp>;
   _or?: InputMaybe<Array<Materials_Bool_Exp>>;
   _and?: InputMaybe<Array<Materials_Bool_Exp>>;
+};
+
+export type Product_Variants_Aggregate = {
+  __typename?: 'product_variants_aggregate';
+  aggregate?: Maybe<Aggregate>;
+};
+
+export type Product_Variant_Fabrics_Aggregate = {
+  __typename?: 'product_variant_fabrics_aggregate';
+  aggregate?: Maybe<Aggregate>;
 };
 
 export type Product_Variant_Stocks = {
@@ -687,6 +764,7 @@ export type Products_Order_By = {
   description?: InputMaybe<Order_By>;
   collection_id?: InputMaybe<Order_By>;
   type_id?: InputMaybe<Order_By>;
+  price?: InputMaybe<Order_By>;
 };
 
 export type Products_Bool_Exp = {
@@ -698,6 +776,7 @@ export type Products_Bool_Exp = {
   description?: InputMaybe<String_Comparison_Exp>;
   collection_id?: InputMaybe<Int_Comparison_Exp>;
   type_id?: InputMaybe<Int_Comparison_Exp>;
+  price?: InputMaybe<Int_Comparison_Exp>;
   _or?: InputMaybe<Array<Products_Bool_Exp>>;
   _and?: InputMaybe<Array<Products_Bool_Exp>>;
 };
@@ -762,6 +841,24 @@ export type Product_Variant_Stocks_Order_By = {
   quantity?: InputMaybe<Order_By>;
 };
 
+export type Product_Variant_Fabrics_Bool_Exp = {
+  id?: InputMaybe<Int_Comparison_Exp>;
+  product_variant_id?: InputMaybe<Int_Comparison_Exp>;
+  material_id?: InputMaybe<Int_Comparison_Exp>;
+  color_id?: InputMaybe<Int_Comparison_Exp>;
+  description?: InputMaybe<String_Comparison_Exp>;
+  _or?: InputMaybe<Array<Product_Variant_Fabrics_Bool_Exp>>;
+  _and?: InputMaybe<Array<Product_Variant_Fabrics_Bool_Exp>>;
+};
+
+export type Product_Variant_Fabrics_Order_By = {
+  id?: InputMaybe<Order_By>;
+  product_variant_id?: InputMaybe<Order_By>;
+  material_id?: InputMaybe<Order_By>;
+  color_id?: InputMaybe<Order_By>;
+  description?: InputMaybe<Order_By>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   update_archives_one?: Maybe<Archives>;
@@ -819,6 +916,11 @@ export type Mutation = {
   insert_product_variant_stocks_one?: Maybe<Product_Variant_Stocks>;
   insert_product_variant_stocks?: Maybe<Array<Maybe<Product_Variant_Stocks>>>;
   update_product_variant_stocks_many?: Maybe<Array<Maybe<Product_Variant_Stocks_Mutation_Response>>>;
+  update_product_variant_fabrics_one?: Maybe<Product_Variant_Fabrics>;
+  delete_product_variant_fabrics?: Maybe<Product_Variant_Fabrics>;
+  insert_product_variant_fabrics_one?: Maybe<Product_Variant_Fabrics>;
+  insert_product_variant_fabrics?: Maybe<Array<Maybe<Product_Variant_Fabrics>>>;
+  update_product_variant_fabrics_many?: Maybe<Array<Maybe<Product_Variant_Fabrics_Mutation_Response>>>;
 };
 
 
@@ -1129,6 +1231,34 @@ export type MutationUpdate_Product_Variant_Stocks_ManyArgs = {
   updates: Array<Product_Variant_Stocks_Updates_Input>;
 };
 
+
+export type MutationUpdate_Product_Variant_Fabrics_OneArgs = {
+  _set: Product_Variant_Fabrics_Set_Input;
+  pk_columns?: InputMaybe<Product_Variant_Fabrics_Pk_Columns_Input>;
+};
+
+
+export type MutationDelete_Product_Variant_FabricsArgs = {
+  where?: InputMaybe<Product_Variant_Fabrics_Bool_Exp>;
+};
+
+
+export type MutationInsert_Product_Variant_Fabrics_OneArgs = {
+  object: Product_Variant_Fabrics_Insert_Input;
+  on_conflict?: InputMaybe<Product_Variant_Fabrics_On_Conflict>;
+};
+
+
+export type MutationInsert_Product_Variant_FabricsArgs = {
+  objects: Array<InputMaybe<Product_Variant_Fabrics_Insert_Input>>;
+  on_conflict?: InputMaybe<Product_Variant_Fabrics_On_Conflict>;
+};
+
+
+export type MutationUpdate_Product_Variant_Fabrics_ManyArgs = {
+  updates: Array<Product_Variant_Fabrics_Updates_Input>;
+};
+
 export type Archives_Set_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -1260,6 +1390,7 @@ export type Products_Set_Input = {
   description?: InputMaybe<Scalars['String']['input']>;
   collection_id?: InputMaybe<Scalars['Int']['input']>;
   type_id?: InputMaybe<Scalars['Int']['input']>;
+  price?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Products_Pk_Columns_Input = {
@@ -1275,6 +1406,7 @@ export type Products_Insert_Input = {
   description?: InputMaybe<Scalars['String']['input']>;
   collection_id?: InputMaybe<Scalars['Int']['input']>;
   type_id?: InputMaybe<Scalars['Int']['input']>;
+  price?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Products_On_Conflict = {
@@ -1300,12 +1432,14 @@ export type Products_Inc = {
   order?: InputMaybe<Scalars['Int']['input']>;
   collection_id?: InputMaybe<Scalars['Int']['input']>;
   type_id?: InputMaybe<Scalars['Int']['input']>;
+  price?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Colors_Set_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   image_json?: InputMaybe<Scalars['JSON']['input']>;
+  color_hex?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Colors_Pk_Columns_Input = {
@@ -1316,6 +1450,7 @@ export type Colors_Insert_Input = {
   id?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   image_json?: InputMaybe<Scalars['JSON']['input']>;
+  color_hex?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Colors_On_Conflict = {
@@ -1571,4 +1706,48 @@ export type Product_Variant_Stocks_Inc = {
   product_variant_id?: InputMaybe<Scalars['Int']['input']>;
   size_id?: InputMaybe<Scalars['Int']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type Product_Variant_Fabrics_Set_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  product_variant_id?: InputMaybe<Scalars['Int']['input']>;
+  material_id?: InputMaybe<Scalars['Int']['input']>;
+  color_id?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Product_Variant_Fabrics_Pk_Columns_Input = {
+  id: Scalars['Int']['input'];
+};
+
+export type Product_Variant_Fabrics_Insert_Input = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  product_variant_id: Scalars['Int']['input'];
+  material_id: Scalars['Int']['input'];
+  color_id: Scalars['Int']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Product_Variant_Fabrics_On_Conflict = {
+  constraint?: InputMaybe<Scalars['String']['input']>;
+  action: Conflict_Action;
+};
+
+export type Product_Variant_Fabrics_Mutation_Response = {
+  __typename?: 'product_variant_fabrics_mutation_response';
+  affected_rows?: Maybe<Scalars['Int']['output']>;
+  returning: Array<Product_Variant_Fabrics>;
+};
+
+export type Product_Variant_Fabrics_Updates_Input = {
+  where?: InputMaybe<Product_Variant_Fabrics_Bool_Exp>;
+  _inc?: InputMaybe<Product_Variant_Fabrics_Inc>;
+  _set?: InputMaybe<Product_Variant_Fabrics_Set_Input>;
+};
+
+export type Product_Variant_Fabrics_Inc = {
+  id?: InputMaybe<Scalars['Int']['input']>;
+  product_variant_id?: InputMaybe<Scalars['Int']['input']>;
+  material_id?: InputMaybe<Scalars['Int']['input']>;
+  color_id?: InputMaybe<Scalars['Int']['input']>;
 };

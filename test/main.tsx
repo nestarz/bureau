@@ -27,7 +27,7 @@ const route = (module: Parameters<typeof renderPipe>[0]) => ({
   ),
 });
 
-await Deno.serve(
+Deno.serve(
   { port: 8028 },
   router({
     "/graphql": graphql.handler,

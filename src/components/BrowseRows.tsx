@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "preact/hooks";
 import { Fragment, h, hydrate } from "preact";
 import { Link } from "wouter";
 export { h, hydrate };
+import { json2csv } from "csv42";
 
 import type { Column, Row, TableInfo } from "../utils/useStore.ts";
 import findForeignKeyFields, {
@@ -10,7 +11,7 @@ import findForeignKeyFields, {
   findTable,
 } from "../utils/findForeignKeyFields.ts";
 import { debounce, gqlify, useLazyQuery, useQuery } from "../utils/useHttp.ts";
-import { toArray } from "../utils/utils.ts";
+import { slugify, toArray } from "../utils/utils.ts";
 import DisplayObject from "./DisplayObject.tsx";
 import DraggableList from "./DraggableList.tsx";
 import { useSignalEffectWithInputs, useStore } from "../utils/useStore.ts";
@@ -177,7 +178,7 @@ export default ({ params: { tableName } }: TableProps) => {
           hasOrder ? "min-content_" : ""
         }min-content_repeat(${
           filteredColumns.length - 1
-        },_auto)_min-content] overflow-hidden w-full rounded-md border border-slate-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600`}
+        },_auto)_min-content] w-full rounded-md border border-slate-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600`}
       >
         <details
           role="fieldset"
@@ -305,6 +306,43 @@ export default ({ params: { tableName } }: TableProps) => {
       </div>
       <Alert {...removeState} />
       <Alert {...reorderState} />
+      <button
+        type="button"
+        className="self-end hover:bg-slate-200 bg-slate-100 py-1 px-2 rounded focus:outline-none mt-1 text-xs"
+        onClick={() => {
+          const csvString = json2csv(reorderedTable.value.map((row) =>
+            Object.fromEntries(
+              filteredColumns.map((column) => [column.name, row[column.name]]),
+            )
+          ));
+          const dataBlob = new Blob([csvString], {
+            type: "text/csv;charset=utf-8;",
+          });
+          const link = document.createElement("a");
+          const url = URL.createObjectURL(dataBlob);
+          link.setAttribute("href", url);
+          link.setAttribute(
+            "download",
+            slugify(
+              [
+                tableName,
+                new Date().toISOString().replace("T", "-").replace(
+                  /[^\d|-]/g,
+                  "",
+                ),
+              ].join("_"),
+            ).concat(
+              ".csv",
+            ),
+          );
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }}
+      >
+        Download CSV
+      </button>
     </Fragment>
   );
 };
