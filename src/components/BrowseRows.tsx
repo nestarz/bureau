@@ -308,7 +308,7 @@ export default ({ params: { tableName } }: TableProps) => {
       <Alert {...reorderState} />
       <button
         type="button"
-        className="self-end hover:bg-slate-200 bg-slate-100 py-1 px-2 rounded focus:outline-none mt-1 text-xs"
+        className="self-end hover:bg-slate-200 bg-slate-100 py-1 px-2 rounded focus:outline-none mt-1 mb-4 text-xs"
         onClick={() => {
           const csvString = json2csv(reorderedTable.value.map((row) =>
             Object.fromEntries(
