@@ -62,6 +62,10 @@ const regex: { type: Mode; re: RegExp }[] = [
     re: /\b(?:((?:\w*_)*)(image|image|video|drawing|images|videos|drawings|svg)((?:_\w*)*))\b/,
   },
   {
+    type: "IMAGE",
+    re: /\b(?:((?:\w*_)*)(file|pdf)((?:_\w*)*))\b/,
+  },
+  {
     type: "DATE",
     re: /(\b(?:((?:\w*_)*)(date)((?:_\w*)*))\b)|(\b(?:((?:\w*_)*)(datetime|created_at|updated_at|time)((?:_\w*)*))\b)/,
   },
