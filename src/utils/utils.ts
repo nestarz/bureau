@@ -1,11 +1,11 @@
 export const sharp = (url, { w = 200, q = 60 } = {}) =>
-  url.includes(".svg")
+  url?.includes(".svg")
     ? url
-    : `https://image-transformer.vercel.app/api/transformer?w=${w}&q=${q}&format=jpg&src=${
-      encodeURIComponent(
-        url,
-      )
-    }`;
+    : url
+    ? `https://image-transformer.vercel.app/api/transformer?w=${w}&q=${q}&format=jpg&src=${encodeURIComponent(
+        url
+      )}`
+    : url;
 
 export const unique =
   (fn: (args: any) => any) => (a: any, i: number, arr: Array<any>) =>
