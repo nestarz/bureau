@@ -1,18 +1,34 @@
 import { h } from "preact";
 import { convertToPlain, sharp } from "../utils/utils.ts";
+import { useContext } from "preact/hooks";
+import { ApiContext } from "../utils/useHttp.ts";
 
 export default ({ value, className, sharpOptions = { w: 40 }, asAsset }) => {
-  const s3PublicUrl = Deno.env.get("S3_PUBLIC_URL");
+  const { s3PublicUrl } = useContext(ApiContext) ?? {};
+
   return value?.["content-type"]?.startsWith("image/") ? (
     <img
-      src={sharp(value?.url ? value?.url : (value?.key && s3PublicUrl) ? new URL(value.key, s3PublicUrl).href : null, sharpOptions)}
+      src={sharp(
+        value?.url
+          ? value?.url
+          : value?.key && s3PublicUrl
+          ? new URL(value.key, s3PublicUrl).href
+          : null,
+        sharpOptions
+      )}
       className={className}
       title={JSON.stringify(value)}
       loading="lazy"
     />
   ) : value?.["content-type"]?.startsWith("video/") ? (
     <video
-      src={value?.url ? value?.url : (value?.key && s3PublicUrl) ? new URL(value.key, s3PublicUrl).href : null}
+      src={
+        value?.url
+          ? value?.url
+          : value?.key && s3PublicUrl
+          ? new URL(value.key, s3PublicUrl).href
+          : null
+      }
       preload="metadata"
       className={className}
       title={JSON.stringify(value)}

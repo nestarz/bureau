@@ -1,9 +1,9 @@
 import {
-  useState,
-  useEffect,
-  useMemo,
   useCallback,
   useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "preact/hooks";
 import { createContext } from "preact";
 
@@ -37,6 +37,7 @@ export interface ApiContextProps {
   url: URL;
   headers: Headers;
   wss?: URL;
+  s3PublicUrl: string;
 }
 
 export const ApiContext = createContext<ApiContextProps | null>(null);
@@ -67,7 +68,7 @@ export const useFetch = (url: URL, options: RequestInit = {}) => {
         .catch((error) => setState((state) => ({ ...state, error })))
         .finally(() => setState((state) => ({ ...state, loading: false })));
     },
-    [url, JSON.stringify(options)]
+    [url, JSON.stringify(options)],
   );
   return { refetch, ...state };
 };
@@ -83,12 +84,12 @@ export const useLazyQuery = (
   { variables, loading = false }: UseQueryOptions = {
     variables: undefined,
     loading: false,
-  }
+  },
 ): [Trigger, QueryState] => {
   const { url, headers } = useContext(ApiContext) ?? {};
   const [state, setState] = useState<QueryState>({ loading });
-  const variablesStr =
-    useMemo(() => JSON.stringify(variables), [variables]) ?? "null";
+  const variablesStr = useMemo(() => JSON.stringify(variables), [variables]) ??
+    "null";
   const key = useMemo(() => {
     const entries = Object.fromEntries(headers?.entries?.() ?? []);
     return JSON.stringify({ url, headers: entries, variablesStr });
@@ -111,10 +112,10 @@ export const useLazyQuery = (
           const state = { loading: false, error: error ?? e, data };
           setState(state);
           return state;
-        }
+        },
       );
     },
-    [query, variablesStr, key]
+    [query, variablesStr, key],
   );
   return [trigger, state];
 };
@@ -139,7 +140,7 @@ const createCache = () => {
 const cache = createCache();
 export const useQuery = (
   query: string,
-  params?: UseQueryOptions | undefined
+  params?: UseQueryOptions | undefined,
 ) => {
   const [trigger, { data, ...state }] = useLazyQuery(query, {
     ...params,
@@ -158,7 +159,7 @@ export const useQuery = (
   };
 };
 
-export const ID = ((i) => (()=> i++))(0); // prettier-ignore
+export const ID = ((i) => (() => i++))(0); // prettier-ignore
 
 type SubscribeCallback = (args: {
   payload?:
@@ -191,7 +192,7 @@ export const createSubscribe = async ({
 
 export const useSubscription = (
   query: string,
-  { variables }: UseQueryOptions = { variables: undefined }
+  { variables }: UseQueryOptions = { variables: undefined },
 ) => {
   const { wss, headers } = useContext(ApiContext) ?? {};
   const [state, setState] = useState<QueryState>({ loading: true });
@@ -219,7 +220,7 @@ export const useSubscription = (
           payload: { data = undefined, errors: e = undefined } = {},
         }) => {
           if (payload) setState({ loading: false, error: e, data });
-        }
+        },
       );
     });
     return clearFn;
@@ -229,17 +230,20 @@ export const useSubscription = (
 };
 
 export const gqlify = (queryOrName: string | any, args?: any) => {
-  if (typeof queryOrName === "string")
+  if (typeof queryOrName === "string") {
     return `${queryOrName}${
       Object.entries(args).length > 0
-        ? `(${JSON.stringify(args)
+        ? `(${
+          JSON.stringify(args)
             .replace(/"/g, "")
-            .replace(/{(.*)}/gs, "$1")})`
+            .replace(/{(.*)}/gs, "$1")
+        })`
         : ""
     }`;
-  else
+  } else {
     return JSON.stringify(queryOrName, null, 4)
       .replace(/"([^"]+)":(\s*true|)/g, "$1")
       .replace(/'/g, '"')
       .replace(/{(.*)}/gs, "$1");
+  }
 };

@@ -42,7 +42,11 @@ const Nav = () => {
               isTable: true,
               active: params?.table === name,
             })),
-            { name: "SQL Editor", href: "/sql", className: "!mt-auto opacity-0 hover:opacity-100" },
+            {
+              name: "SQL Editor",
+              href: "/sql",
+              className: "!mt-auto opacity-0 hover:opacity-100",
+            },
           ].map(({ className, name, href, active }) => (
             <li
               className={clsx(
@@ -86,15 +90,18 @@ export default ({
   gqlHttpUrl,
   gqlWebsocketUrl,
   apiKey,
+  s3PublicUrl,
 }: {
   apiKey: string;
   gqlHttpUrl: string;
   gqlWebsocketUrl: string;
   className?: string;
+  s3PublicUrl: string;
 }) => (
   <div className={clsx(className, "flex", "gap-2")}>
     <ApiContext.Provider
       value={{
+        s3PublicUrl,
         url: new URL(gqlHttpUrl, window.location.origin),
         wss: new URL(gqlWebsocketUrl, window.location.origin),
         headers: new Headers({
