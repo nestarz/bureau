@@ -218,7 +218,9 @@ export default ({ onClose, onChange, value, multiple }) => {
                       asAsset
                     />
                     <span className="inline-grid text-xs">
-                      <span className="truncate">{value.key.split("/").pop()}</span>
+                      <span className="truncate">
+                        {value.key.split("/").pop()}
+                      </span>
                       <span className="truncate text-slate-500 leading-none">
                         {value.key.split("/").slice(0, -1).join("/")}
                       </span>
@@ -274,6 +276,18 @@ export default ({ onClose, onChange, value, multiple }) => {
                         method: "HEAD",
                         headers: { "Cache-Control": "no-store" },
                       }).then((r) => r.headers.get("content-type"));
+                      obj.metadata = await new Promise((resolve, reject) => {
+                        const image = new Image();
+                        image.addEventListener("load", () =>
+                          resolve({
+                            width: image.naturalWidth,
+                            height: image.naturalHeight,
+                          })
+                        );
+                        image.addEventListener("error", reject);
+                        image.src = obj.url;
+                      });
+
                       return obj;
                     })
                   );
