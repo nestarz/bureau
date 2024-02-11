@@ -4,6 +4,7 @@ import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
 import { Sidebar } from "@/src/components/Sidebar.tsx";
 import urlcat from "outils/urlcat.ts";
 import { formatColumnName } from "@/src/lib/formatColumnName.ts";
+import { Toaster } from "@/src/components/ui/sonner.tsx";
 
 export default async (
   _req: Request,
@@ -30,6 +31,7 @@ export default async (
         ]}
       />
       <ctx.Component />
+      <Toaster />
     </body>
   );
 };

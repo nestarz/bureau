@@ -11,18 +11,27 @@ export const Media = ({
   maxWidth: number;
 }) => (
   <div className={className}>
-    {/image\//.test(media["content-type"])
-      ? (
-        <Picture
-          src={media.url}
-          maxWidth={maxWidth}
-          className={cn(
-            "aspect-square object-contain w-full h-auto",
-            mediaClassName,
-          )}
-        />
-      )
-      : <div className="aspect-square w-full bg-foreground" />}
+    {/image\//.test(media["content-type"]) ? (
+      <Picture
+        src={media.url}
+        maxWidth={maxWidth}
+        className={cn(
+          "aspect-square object-contain w-full h-auto",
+          mediaClassName
+        )}
+      />
+    ) : /video\//.test(media["content-type"]) ? (
+      <video
+        src={media.url}
+        preload="metadata"
+        className={cn(
+          "aspect-square object-contain w-full h-auto",
+          mediaClassName
+        )}
+      />
+    ) : (
+      <div className="aspect-square w-full bg-foreground" />
+    )}
   </div>
 );
 

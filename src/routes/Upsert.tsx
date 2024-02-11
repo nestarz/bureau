@@ -8,6 +8,7 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import urlcat from "outils/urlcat.ts";
 import { sql } from "npm:kysely";
 import adjacentOrderRetrieval from "@/src/lib/adjacentQueryBuilder.ts";
+import { Toast } from "@/src/components/ui/sonner.tsx";
 
 export const config: RouteConfig["config"] = {
   routeOverride: "/upsert/:tableName{/}?",
@@ -25,26 +26,33 @@ export const handler = {
       (table) => table.name === ctx.params.tableName
     )!;
     const formData = await req.formData();
-    const returning = await ctx.state.clientQuery.default((qb) =>
-      (Object.entries(primaryKeys ?? {}).length > 0
-        ? qb
-            .updateTable(tableConfig.name)
-            .set(Object.fromEntries(formData))
-            .$if(true, (wb) => {
-              for (const [key, value] of Object.entries(primaryKeys)) {
-                wb = wb.where(key, "=", value);
-              }
-              return wb;
-            })
-            .returningAll()
-        : qb
-            .insertInto(tableConfig.name)
-            .values(Object.fromEntries(formData))
-            .returningAll()
-      ).compile()
-    );
+    const returning = await ctx.state.clientQuery
+      .default((qb) =>
+        (Object.entries(primaryKeys ?? {}).length > 0
+          ? qb
+              .updateTable(tableConfig.name)
+              .set(Object.fromEntries(formData))
+              .$if(true, (wb) => {
+                for (const [key, value] of Object.entries(primaryKeys)) {
+                  wb = wb.where(key, "=", value);
+                }
+                return wb;
+              })
+              .returningAll()
+          : qb
+              .insertInto(tableConfig.name)
+              .values(Object.fromEntries(formData))
+              .returningAll()
+        ).compile()
+      )
+      .then((data) => ({ data }))
+      .catch((error) => ({ error }));
 
-    return new Response(JSON.stringify(returning));
+    ctx.state.session.flash("x-data", returning);
+    return new Response(null, {
+      status: 302,
+      headers: { Location: req.url },
+    });
   },
 };
 
@@ -142,6 +150,8 @@ export default async (
       )
     : null;
 
+  const { data: saveData, error } = ctx.state.session.flash("x-data") ?? {};
+
   return (
     <form className="gap-4 bg-background p-6 col-span-4" method="POST">
       <div className="flex gap-2 w-full justify-between">
@@ -177,6 +187,9 @@ export default async (
             </a>
           </Button>
           <Button type="submit">Save changes</Button>
+          {(saveData || error) && (
+            <Toast string={saveData ? "Success" : error ? "Error" : null} />
+          )}
         </div>
       </div>
       <div className="grid gap-6 py-4">

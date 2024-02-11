@@ -23,7 +23,7 @@ import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTab
 
 const withWritePermission =
   (await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
-    "granted";
+  "granted";
 
 export default async ({
   parentPathSegment,
@@ -39,12 +39,15 @@ export default async ({
   parentPathSegment: string;
   database: any;
 }) => {
-  const getPrefixFn = (parentPathSegment: string) => (key: string) =>
-    import.meta.resolve("./" + join("_islet", parentPathSegment, "tailwindcss", key));
+  const getPrefixFn =
+    (parentPathSegment: string) =>
+    (key: string, absolute = false) => {
+      const path = join("_islet", parentPathSegment, "tailwindcss", key);
+      return absolute
+        ? new URL(import.meta.resolve("./".concat(path)))
+        : join(import.meta.dirname!, path);
+    };
   const getPrefix = getPrefixFn(parentPathSegment);
-  const withWritePermission =
-    (await Deno.permissions.query({ name: "write", path: Deno.cwd() }))
-      .state === "granted";
   if (withWritePermission && import.meta.url.startsWith("file://")) {
     const tailwindConfig = await import("./tailwind.config.ts");
     const postcss = (await import("postcss")).default;
@@ -56,18 +59,19 @@ export default async ({
       .process(tailwindConfig.globalCss, { from: undefined })
       .then((v) => v.css);
     const hash = getHashSync(newCss);
-    const path = getPrefix(`${hash}.css`);
+    const filename = getPrefix(`${hash}.css`, false);
     await Deno.remove(getPrefix(""), { recursive: true }).catch(() => null);
     await Deno.mkdir(getPrefix(""), { recursive: true });
     await Deno.writeTextFile(
       getPrefix("snapshot.json"),
-      JSON.stringify({ path }),
+      JSON.stringify({ filename })
     );
-    await Deno.writeTextFile(path, newCss);
+    console.log("writing", filename);
+    await Deno.writeTextFile(filename, newCss);
   }
-  const newCss = await fetch(getPrefix("snapshot.json"))
+  const newCss = await fetch(getPrefix("snapshot.json", true))
     .then((response) => response.json())
-    .then((snapshot) => Deno.readTextFile(snapshot.path))
+    .then((snapshot) => Deno.readTextFile(snapshot.filename))
     .catch(console.error)
     .catch(() => null);
 
@@ -79,7 +83,7 @@ export default async ({
         const string = await new Response(stream).text();
         return string.replace(
           string.includes("</head>") ? /(<\/head>)/ : /(.*)/,
-          (_, $1) => (newCss ? `<style tailwind>${newCss}</style>${$1}` : $1),
+          (_, $1) => (newCss ? `<style tailwind>${newCss}</style>${$1}` : $1)
         );
       })
   );
@@ -109,7 +113,7 @@ export default async ({
         databaseKey,
         analyticsKey,
       }),
-      renderPipe(module, { Layout }),
+      renderPipe(module, { Layout })
     ),
   });
 
@@ -126,7 +130,7 @@ export default async ({
       .reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
     ...[ApiMedias, Analytics, SqlEditor, Settings, Home, Upsert, Browse].reduce(
       (acc, module) => ({ ...acc, ...route(module) }),
-      {},
+      {}
     ),
     [staticFileRoute.config.routeOverride!]: staticFileRoute.createHandler({
       baseUrl: import.meta.url,

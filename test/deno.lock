@@ -27,6 +27,8 @@
       "npm:react-icons": "npm:react-icons@5.0.1_react@18.2.0",
       "npm:react@18.2.0": "npm:react@18.2.0",
       "npm:react@^18.2.0": "npm:react@18.2.0",
+      "npm:sonner": "npm:sonner@1.4.0_react@18.2.0_react-dom@18.2.0__react@18.2.0",
+      "npm:sonner@^1.4.0": "npm:sonner@1.4.0_react@18.2.0_react-dom@18.2.0__react@18.2.0",
       "npm:swr": "npm:swr@2.2.4_react@18.2.0",
       "npm:tailwind-merge@^2.2.1": "npm:tailwind-merge@2.2.1",
       "npm:tailwindcss-animate@^1.0.7": "npm:tailwindcss-animate@1.0.7_tailwindcss@3.4.1__postcss@8.4.33",
@@ -2246,6 +2248,13 @@
           "tslib": "tslib@2.5.3"
         }
       },
+      "sonner@1.4.0_react@18.2.0_react-dom@18.2.0__react@18.2.0": {
+        "integrity": "sha512-nvkTsIuOmi9e5Wz5If8ldasJjZNVfwiXYijBi2dbijvTQnQppvMcXTFNxL/NUFWlI2yJ1JX7TREDsg+gYm9WyA==",
+        "dependencies": {
+          "react": "react@18.2.0",
+          "react-dom": "react-dom@18.2.0_react@18.2.0"
+        }
+      },
       "source-map-js@1.0.2": {
         "integrity": "sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==",
         "dependencies": {}
@@ -3458,6 +3467,7 @@
       "npm:react-dom@^18.2.0",
       "npm:react-hook-form@^7.50.1",
       "npm:react@^18.2.0",
+      "npm:sonner@^1.4.0",
       "npm:tailwind-merge@^2.2.1",
       "npm:tailwindcss-animate@^1.0.7",
       "npm:tailwindcss@^3.2.4",

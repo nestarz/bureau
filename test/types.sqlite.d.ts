@@ -5,38 +5,46 @@ type JSONValue =
   | { [x: string]: JSONValue }
   | Array<JSONValue>;
 
-export interface PublicAnalyticsEvents {
+export interface PublicProjects {
   id?: number;
-  visit_id?: number;
-  category?: string;
-  action?: string;
-  value?: string;
-  label?: string;
+  title?: string;
+  date?: string;
+  images_json?: string;
+  description?: string;
+  url?: string;
+  type?: string;
+  order?: number;
 }
-export interface PublicAnalyticsVisits {
+export interface PublicSite {
   id?: number;
-  referrer?: string;
-  ip?: string;
-  user_agent?: string;
-  hostname?: string;
-  latitude?: number;
-  longitude?: number;
-  country_code?: string;
-  region_name?: string;
-  city_name?: string;
-  parameters?: string;
-  screen_width?: number;
-  screen_height?: number;
-  load_time?: number;
-  visit_duration?: number;
-  path?: string;
-  session_id?: number;
-  ignore?: number;
+  title?: string;
+  description?: string;
+  instagram?: string;
+  email?: string;
+  images_json?: string;
+  url?: string;
+  city_geo?: string;
+  keywords?: string;
+  subtitle?: string;
+  favicon_svg_json?: string;
+  logo_full_image_json?: string;
+}
+export interface PublicStaff {
+  id?: number;
+  firstname?: string;
+  lastname?: string;
+  role?: string;
+  description?: string;
+  images_json?: string;
+  url?: string;
+  email?: string;
+  telephone?: string;
 }
 
 export interface Public {
-  analytics_events: PublicAnalyticsEvents;
-  analytics_visits: PublicAnalyticsVisits;
+  projects: PublicProjects;
+  site: PublicSite;
+  staff: PublicStaff;
 }
 
 export interface Database {
