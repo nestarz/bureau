@@ -40,7 +40,7 @@ export default async ({
   database: any;
 }) => {
   const getPrefixFn = (parentPathSegment: string) => (key: string) =>
-    import.meta.resolve(join("./", "_islet", parentPathSegment, "tailwindcss", key));
+    import.meta.resolve("./" + join("_islet", parentPathSegment, "tailwindcss", key));
   const getPrefix = getPrefixFn(parentPathSegment);
   const withWritePermission =
     (await Deno.permissions.query({ name: "write", path: Deno.cwd() }))
