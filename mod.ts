@@ -20,14 +20,10 @@ import * as ApiMedias from "@/src/routes/api/medias.ts";
 import * as SqlEditor from "@/src/routes/SqlEditor.tsx";
 import * as Analytics from "@/src/routes/Analytics.tsx";
 import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
-import {
-  fromFileUrl,
-  relative,
-} from "https://deno.land/std@0.211.0/path/mod.ts";
 
 const withWritePermission =
   (await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
-  "granted";
+    "granted";
 
 export default async ({
   parentPathSegment,
@@ -64,13 +60,14 @@ export default async ({
     await Deno.mkdir(getPrefix(""), { recursive: true });
     await Deno.writeTextFile(
       getPrefix("snapshot.json"),
-      JSON.stringify({ filename: `${hash}.css` })
+      JSON.stringify({ filename: `${hash}.css` }),
     );
     await Deno.writeTextFile(filename, newCss);
   }
   const newCss = await fetch(getPrefix("snapshot.json"))
     .then((response) => response.json())
-    .then((snapshot) => Deno.readTextFile(getPrefix(snapshot.filename)))
+    .then((snapshot) => fetch(getPrefix(snapshot.filename)))
+    .then((response) => response.text())
     .catch(console.error)
     .catch(() => null);
 
@@ -82,7 +79,7 @@ export default async ({
         const string = await new Response(stream).text();
         return string.replace(
           string.includes("</head>") ? /(<\/head>)/ : /(.*)/,
-          (_, $1) => (newCss ? `<style tailwind>${newCss}</style>${$1}` : $1)
+          (_, $1) => (newCss ? `<style tailwind>${newCss}</style>${$1}` : $1),
         );
       })
   );
@@ -112,7 +109,7 @@ export default async ({
         databaseKey,
         analyticsKey,
       }),
-      renderPipe(module, { Layout })
+      renderPipe(module, { Layout }),
     ),
   });
 
@@ -129,7 +126,7 @@ export default async ({
       .reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
     ...[ApiMedias, Analytics, SqlEditor, Settings, Home, Upsert, Browse].reduce(
       (acc, module) => ({ ...acc, ...route(module) }),
-      {}
+      {},
     ),
     [staticFileRoute.config.routeOverride!]: staticFileRoute.createHandler({
       baseUrl: import.meta.url,
