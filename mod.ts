@@ -20,6 +20,10 @@ import * as ApiMedias from "@/src/routes/api/medias.ts";
 import * as SqlEditor from "@/src/routes/SqlEditor.tsx";
 import * as Analytics from "@/src/routes/Analytics.tsx";
 import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
+import {
+  fromFileUrl,
+  relative,
+} from "https://deno.land/std@0.211.0/path/mod.ts";
 
 const withWritePermission =
   (await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
@@ -39,14 +43,10 @@ export default async ({
   parentPathSegment: string;
   database: any;
 }) => {
-  const getPrefixFn =
-    (parentPathSegment: string) =>
-    (key: string, absolute = false) => {
-      const path = join("_islet", parentPathSegment, "tailwindcss", key);
-      return absolute
-        ? new URL(import.meta.resolve("./".concat(path)))
-        : join(import.meta.dirname!, path);
-    };
+  const getPrefixFn = (parentPathSegment: string) => (key: string) => {
+    const path = join("_islet", parentPathSegment, "tailwindcss", key);
+    return new URL(import.meta.resolve("./".concat(path)));
+  };
   const getPrefix = getPrefixFn(parentPathSegment);
   if (withWritePermission && import.meta.url.startsWith("file://")) {
     const tailwindConfig = await import("./tailwind.config.ts");
@@ -59,19 +59,18 @@ export default async ({
       .process(tailwindConfig.globalCss, { from: undefined })
       .then((v) => v.css);
     const hash = getHashSync(newCss);
-    const filename = getPrefix(`${hash}.css`, false);
+    const filename = getPrefix(`${hash}.css`);
     await Deno.remove(getPrefix(""), { recursive: true }).catch(() => null);
     await Deno.mkdir(getPrefix(""), { recursive: true });
     await Deno.writeTextFile(
       getPrefix("snapshot.json"),
-      JSON.stringify({ filename })
+      JSON.stringify({ filename: `${hash}.css` })
     );
-    console.log("writing", filename);
     await Deno.writeTextFile(filename, newCss);
   }
-  const newCss = await fetch(getPrefix("snapshot.json", true))
+  const newCss = await fetch(getPrefix("snapshot.json"))
     .then((response) => response.json())
-    .then((snapshot) => Deno.readTextFile(snapshot.filename))
+    .then((snapshot) => Deno.readTextFile(getPrefix(snapshot.filename)))
     .catch(console.error)
     .catch(() => null);
 
