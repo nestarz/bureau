@@ -45,7 +45,7 @@ export default async ({
   const withWritePermission =
     (await Deno.permissions.query({ name: "write", path: Deno.cwd() }))
       .state === "granted";
-  if (withWritePermission) {
+  if (withWritePermission && import.meta.url.startsWith("file://")) {
     const tailwindConfig = await import("./tailwind.config.ts");
     const postcss = (await import("postcss")).default;
     const tailwindCss = (await import("tailwindcss")).default;
