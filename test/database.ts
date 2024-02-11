@@ -18,7 +18,7 @@ const createDatabase = (filename: string) =>
   sqliteMemorySync(
     () => s3Client.getObject(filename).then((r) => r.arrayBuffer()),
     (buffer) => s3Client.putObject(filename, buffer).then(() => true),
-    () => s3Client.statObject(filename).then((r) => r.etag)
+    () => s3Client.statObject(filename).then((r) => r.etag),
   );
 
 export const databases = {

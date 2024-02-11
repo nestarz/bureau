@@ -1,23 +1,17 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import { jsx as _jsx } from "../jsx-runtime.ts";
-import Client from "../components/Client.tsx";
+import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import type { ClientMiddleware } from "@/src/middlewares/client.ts";
+import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
 
-const jsx = (a, b, ...c: unknown[]) => _jsx(a, { children: c, ...(b ?? {}) });
+export const config: RouteConfig["config"] = {
+  routeOverride: "/",
+};
 
-export default (req: Request, ctx) => {
-  const data = {
-    apiKey: req.headers.get("authorization"),
-    gqlHttpUrl: ctx.state.gqlHttpUrl,
-    gqlWebsocketUrl: ctx.state.gqlWebsocketUrl,
-    s3PublicUrl: Deno.env.get("S3_PUBLIC_URL"),
-  };
-  return (
-    <html>
-      <head></head>
-      <body>
-        <Client {...data} />
-      </body>
-    </html>
-  );
+export default async (
+  _req: Request,
+  _ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
+) => {
+  return new Response(null, {
+    status: 302,
+    headers: { Location: "/admin/analytics" },
+  });
 };

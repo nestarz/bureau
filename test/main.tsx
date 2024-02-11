@@ -1,8 +1,6 @@
-import "std/dotenv/load.ts";
-
 import { router } from "rutt";
 import renderToString from "preact-render-to-string";
-import createContentManagementSystem from "bureau";
+import createContentManagementSystem from "bureau/mod.ts";
 import createGQLite from "gqlite";
 import createRenderPipe from "outils/createRenderPipe.ts";
 import createBasicAuth from "outils/createBasicAuth.ts";
@@ -28,14 +26,16 @@ const route = (module: Parameters<typeof renderPipe>[0]) => ({
 });
 
 Deno.serve(
-  { port: 8028 },
+  { port: 8029 },
   router({
     "/graphql": graphql.handler,
     "/admin": await createContentManagementSystem({
       s3Client,
       getS3Uri,
-      graphqlPath: "/graphql",
-      prefix: "/admin",
+      database: databases.main,
+      analytics: databases.analytics,
+      analyticsKey: "analytics.sqlite",
+      parentPathSegment: "/admin",
       middleware: [
         createBasicAuth(
           Deno.env.get("BASIC_AUTH_USERNAME")!,

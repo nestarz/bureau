@@ -1,2 +1,4 @@
-.env*
-_islet
+.DS_Store
+.git_*
+.env
+test/_islet
