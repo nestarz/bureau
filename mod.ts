@@ -65,8 +65,9 @@ export default async ({
     );
     await Deno.writeTextFile(path, newCss);
   }
-  const newCss = await Deno.readTextFile(getPrefix("snapshot.json"))
-    .then((str) => Deno.readTextFile(JSON.parse(str).path))
+  const newCss = await fetch(getPrefix("snapshot.json"))
+    .then((response) => response.json())
+    .then((snapshot) => Deno.readTextFile(snapshop.path))
     .catch(console.error)
     .catch(() => null);
 
