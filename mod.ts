@@ -67,7 +67,7 @@ export default async ({
   }
   const newCss = await fetch(getPrefix("snapshot.json"))
     .then((response) => response.json())
-    .then((snapshot) => Deno.readTextFile(snapshop.path))
+    .then((snapshot) => Deno.readTextFile(snapshot.path))
     .catch(console.error)
     .catch(() => null);
 
