@@ -68,7 +68,8 @@
     "@lexical/selection": "https://esm.sh/@lexical/selection@0.13.1&external=react,react-dom,lexical",
     "@lexical/html": "https://esm.sh/@lexical/html@0.13.1&external=react,react-dom,lexical",
     "@lexical/react/": "https://esm.sh/@lexical/react@0.13.1&external=react,react-dom,lexical/",
-    "sonner": "npm:sonner@^1.4.0"
+    "sonner": "npm:sonner@^1.4.0",
+    "@radix-ui/react-alert-dialog": "npm:@radix-ui/react-alert-dialog@^1.0.5"
   },
   "shadcn-ui": {
     "moduleResolution": "NodeNext",

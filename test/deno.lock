@@ -6,6 +6,7 @@
       "npm:@codemirror/state": "npm:@codemirror/state@6.4.0",
       "npm:@graphql-codegen/core@4.0.0": "npm:@graphql-codegen/core@4.0.0_graphql@16.8.1",
       "npm:@graphql-codegen/typescript@4.0.0": "npm:@graphql-codegen/typescript@4.0.0_graphql@16.8.1",
+      "npm:@radix-ui/react-alert-dialog@^1.0.5": "npm:@radix-ui/react-alert-dialog@1.0.5_react@18.2.0_react-dom@18.2.0__react@18.2.0",
       "npm:@radix-ui/react-checkbox@^1.0.4": "npm:@radix-ui/react-checkbox@1.0.4_react@18.2.0_react-dom@18.2.0__react@18.2.0",
       "npm:@radix-ui/react-dialog@^1.0.5": "npm:@radix-ui/react-dialog@1.0.5_react@18.2.0_react-dom@18.2.0__react@18.2.0",
       "npm:@radix-ui/react-dropdown-menu@^2.0.6": "npm:@radix-ui/react-dropdown-menu@2.0.6_react@18.2.0_react-dom@18.2.0__react@18.2.0",
@@ -775,6 +776,20 @@
         "integrity": "sha512-yQ8oGX2GVsEYMWGxcovu1uGWPCxV5BFfeeYxqPmuAzUyLT9qmaMXSAhXpb0WrspIeqYzdJpkh2vHModJPgRIaw==",
         "dependencies": {
           "@babel/runtime": "@babel/runtime@7.23.9"
+        }
+      },
+      "@radix-ui/react-alert-dialog@1.0.5_react@18.2.0_react-dom@18.2.0__react@18.2.0": {
+        "integrity": "sha512-OrVIOcZL0tl6xibeuGt5/+UxoT2N27KCFOPjFyfXMnchxSHZ/OW7cCX2nGlIYJrbHK/fczPcFzAwvNBB6XBNMA==",
+        "dependencies": {
+          "@babel/runtime": "@babel/runtime@7.23.9",
+          "@radix-ui/primitive": "@radix-ui/primitive@1.0.1",
+          "@radix-ui/react-compose-refs": "@radix-ui/react-compose-refs@1.0.1_react@18.2.0",
+          "@radix-ui/react-context": "@radix-ui/react-context@1.0.1_react@18.2.0",
+          "@radix-ui/react-dialog": "@radix-ui/react-dialog@1.0.5_react@18.2.0_react-dom@18.2.0__react@18.2.0",
+          "@radix-ui/react-primitive": "@radix-ui/react-primitive@1.0.3_react@18.2.0_react-dom@18.2.0__react@18.2.0",
+          "@radix-ui/react-slot": "@radix-ui/react-slot@1.0.2_react@18.2.0",
+          "react": "react@18.2.0",
+          "react-dom": "react-dom@18.2.0_react@18.2.0"
         }
       },
       "@radix-ui/react-arrow@1.0.3_react@18.2.0_react-dom@18.2.0__react@18.2.0": {
@@ -3449,6 +3464,7 @@
     "dependencies": [
       "npm:@hookform/resolvers@^3.3.4",
       "npm:@mhsdesign/jit-browser-tailwindcss@^0.4.0",
+      "npm:@radix-ui/react-alert-dialog@^1.0.5",
       "npm:@radix-ui/react-checkbox@^1.0.4",
       "npm:@radix-ui/react-dialog@^1.0.5",
       "npm:@radix-ui/react-dropdown-menu@^2.0.6",

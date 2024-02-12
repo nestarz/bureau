@@ -1,5 +1,25 @@
 import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
+import { useRef } from "react";
+
+const Video = ({ media, className }) => {
+  const ref = useRef();
+  return (
+    <video
+      ref={ref}
+      src={media.url}
+      preload="metadata"
+      onMouseEnter={() => {
+        ref.current.play?.();
+      }}
+      onMouseLeave={() => {
+        ref.current.pause?.();
+        ref.current.currentTime = 0;
+      }}
+      className={cn("aspect-square object-contain w-full h-auto", className)}
+    />
+  );
+};
 
 export const Media = ({
   className,
@@ -21,14 +41,7 @@ export const Media = ({
         )}
       />
     ) : /video\//.test(media["content-type"]) ? (
-      <video
-        src={media.url}
-        preload="metadata"
-        className={cn(
-          "aspect-square object-contain w-full h-auto",
-          mediaClassName
-        )}
-      />
+      <Video media={media} className={mediaClassName} />
     ) : (
       <div className="aspect-square w-full bg-foreground" />
     )}

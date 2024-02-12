@@ -4,6 +4,7 @@ import DataTable from "@/src/components/DataTableDemo.tsx";
 import { Button } from "@/src/components/ui/button.tsx";
 import urlcat from "outils/urlcat.ts";
 import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import formatColumnName from "@/src/lib/formatColumnName.ts";
 
 export const config: RouteConfig["config"] = {
   routeOverride: "/browse/:tableName",
@@ -18,29 +19,39 @@ export default async (
     (table) => table.name === ctx.params.tableName
   );
   const tableName = tableConfig?.name;
+  const orderKey = tableConfig?.columns.find(
+    (d) => formatColumnName(d.name) === "Order"
+  )?.name;
   const table = tableName
     ? await ctx.state.clientQuery.default((qb) =>
-        qb.selectFrom(tableName).selectAll().compile()
+        qb
+          .selectFrom(tableName)
+          .$if(orderKey, (wb) => wb.orderBy(orderKey))
+          .selectAll()
+          .compile()
       )
     : null;
-  return (
+  return !tableConfig ? (
+    <div></div>
+  ) : (
     <div className="col-span-4 p-4">
-      {tableConfig && (
-        <Button asChild>
-          <a
-            href={urlcat("/admin/upsert/:table_name", {
-              table_name: tableConfig.name,
-            })}
-          >
-            Insert
-          </a>
-        </Button>
-      )}
       <DataTable
         name={tableConfig?.name}
         columns={tableConfig?.columns}
         data={table}
-      />
+      >
+        {tableConfig?.name && (
+          <Button asChild>
+            <a
+              href={urlcat("/admin/upsert/:table_name", {
+                table_name: tableConfig?.name,
+              })}
+            >
+              Insert
+            </a>
+          </Button>
+        )}
+      </DataTable>
     </div>
   );
 };

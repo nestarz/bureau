@@ -171,7 +171,7 @@ export default async (
           </div>
         </div>
       </div>
-      <div className="flex items-start justify-start gap-4">
+      <div className="flex items-start flex-wrap gap-2 justify-between">
         {[
           { label: "Visits", value: table.sessions },
           { label: "Uniques", value: table.uniques },
@@ -187,10 +187,19 @@ export default async (
             }),
           },
           {
-            label: "Load time",
-            value: table.load_time ? table.load_time * 1000 : null,
+            label: "Load time (ms)",
+            value: table.load_time
+              ? (table.load_time * 1000)?.toLocaleString("fr", {
+                  maximumFractionDigits: 0,
+                })
+              : null,
           },
-          { label: "Visit duration", value: table.visit_duration },
+          {
+            label: "Visit duration (s)",
+            value: table.visit_duration?.toLocaleString("fr", {
+              maximumFractionDigits: 0,
+            }),
+          },
         ].map(({ label, value }) => (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -19,6 +19,7 @@ import * as Settings from "@/src/routes/Settings.tsx";
 import * as ApiMedias from "@/src/routes/api/medias.ts";
 import * as SqlEditor from "@/src/routes/SqlEditor.tsx";
 import * as Analytics from "@/src/routes/Analytics.tsx";
+import * as ApiReorder from "@/src/routes/api/reorder.ts";
 import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
 
 const withWritePermission =
@@ -124,7 +125,16 @@ export default async ({
       .map(adaptFreshPlugin)
       .flatMap((module) => module.routes)
       .reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
-    ...[ApiMedias, Analytics, SqlEditor, Settings, Home, Upsert, Browse].reduce(
+    ...[
+      ApiMedias,
+      ApiReorder,
+      Analytics,
+      SqlEditor,
+      Settings,
+      Home,
+      Upsert,
+      Browse,
+    ].reduce(
       (acc, module) => ({ ...acc, ...route(module) }),
       {},
     ),

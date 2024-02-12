@@ -26,13 +26,13 @@ function DraggableArray({ children, onMove }: DraggableArrayProps) {
 
   return Children.toArray(children).map((child, index) =>
     cloneElement(child as preact.VNode, {
-      draggable: true,
+      draggable: false,
       onDragStart: () => handleDragStart(index),
       onDragOver: (event: DragEvent) => handleDragOver(event, index),
       onDragEnd: handleDragEnd,
       children: Children.toArray(child.props?.children).map((child) =>
         cloneElement(child as preact.VNode, {
-          draggable: true,
+          draggable: child.props["data-draggable"] === true,
           onDragStart: () => handleDragStart(index),
           onDragOver: (event: DragEvent) => handleDragOver(event, index),
           onDragEnd: handleDragEnd,

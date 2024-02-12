@@ -13,6 +13,7 @@ import { Input } from "@/src/components/ui/input.tsx";
 import { Label } from "@/src/components/ui/label.tsx";
 import { Fragment, useState } from "react";
 import useSWR from "npm:swr";
+import { toast } from "npm:sonner";
 
 import {
   Card,
@@ -22,13 +23,12 @@ import {
 } from "@/src/components/ui/card.tsx";
 import Media from "@/src/components/Media.tsx";
 import { cn } from "@/src/lib/utils.ts";
+import { useDebounce } from "@/src/lib/useDebounce.ts";
+import { Uploader } from "@/src/components/bureau-ui/uploader.tsx";
 
 const MediaCard = ({ media, checked, onChecked }) => (
   <Card
-    className={cn(
-      checked ? "border-accent-foreground" : "",
-      "overflow-hidden",
-    )}
+    className={cn(checked ? "border-accent-foreground" : "", "overflow-hidden")}
     onClick={() => onChecked?.(!checked)}
   >
     <Media
@@ -36,26 +36,33 @@ const MediaCard = ({ media, checked, onChecked }) => (
       maxWidth={321}
       className="m-2 rounded overflow-hidden"
     />
-    <CardHeader className="p-2">
-      <CardTitle className="truncate text-xs">{media.key}</CardTitle>
-      <CardDescription>{media["content-type"]}</CardDescription>
+    <CardHeader className="p-2 pt-0 space-y-0">
+      <CardTitle className="truncate text-xs">
+        {media.key.replace(/^medias\//, "")}
+      </CardTitle>
+      <CardDescription className="text-xs">
+        {media["content-type"]}
+      </CardDescription>
     </CardHeader>
   </Card>
 );
 
 const MediaManagerContent = ({ onChange, value, accept }) => {
-  const { data, error, isLoading } = useSWR(
-    ["/admin/api/medias", accept],
-    ([url, accept]) =>
-      fetch(url, { method: "POST", body: JSON.stringify({ accept }) }).then(
-        (r) => r.json(),
-      ),
+  const [ilike, setIlike] = useState();
+  const debouncedIlike = useDebounce(ilike, 1000);
+  const { data, mutate } = useSWR(
+    ["/admin/api/medias", accept, debouncedIlike],
+    ([url, accept, ilike]) =>
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({ accept, ilike }),
+      }).then((r) => r.json())
   );
   const toggleMedia = (media, isSelected) => {
     onChange?.(
       isSelected
         ? [...(value ?? []), media]
-        : value?.filter((v) => v.key !== media.key),
+        : value?.filter((v) => v.key !== media.key)
     );
   };
 
@@ -68,15 +75,36 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
         </DialogDescription>
       </DialogHeader>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2">
           <Label htmlFor="search" className="sr-only">
             Search
           </Label>
-          <Input id="search" />
+          <Input
+            id="search"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setIlike(e.target.value.length > 1 ? `%${e.target.value}%` : null)
+            }
+          />
+          <Uploader
+            asChild
+            accept={accept}
+            onProgress={(i, length) => toast(`Uploading (${i}/${length})`)}
+            onEnded={(length) => {
+              toast(`${length} Files uploaded`);
+              mutate();
+            }}
+          >
+            <Button>Upload</Button>
+          </Uploader>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 max-h-[70vh] gap-4 overflow-auto p-1">
-          {data?.map((media) => (
+          {[
+            ...(value?.filter((a) => !data?.some((b) => b.key === a.key)) ??
+              []),
+            ...(data ?? []),
+          ]?.map((media) => (
             <MediaCard
+              key={media.key}
               media={media}
               checked={value?.some((v) => v.key === media.key)}
               onChecked={(selected) => toggleMedia(media, selected)}
@@ -116,7 +144,7 @@ export function MediaManager({
     () =>
       (typeof defaultValue === "string"
         ? parseJSON(defaultValue)
-        : defaultValue) ?? null,
+        : defaultValue) ?? null
   );
 
   return (

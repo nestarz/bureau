@@ -31,8 +31,7 @@ export const Toast = ({ string }: { string: string }) => {
   useEffect(() => {
     toast(string);
   }, [string]);
-
-  return <Toaster />;
+  return null;
 };
 
 export { Toaster };
