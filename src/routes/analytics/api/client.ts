@@ -23,10 +23,9 @@ const clientScript = (endpoint: string | URL) => {
       e,
       new Blob([JSON.stringify(v)], {
         type: "application/json; charset=UTF-8",
-      })
+      }),
     );
-  Object.fromEntries =
-    Object.fromEntries ||
+  Object.fromEntries = Object.fromEntries ||
     ((arr) => arr.reduce((acc, [k, v]) => ((acc[k] = v), acc), {}));
   const id = Date.now();
   post(VISIT, {
@@ -57,9 +56,8 @@ const clientScript = (endpoint: string | URL) => {
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
-      const load_time =
-        (window.performance.timing.loadEventEnd -
-          window.performance.timing.navigationStart) /
+      const load_time = (window.performance.timing.loadEventEnd -
+        window.performance.timing.navigationStart) /
         1000;
       beacon(QUIT, {
         id,
@@ -82,7 +80,10 @@ export const createApiClientPlugin = ({
       path: join(parentPathSegment, "/client.js"),
       handler: {
         GET: (req: Request) => {
-          const url = new URL(parentPathSegment, req.url);
+          const url = new URL(
+            `${parentPathSegment ?? ""}/`.replace("//", "/"),
+            req.url,
+          );
           storeFunctionExecution(clientScript, url.href);
 
           return new Response(collectAndCleanScripts(), {
