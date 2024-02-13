@@ -36,6 +36,7 @@ import {
 
 const MediaCard = ({
   className,
+  folder,
   media,
   checked,
   onChecked,
@@ -74,7 +75,7 @@ const MediaCard = ({
     {size !== "small" && (
       <CardHeader className="p-2 pt-0 space-y-0">
         <CardTitle className="truncate text-xs">
-          {media.key.replace(/^medias\//, "")}
+          {media.key.replace(folder, "").replace(/^\//, "")}
         </CardTitle>
         <CardDescription className="text-xs">
           {media["content-type"]}
@@ -203,6 +204,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
             {currentFiles.map((media) => (
               <MediaCard
                 key={media.key}
+                folder={path}
                 media={media}
                 checked={value?.some((v) => v.key === media.key)}
                 onChecked={(selected) => toggleMedia(media, selected)}
