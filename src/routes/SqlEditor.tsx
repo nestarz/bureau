@@ -3,7 +3,7 @@ import type { ClientMiddleware } from "@/src/middlewares/client.ts";
 import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
 import { SqlInput } from "@/src/components/SqlInput.tsx";
 import { Button } from "@/src/components/ui/button.tsx";
-import DataTable from "@/src/components/DataTableDemo.tsx";
+import DataTable from "@/src/components/DataTable.tsx";
 
 export const config: RouteConfig["config"] = {
   routeOverride: "/sqleditor{/}?",

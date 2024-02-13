@@ -29,9 +29,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
 export const Toast = ({ string }: { string: string }) => {
   useEffect(() => {
-    toast(string);
+    console.log("toast", string);
+    if (string) setTimeout(() => toast(string), 10);
   }, [string]);
-  return null;
+  return <div className="hidden absolute" />;
 };
 
 export { Toaster };

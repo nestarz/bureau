@@ -8,6 +8,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -66,8 +67,13 @@ export default <TData, TValue>({
   columns,
   data,
   children,
+  references,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageSize: 12,
+    pageIndex: 0,
+  });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -97,6 +103,7 @@ export default <TData, TValue>({
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -104,6 +111,7 @@ export default <TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
+      pagination,
       sorting,
       globalFilter,
       columnFilters,
@@ -159,6 +167,9 @@ export default <TData, TValue>({
             <DisplayValue
               value={value}
               type={getExtendedType(column.type, column.name)}
+              references={references?.[column.references]?.find(
+                (row) => row[column.to] === value
+              )}
             />
           );
         },
@@ -261,7 +272,6 @@ export default <TData, TValue>({
           type="button"
           onClick={async () => {
             const formData = new FormData();
-            console.log(rowOrder);
             formData.set(
               "order",
               JSON.stringify(

@@ -18,12 +18,20 @@ import {
   RiQuoteText,
   RiStrikethrough,
   RiUnderline,
+  RiPencilLine,
 } from "npm:react-icons/ri";
 
 const { useLexicalComposerContext } = (
   await import("@lexical/react/LexicalComposerContext.js")
 ).default;
-import { useCallback, useEffect, useMemo, useRef, useState, Fragment } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  Fragment,
+} from "react";
 const {
   $createParagraphNode,
   $getNodeByKey,
@@ -230,14 +238,16 @@ function FloatingLinkEditor({ editor }) {
               {linkUrl}
             </a>
             <div
-              className="link-edit"
+              className="w-[35px] absolute cursor-pointer right-0 inset-y-0 align-[-0.25em] flex items-center justify-center"
               role="button"
               tabIndex={0}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => {
                 setEditMode(true);
               }}
-            />
+            >
+              <RiPencilLine className="w-5 h-5" />
+            </div>
           </div>
         </Fragment>
       )}

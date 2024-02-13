@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card.tsx";
-import DataTable from "@/src/components/DataTableDemo.tsx";
+import DataTable from "@/src/components/DataTable.tsx";
 import {
   Tabs,
   TabsContent,

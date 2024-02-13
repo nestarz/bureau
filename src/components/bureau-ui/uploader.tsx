@@ -1,3 +1,7 @@
+export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
+  (v) => v.default(import.meta.url)
+);
+
 import { Slot } from "@radix-ui/react-slot";
 import useUpload from "@/src/lib/useUpload.ts";
 import { Fragment, forwardRef, useRef } from "react";

@@ -69,7 +69,9 @@
     "@lexical/html": "https://esm.sh/@lexical/html@0.13.1&external=react,react-dom,lexical",
     "@lexical/react/": "https://esm.sh/@lexical/react@0.13.1&external=react,react-dom,lexical/",
     "sonner": "npm:sonner@^1.4.0",
-    "@radix-ui/react-alert-dialog": "npm:@radix-ui/react-alert-dialog@^1.0.5"
+    "@radix-ui/react-alert-dialog": "npm:@radix-ui/react-alert-dialog@^1.0.5",
+    "cmdk": "npm:cmdk@^0.2.1",
+    "@radix-ui/react-popover": "npm:@radix-ui/react-popover@^1.0.7"
   },
   "shadcn-ui": {
     "moduleResolution": "NodeNext",

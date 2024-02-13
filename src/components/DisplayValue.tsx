@@ -5,7 +5,7 @@ import { Badge } from "@/src/components/ui/badge.tsx";
 
 const MAX = 3;
 
-export default ({ value, type }) => {
+export default ({ value, type, references }) => {
   return (
     <div className="flex space-x-2">
       <span className="max-w-[300px] truncate font-medium">
@@ -34,6 +34,16 @@ export default ({ value, type }) => {
         ) : (
           value
         )}
+        {references ? (
+          <Badge variant="outline" className="ml-2">
+            <span className="truncate max-w-[200px]">
+              {references.name ??
+                references.title ??
+                references.label ??
+                references.key}
+            </span>
+          </Badge>
+        ) : null}
       </span>
     </div>
   );

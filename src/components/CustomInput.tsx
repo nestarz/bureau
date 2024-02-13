@@ -14,18 +14,23 @@ import {
 import { useState } from "react";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
+import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
 export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
-  (v) => v.default(import.meta.url),
+  (v) => v.default(import.meta.url)
 );
 
 export const CustomInput = ({
   type,
   name,
+  references,
+  referencesRows,
+  referencesTo,
   ...props
 }: {
   type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
   name: string;
+  references?: string | null;
 }) => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
@@ -47,8 +52,18 @@ export const CustomInput = ({
     ),
     date: ({ children: _v, ...props }) => <Input {...props} type="date" />,
   };
-  const Component = components[extendedType as keyof typeof components] ??
-    Input;
+  const Component = references
+    ? ({ ...props }) => (
+        <ComboBoxResponsive
+          {...props}
+          optionsName={references}
+          options={referencesRows.map((row) => ({
+            label: row.name ?? row.title ?? row.label ?? row.key,
+            value: row[referencesTo],
+          }))}
+        />
+      )
+    : components[extendedType as keyof typeof components] ?? Input;
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-sm">
@@ -74,7 +89,7 @@ export const CustomInput = ({
                 >
                   {type}
                 </DropdownMenuRadioItem>
-              ),
+              )
             )}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>

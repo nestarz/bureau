@@ -11,7 +11,7 @@ export interface Column {
   table_name: string;
   cid: number;
   name: string;
-  type: string;
+  type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
   notnull: number;
   dflt_value: null;
   pk: number;
@@ -32,7 +32,7 @@ export type ClientMiddleware = {
 const mapSqliteGraphql = (
   type: string,
   columnName: string,
-  notnull?: boolean
+  notnull?: boolean,
 ) => {
   const rgx = /\b(?:((?:\w*_)*)(json)((?:_\w*)*))\b/;
   const newType = type === "TEXT" && rgx.test(columnName ?? "") ? "JSON" : type;
@@ -48,7 +48,7 @@ export const createHandler = ({
 }) => {
   return async (
     _req: Request,
-    ctx: FreshContext<ClientMiddleware & { gqlHttpUrl: string }>
+    ctx: FreshContext<ClientMiddleware & { gqlHttpUrl: string }>,
   ) => {
     ctx.state.databaseKey = databaseKey;
     ctx.state.analyticsKey = analyticsKey;
@@ -62,7 +62,8 @@ export const createHandler = ({
 
     ctx.state.tables = await ctx.state
       .clientQuery.default(() => ({
-        sql: `  SELECT s.name AS table_name, info.*, fk."table" as "references", fk."to"
+        sql:
+          `  SELECT s.name AS table_name, info.*, fk."table" as "references", fk."to"
   FROM sqlite_schema AS s
   JOIN pragma_table_info(s.name) AS info ON 1=1
   LEFT JOIN pragma_foreign_key_list(s.name) AS fk ON fk."from" = info.name

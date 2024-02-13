@@ -18,7 +18,6 @@ export const middleware: Middleware<SessionMiddlewareState> = {
   handler: [
     (req, ctx) => session(req, ctx),
     (req, ctx) => {
-      console.log("ok");
       return ctx.next();
     },
   ],

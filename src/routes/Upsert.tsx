@@ -6,9 +6,10 @@ import { Button } from "@/src/components/ui/button.tsx";
 import { Column } from "@/src/middlewares/client.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import urlcat from "outils/urlcat.ts";
-import { sql } from "npm:kysely";
-import adjacentOrderRetrieval from "@/src/lib/adjacentQueryBuilder.ts";
+import createAdjacentOrderRetrieval from "@/src/lib/createAdjacentOrderRetrieval.ts";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { jsonArrayFrom } from "npm:kysely/helpers/sqlite";
+import deserializeNestedJSON from "outils/deserializeNestedJSON.ts";
 
 export const config: RouteConfig["config"] = {
   routeOverride: "/upsert/:tableName{/}?",
@@ -92,6 +93,7 @@ export default async (
   req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
 ) => {
+  const tables = ctx.state.tables;
   const pk = new URL(req.url).searchParams.get("pk");
   const primaryKeys = JSON.parse(pk || "null");
   const tableConfig = ctx.state.tables.find(
@@ -104,68 +106,85 @@ export default async (
   const orderKey = tableConfig?.columns.find(
     (d) => formatColumnName(d.name) === "Order"
   )?.name;
-  const rows =
-    tableConfig?.name && mode === "update"
-      ? await ctx.state.clientQuery.default((qb) =>
-          qb
-            .with("cte_target", (qb) =>
-              qb
-                .selectFrom(tableConfig.name)
-                .selectAll()
-                .select(sql<string>`'target'`.as("_pos"))
-                .$if(mode === "update", (wb) => {
-                  for (const [key, value] of Object.entries(primaryKeys)) {
-                    wb = wb.where(key, "=", value);
-                    wb = wb.orderBy(key, "desc");
-                  }
-                  return wb.limit(1);
-                })
-            )
-            .with("cte_prev", (qb) =>
-              qb
-                .selectFrom([tableConfig.name, "cte_target"])
-                .selectAll(tableConfig.name)
-                .select(sql<string>`'previous'`.as("_pos"))
-                .$if(
-                  mode === "update",
-                  adjacentOrderRetrieval(
-                    "cte_target",
-                    tableConfig.name,
-                    primaryKeys,
-                    orderKey,
-                    "desc"
-                  )
-                )
-            )
-            .with("cte_next", (qb) =>
-              qb
-                .selectFrom([tableConfig.name, "cte_target"])
-                .selectAll(tableConfig.name)
-                .select(sql<string>`'next'`.as("_pos"))
-                .$if(
-                  mode === "update",
-                  adjacentOrderRetrieval(
-                    "cte_target",
-                    tableConfig.name,
-                    primaryKeys,
-                    orderKey,
-                    "asc"
-                  )
-                )
-            )
-            .selectFrom("cte_target")
-            .union((eb) => eb.selectFrom("cte_prev").selectAll())
-            .union((eb) => eb.selectFrom("cte_next").selectAll())
-            .selectAll()
-            .compile()
+  const referencesSet = Array.from(
+    new Set(
+      (tableConfig?.columns ?? [])
+        .filter((v) => v.references)
+        .map((v) => v.references)
+    )
+  );
+  const adjacentOrderRetrieval = createAdjacentOrderRetrieval(
+    "cte_current_cte",
+    tableConfig.name,
+    primaryKeys,
+    orderKey
+  );
+  const results = await ctx.state.clientQuery.default((qb) => {
+    for (const references of referencesSet) {
+      qb = qb.with(`cte_${references}`, (wb) => {
+        wb = wb.selectFrom(references).distinct().selectAll(references);
+        return wb;
+      });
+    }
+    return qb
+      .with("cte_current_cte", (wb) =>
+        wb
+          .selectFrom(tableConfig.name)
+          .$if(orderKey, (wb) => wb.orderBy(orderKey))
+          .$if(mode === "update", (wb) => {
+            for (const [key, value] of Object.entries(primaryKeys)) {
+              wb = wb.where(key, "=", value);
+              wb = wb.orderBy(key, "desc");
+            }
+            return wb.limit(1);
+          })
+          .$if(mode === "insert", (wb) => wb.limit(0))
+          .selectAll()
+      )
+      .with("cte_previous_cte", (qb) =>
+        qb
+          .selectFrom([tableConfig.name, "cte_current_cte"])
+          .selectAll(tableConfig.name)
+          .$if(mode === "update", adjacentOrderRetrieval("desc"))
+      )
+      .with("cte_next_cte", (qb) =>
+        qb
+          .selectFrom([tableConfig.name, "cte_current_cte"])
+          .selectAll(tableConfig.name)
+          .$if(mode === "update", adjacentOrderRetrieval("asc"))
+      )
+      .selectNoFrom((qb) =>
+        [
+          ["current_cte", tableConfig.columns],
+          ["next_cte", tableConfig.columns],
+          ["previous_cte", tableConfig.columns],
+          ...referencesSet.map((references) => [
+            references,
+            tables.find((table) => table.name === references).columns,
+          ]),
+        ].map(([references, columns]) =>
+          jsonArrayFrom(
+            qb
+              .selectFrom(`cte_${references}`)
+              .select(columns.map((column) => column.name))
+          ).as(references)
         )
-      : [];
+      )
+      .compile();
+  });
 
+  const referencesData = Object.fromEntries(
+    referencesSet.map((references) => [
+      references,
+      deserializeNestedJSON(JSON.parse(results[0][references])),
+    ])
+  );
   const name = tableConfig?.name;
   const columns = tableConfig?.columns as Column[];
-  const data = rows.find((d) => d._pos === "target");
-  const rowNext = rows.find((d) => d._pos === "next");
-  const rowPrev = rows.find((d) => d._pos === "previous");
+  const data = deserializeNestedJSON(JSON.parse(results[0].current_cte))?.[0];
+  const rowNext = deserializeNestedJSON(JSON.parse(results[0].next_cte))?.[0];
+  const rowPrev = deserializeNestedJSON(JSON.parse(results[0].previous_cte))?.[0];
+
   const nextPk = rowNext
     ? JSON.stringify(
         Object.fromEntries(
@@ -241,6 +260,9 @@ export default async (
             required={column.notnull}
             type={column.type}
             className="w-full"
+            references={column.references}
+            referencesRows={referencesData[column.references]}
+            referencesTo={column.to}
           />
         ))}
       </div>
