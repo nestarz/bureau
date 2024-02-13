@@ -7,7 +7,6 @@ export const createPicture = ({
   src: string;
   maxWidth?: number;
 }) => {
-  console.log(maxWidth);
   const sources = [maxWidth]
     .map((resize, _, arr) => ({
       maxWidth: resize,
