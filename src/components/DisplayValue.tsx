@@ -5,9 +5,10 @@ import { Badge } from "@/src/components/ui/badge.tsx";
 
 const MAX = 3;
 
-export default ({ value, type, references }) => {
+export default ({ href, value, type, references }) => {
+  const Comp = href ? "a" : "div";
   return (
-    <div className="flex space-x-2">
+    <Comp className="flex space-x-2" href={href}>
       <span className="max-w-[300px] truncate font-medium">
         {type === "order" ? (
           <DragHandleDots2Icon className="mx-auto" />
@@ -45,6 +46,6 @@ export default ({ value, type, references }) => {
           </Badge>
         ) : null}
       </span>
-    </div>
+    </Comp>
   );
 };

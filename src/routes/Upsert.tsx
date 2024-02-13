@@ -12,6 +12,7 @@ import { jsonArrayFrom } from "npm:kysely/helpers/sqlite";
 import deserializeNestedJSON from "outils/deserializeNestedJSON.ts";
 import DataTable from "@/src/components/DataTable.tsx";
 import { sql } from "npm:kysely";
+import { Fragment } from "react";
 
 export const config: RouteConfig["config"] = {
   routeOverride: "/upsert/:tableName{/}?",
@@ -289,44 +290,51 @@ export default async (
               {mode} {name}
             </div>
             <div className="text-sm text-muted-foreground">
-              Make changes to your profile here. Click save when you're done.
+              {mode === "update"
+                ? "Make changes to your data here."
+                : "Insert a new record here."}{" "}
+              Click save when you're done.
             </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-            <Button
-              size="icon"
-              variant="destructive"
-              formAction={urlcat("/admin/upsert/:name", {
-                pk,
-                name,
-                method: "DELETE",
-              })}
-              formMethod="POST"
-            >
-              <TrashIcon />
-            </Button>
-            <Button variant="outline" asChild>
-              <a
-                href={
-                  prevPk
-                    ? urlcat("/admin/upsert/:name", { pk: prevPk, name })
-                    : null
-                }
-              >
-                Previous
-              </a>
-            </Button>
-            <Button variant="outline" asChild>
-              <a
-                href={
-                  nextPk
-                    ? urlcat("/admin/upsert/:name", { pk: nextPk, name })
-                    : null
-                }
-              >
-                Next
-              </a>
-            </Button>
+            {mode === "update" && (
+              <Fragment>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  formAction={urlcat("/admin/upsert/:name", {
+                    pk,
+                    name,
+                    method: "DELETE",
+                  })}
+                  formMethod="POST"
+                >
+                  <TrashIcon />
+                </Button>
+                <Button variant="outline" asChild>
+                  <a
+                    href={
+                      prevPk
+                        ? urlcat("/admin/upsert/:name", { pk: prevPk, name })
+                        : null
+                    }
+                  >
+                    Previous
+                  </a>
+                </Button>
+                <Button variant="outline" asChild>
+                  <a
+                    href={
+                      nextPk
+                        ? urlcat("/admin/upsert/:name", { pk: nextPk, name })
+                        : null
+                    }
+                  >
+                    Next
+                  </a>
+                </Button>
+              </Fragment>
+            )}
             <Button type="submit">Save changes</Button>
           </div>
         </div>

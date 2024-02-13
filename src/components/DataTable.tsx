@@ -165,6 +165,16 @@ export default <TData, TValue>({
           const value = row.getValue(column.name);
           return (
             <DisplayValue
+              href={urlcat("/admin/upsert/:table_name", {
+                table_name: name,
+                pk: JSON.stringify(
+                  Object.fromEntries(
+                    columns
+                      .filter((column) => column.pk === 1)
+                      .map((column) => [column.name, row.original[column.name]])
+                  )
+                ),
+              })}
               value={value}
               type={getExtendedType(column.type, column.name)}
               references={references?.[column.references]?.find(
