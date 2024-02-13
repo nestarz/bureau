@@ -7,6 +7,7 @@ export const createPicture = ({
   src: string;
   maxWidth?: number;
 }) => {
+  console.log(maxWidth);
   const sources = [maxWidth]
     .map((resize, _, arr) => ({
       maxWidth: resize,
@@ -39,7 +40,9 @@ export default ({ src, sources, alt = "", maxWidth, ...props }) => {
         <source className="hidden" key={source.media} {...source} />
       ))}
       <img
-        src={filteredSources.pop()?.srcSet ?? createPicture({ src }).src}
+        src={
+          filteredSources.pop()?.srcSet ?? createPicture({ src, maxWidth }).src
+        }
         alt={alt}
         tabIndex={0}
         {...props}

@@ -7,6 +7,7 @@ import { formatColumnName } from "@/src/lib/formatColumnName.ts";
 import { Toast, Toaster } from "@/src/components/ui/sonner.tsx";
 import { CodeIcon, GearIcon } from "@radix-ui/react-icons";
 import { cn } from "@/src/lib/utils.ts";
+import { MediaContext } from "@/src/components/Media.tsx";
 
 export default async (
   req: Request,
@@ -17,7 +18,6 @@ export default async (
     (table) => table.name === ctx.params.tableName
   );
   const { data, error } = ctx.state.session.flash("x-sonner") ?? {};
-
   return (
     <body className="grid grid-cols-5 min-h-screen">
       <Sidebar
@@ -66,6 +66,7 @@ export default async (
           },
         ]}
       />
+      <MediaContext endpoint={ctx.state.getS3Uri?.("/").href} />
       <ctx.Component />
       <Toaster />
       <Toast string={data ? "Success" : error ? "Error" : null} />

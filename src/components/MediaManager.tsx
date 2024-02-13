@@ -26,14 +26,14 @@ import { cn } from "@/src/lib/utils.ts";
 import { useDebounce } from "@/src/lib/useDebounce.ts";
 import { Uploader } from "@/src/components/bureau-ui/uploader.tsx";
 
-const MediaCard = ({ media, checked, onChecked }) => (
+const MediaCard = ({ media, checked, onChecked, maxWidth }) => (
   <Card
     className={cn(checked ? "border-accent-foreground" : "", "overflow-hidden")}
     onClick={() => onChecked?.(!checked)}
   >
     <Media
       media={media}
-      maxWidth={321}
+      maxWidth={maxWidth ?? 321}
       className="m-2 rounded overflow-hidden"
     />
     <CardHeader className="p-2 pt-0 space-y-0">
@@ -108,6 +108,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
               media={media}
               checked={value?.some((v) => v.key === media.key)}
               onChecked={(selected) => toggleMedia(media, selected)}
+              maxWidth={200}
             />
           ))}
         </div>
