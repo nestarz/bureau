@@ -38,6 +38,7 @@ export default async ({
   getIpData,
   isDev,
   middleware: middlewareFns,
+  analyticsPathSegment = "../analytics",
 }: {
   parentPathSegment: string;
   database: any;
@@ -105,7 +106,11 @@ export default async ({
 
   const route = (module: Parameters<typeof renderPipe>[0]) => ({
     [module.config!.routeOverride!]: middleware(
-      ...toArray(middlewareFns),
+      ...toArray(
+        typeof middlewareFns === "function"
+          ? middlewareFns(module)
+          : middlewareFns,
+      ),
       Hmr.middleware,
       ...MiddlewareSession.middleware.handler,
       sqliteMiddleware.handler,
@@ -126,7 +131,7 @@ export default async ({
   return {
     ...createAnalyticsPlugin({
       database: analytics,
-      parentPathSegment: "../analytics",
+      parentPathSegment: analyticsPathSegment,
       getIpData,
     })
       .map(adaptFreshPlugin)

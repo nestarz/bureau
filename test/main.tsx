@@ -9,7 +9,9 @@ import { middleware } from "outils/fresh/middleware.ts";
 import { databases, getS3Uri, s3Client } from "./database.ts";
 
 const renderPipe = createRenderPipe((vn) =>
-  "<!DOCTYPE html>".concat(renderToString(vn))
+  "<!DOCTYPE html>"
+    .concat(renderToString(vn))
+    .concat(`<script src="/analytics/client.js" />`)
 );
 
 const route = (module: Parameters<typeof renderPipe>[0]) => ({
@@ -29,11 +31,16 @@ Deno.serve(
       analytics: databases.analytics,
       analyticsKey: "analytics.sqlite",
       parentPathSegment: "/admin",
-      middleware: [
-        createBasicAuth(
-          Deno.env.get("BASIC_AUTH_USERNAME")!,
-          Deno.env.get("BASIC_AUTH_PASSWORD")!
-        )((_req, ctx) => ctx.next()),
+      analyticsPathSegment: "../analytics",
+      middleware: (module) => [
+        ...(!module.config.routeOverride.startsWith("../analytics")
+          ? [
+              createBasicAuth(
+                Deno.env.get("BASIC_AUTH_USERNAME")!,
+                Deno.env.get("BASIC_AUTH_PASSWORD")!
+              )((_req, ctx) => ctx.next()),
+            ]
+          : []),
         createCors({ hostnames: ["localhost"] })((_req, ctx) => ctx.next()),
       ],
     }),

@@ -1,5 +1,6 @@
 import type { Plugin } from "https://deno.land/x/fresh@1.6.3/server.ts";
 import columnSafe from "../utils/columnSafe.ts";
+import { join } from "https://deno.land/std@0.215.0/path/join.ts";
 
 type ActiveSessions = { [ip: string]: number };
 
@@ -20,27 +21,30 @@ export type GetIpData = (ip: string) => Promise<
   | null
   | undefined
   | {
-      latitude: string;
-      longitude: string;
-      country_code: string;
-      region_code: string;
-      city_name: string;
-    }
+    latitude: string;
+    longitude: string;
+    country_code: string;
+    region_code: string;
+    city_name: string;
+  }
 >;
 
-export const createApiLogVisitPlugin: (getIpData?: GetIpData) => Plugin = (
-  getIpData
-) => ({
+export const createApiLogVisitPlugin = (
+  { parentPathSegment, getIpData }: {
+    parentPathSegment: string;
+    getIpData?: GetIpData;
+  },
+): Plugin => ({
   name: "createApiLogVisitPlugin",
   routes: [
     {
-      path: "/api/log/visit{/}?",
+      path: join(parentPathSegment, "/api/log/visit{/}?"),
       handler: {
         POST: async (req: Request, ctx) => {
           const json = await req.json();
           const { hostname } = ctx?.remoteAddr ?? {};
-          const ip =
-            req.headers.get("x-forwarded-for")?.split(",").shift() || hostname;
+          const ip = req.headers.get("x-forwarded-for")?.split(",").shift() ||
+            hostname;
           const geo = ip ? await getIpData?.(ip) : null;
           const payload = {
             ...json,
@@ -57,7 +61,8 @@ export const createApiLogVisitPlugin: (getIpData?: GetIpData) => Plugin = (
           const keys = Object.keys(payload).map(columnSafe);
           const columns = keys.map((v) => `"${v}"`).join(", ");
           const placeholders = keys.map(() => `?`).join(", ");
-          const query = `INSERT INTO analytics_visits (${columns}) VALUES (${placeholders});`;
+          const query =
+            `INSERT INTO analytics_visits (${columns}) VALUES (${placeholders});`;
           const values = Object.values(payload).map((d) =>
             typeof d === "object" && d !== null ? JSON.stringify(d) : d ?? null
           );
