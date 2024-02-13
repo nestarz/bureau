@@ -287,7 +287,7 @@ export default async (
         <div className="flex gap-2 w-full justify-between">
           <div className="flex flex-col space-y-2">
             <div className="text-lg font-semibold text-foreground capitalize">
-              {mode} {name}
+              {mode} {formatColumnName(name)}
             </div>
             <div className="text-sm text-muted-foreground">
               {mode === "update"

@@ -52,7 +52,7 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import { Fragment, useMemo } from "react";
 import { toast } from "npm:sonner";
 
-export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
   (v) => v.default(import.meta.url)
 );
 

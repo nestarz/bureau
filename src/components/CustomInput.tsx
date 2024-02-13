@@ -16,7 +16,7 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
-export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
   (v) => v.default(import.meta.url)
 );
 

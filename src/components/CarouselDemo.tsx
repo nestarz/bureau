@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from "@/src/components/ui/carousel.tsx";
 
-export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
   (v) => v.default(import.meta.url),
 );
 

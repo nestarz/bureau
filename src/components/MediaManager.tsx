@@ -14,6 +14,8 @@ import { Label } from "@/src/components/ui/label.tsx";
 import { Fragment, useState } from "react";
 import useSWR from "npm:swr";
 import { toast } from "npm:sonner";
+import { CheckCircledIcon, CircleIcon, TrashIcon } from "@radix-ui/react-icons";
+import slugify from "outils/slugify.ts";
 
 import {
   Card,
@@ -25,25 +27,60 @@ import Media from "@/src/components/Media.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useDebounce } from "@/src/lib/useDebounce.ts";
 import { Uploader } from "@/src/components/bureau-ui/uploader.tsx";
+import useFileBrowser from "@/src/lib/useFileBrowser.ts";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+} from "@/src/components/bureau-ui/breadcrumb.tsx";
 
-const MediaCard = ({ media, checked, onChecked, maxWidth }) => (
+const MediaCard = ({
+  className,
+  media,
+  checked,
+  onChecked,
+  maxWidth,
+  onDelete,
+  size,
+}) => (
   <Card
-    className={cn(checked ? "border-accent-foreground" : "", "overflow-hidden")}
-    onClick={() => onChecked?.(!checked)}
+    className={cn(
+      checked ? "border-accent-foreground" : "",
+      "overflow-hidden",
+      className
+    )}
+    onClick={size === "small" ? () => onChecked?.(!checked) : null}
   >
+    {size !== "small" && (
+      <div className="w-full h-0 relative z-10 flex gap-1 justify-between">
+        <Button
+          onClick={() => onChecked?.(!checked)}
+          variant="ghost"
+          size="icon"
+        >
+          {checked ? <CheckCircledIcon /> : <CircleIcon />}
+        </Button>
+        <Button size="icon" variant="ghost" onClick={onDelete}>
+          <TrashIcon />
+        </Button>
+      </div>
+    )}
     <Media
       media={media}
       maxWidth={maxWidth ?? 321}
-      className="m-2 rounded overflow-hidden"
+      className={cn(size !== "small" && "m-2", "rounded overflow-hidden")}
+      mediaClassName={cn(size === "small" && "object-cover")}
     />
-    <CardHeader className="p-2 pt-0 space-y-0">
-      <CardTitle className="truncate text-xs">
-        {media.key.replace(/^medias\//, "")}
-      </CardTitle>
-      <CardDescription className="text-xs">
-        {media["content-type"]}
-      </CardDescription>
-    </CardHeader>
+    {size !== "small" && (
+      <CardHeader className="p-2 pt-0 space-y-0">
+        <CardTitle className="truncate text-xs">
+          {media.key.replace(/^medias\//, "")}
+        </CardTitle>
+        <CardDescription className="text-xs">
+          {media["content-type"]}
+        </CardDescription>
+      </CardHeader>
+    )}
   </Card>
 );
 
@@ -66,6 +103,20 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
     );
   };
 
+  const {
+    path,
+    currentFiles,
+    currentFolders,
+    goTo,
+    getFolder,
+    getFolderName,
+    addFolder,
+  } = useFileBrowser({
+    initialPath: "medias",
+    files: data ?? [],
+    getKey: ({ key }) => key,
+  });
+
   return (
     <Fragment>
       <DialogHeader>
@@ -74,7 +125,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
           Anyone who has this link will be able to view this.
         </DialogDescription>
       </DialogHeader>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2 overflow-x-hidden">
         <div className="flex gap-2">
           <Label htmlFor="search" className="sr-only">
             Search
@@ -85,8 +136,18 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
               setIlike(e.target.value.length > 1 ? `%${e.target.value}%` : null)
             }
           />
+          <Button
+            variant="outline"
+            onClick={() => {
+              const name = prompt("Choose a name");
+              if (name?.trim()) addFolder(name, slugify);
+            }}
+          >
+            New Folder
+          </Button>
           <Uploader
             asChild
+            folder={path}
             accept={accept}
             onProgress={(i, length) => toast(`Uploading (${i}/${length})`)}
             onEnded={(length) => {
@@ -97,23 +158,80 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
             <Button>Upload</Button>
           </Uploader>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 max-h-[70vh] gap-4 overflow-auto p-1">
-          {[
-            ...(value?.filter((a) => !data?.some((b) => b.key === a.key)) ??
-              []),
-            ...(data ?? []),
-          ]?.map((media) => (
+        <div className="flex overflow-x-auto max-w-full gap-2 min-h-10">
+          {value.map((media) => (
             <MediaCard
               key={media.key}
               media={media}
               checked={value?.some((v) => v.key === media.key)}
               onChecked={(selected) => toggleMedia(media, selected)}
-              maxWidth={200}
+              maxWidth={30}
+              className="w-10"
+              size="small"
             />
           ))}
         </div>
+        {path?.split("/").length > 1 && (
+          <Breadcrumb separator="/">
+            {path.split("/").map((folder, i, arr) => (
+              <BreadcrumbItem
+                key={folder}
+                onClick={() => goTo(arr.slice(0, i + 1).join("/"))}
+              >
+                <BreadcrumbLink as="div">{folder}</BreadcrumbLink>
+              </BreadcrumbItem>
+            ))}
+          </Breadcrumb>
+        )}
+        <div className="max-h-[60vh] overflow-auto flex flex-col gap-1">
+          {currentFolders.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+              {currentFolders.map((folder) => (
+                <Button
+                  key={getFolderName(folder)}
+                  className="w-full"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goTo(getFolder(folder))}
+                >
+                  <span className="truncate">{getFolderName(folder)}</span>
+                </Button>
+              ))}
+            </div>
+          )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+            {currentFiles.map((media) => (
+              <MediaCard
+                key={media.key}
+                media={media}
+                checked={value?.some((v) => v.key === media.key)}
+                onChecked={(selected) => toggleMedia(media, selected)}
+                maxWidth={200}
+                onDelete={async () => {
+                  const reply = globalThis.prompt(
+                    [
+                      `You are deleting images, they may be associated in somes pages, if so it may break the website, be sure to not use them in the website.`,
+                      media.key,
+                      `Are you sure ? [Yes|No]`,
+                    ].join("\n\n"),
+                    "No"
+                  );
+                  if (reply?.toLowerCase()?.trim() === "yes") {
+                    await fetch("/admin/api/medias", {
+                      method: "DELETE",
+                      body: JSON.stringify({
+                        medias: [{ key: media.key }],
+                      }),
+                    });
+                    mutate();
+                  }
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-      <DialogFooter className="sm:justify-start">
+      <DialogFooter className="sm:justify-start mt-auto">
         <DialogClose asChild>
           <Button type="button" variant="secondary">
             Close
@@ -171,7 +289,7 @@ export function MediaManager({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-4xl h-full max-h-[90vh] flex flex-col">
         <MediaManagerContent
           value={selection}
           onChange={setSelection}

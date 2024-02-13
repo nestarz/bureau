@@ -24,13 +24,13 @@ const getSafeName = (string: string) => {
 };
 
 interface UseUpload {
-  getPrefix: () => string | undefined;
+  folder?: string;
   onProgress?: (p: number, all: number) => unknown;
   onEnded?: (all: number) => unknown;
   uploadFn: (key: string, file: File) => Promise<unknown>;
 }
 
-export default ({ getPrefix, onProgress, uploadFn, onEnded }: UseUpload) => {
+export default ({ folder, onProgress, uploadFn, onEnded }: UseUpload) => {
   const handleFileSubmit = (fn) => (e) => {
     e.preventDefault();
     return fn(getFilesFromFormData(new FormData(e.target)));
@@ -44,7 +44,7 @@ export default ({ getPrefix, onProgress, uploadFn, onEnded }: UseUpload) => {
       const relpath = file.webkitRelativePath?.slice(0, -file.name.length - 1);
       const path = relpath?.split("/").map((v) => slugify(v)) ?? [];
       const { name } = getSafeName(file.name);
-      const key = [getPrefix?.() ?? "", ...path, name]
+      const key = [folder ?? "", ...path, name]
         .filter((v) => v)
         .join("/")
         .replaceAll("//", "/");

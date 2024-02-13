@@ -2,7 +2,7 @@ import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useRef } from "react";
 
-export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
   (v) => v.default(import.meta.url)
 );
 

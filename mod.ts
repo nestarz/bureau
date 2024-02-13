@@ -12,7 +12,7 @@ import * as MiddlewareSession from "@/src/middlewares/session.ts";
 import createSqliteMiddleware from "outils/sqliteMiddleware.ts";
 import adaptFreshPlugin from "outils/fresh/adaptFreshPlugin.ts";
 import { join } from "std/path/join.ts";
-import { namespace } from "@/src/lib/use_client.ts";
+import { namespace } from "@/src/lib/useClient.ts";
 import { createAnalyticsPlugin } from "@/src/routes/analytics/createAnalyticsPlugin.ts";
 import * as Layout from "@/src/routes/_Layout.tsx";
 import * as Settings from "@/src/routes/Settings.tsx";

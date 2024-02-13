@@ -1,5 +1,5 @@
-export const { h, hydrate } = await import("@/src/lib/use_client.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
 
 import { Slot } from "@radix-ui/react-slot";
@@ -7,10 +7,10 @@ import useUpload from "@/src/lib/useUpload.ts";
 import { Fragment, forwardRef, useRef } from "react";
 
 export const Uploader = forwardRef(
-  ({ asChild, onEnded, onProgress, accept, ...props }, ref) => {
+  ({ asChild, onEnded, onProgress, accept, folder, ...props }, ref) => {
     const inputRef = useRef();
     const { upload } = useUpload({
-      getPrefix: () => "medias/",
+      folder,
       onEnded,
       onProgress,
       uploadFn: async (key, body) => {
