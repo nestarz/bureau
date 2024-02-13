@@ -18,7 +18,7 @@ export default ({ value, type, references }) => {
                 <Media
                   key={media.key}
                   media={media}
-                  maxWidth={10}
+                  maxWidth={20}
                   mediaClassName="w-6 h-6 flex-1 rounded object-cover"
                 />
               ))}
