@@ -4,6 +4,7 @@ import * as staticFileRoute from "outils/staticFileRoute.ts";
 import * as Hmr from "outils/hmr.ts";
 import createRenderPipe from "outils/createRenderPipe.ts";
 import middleware from "outils/fresh/middleware.ts";
+import toArray from "outils/toArray.ts";
 import * as Home from "@/src/routes/Home.tsx";
 import * as Upsert from "@/src/routes/Upsert.tsx";
 import * as Browse from "@/src/routes/Browse.tsx";
@@ -36,6 +37,7 @@ export default async ({
   s3Client,
   getIpData,
   isDev,
+  middleware: middlewareFns,
 }: {
   parentPathSegment: string;
   database: any;
@@ -99,6 +101,7 @@ export default async ({
 
   const route = (module: Parameters<typeof renderPipe>[0]) => ({
     [module.config!.routeOverride!]: middleware(
+      ...toArray(middlewareFns),
       Hmr.middleware,
       ...MiddlewareSession.middleware.handler,
       sqliteMiddleware.handler,
