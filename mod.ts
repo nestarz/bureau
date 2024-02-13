@@ -50,11 +50,15 @@ export default async ({
   if (withWritePermission && import.meta.url.startsWith("file://")) {
     const tailwindConfig = await import("./tailwind.config.ts");
     const postcss = (await import("postcss")).default;
+    const cssnano = (await import("cssnano")).default;
+    const autoprefixer = (await import("autoprefixer")).default;
     const tailwindCss = (await import("tailwindcss")).default;
-    const { getHashSync } = await import(
-      "https://deno.land/x/scripted@0.0.3/mod.ts"
-    );
-    const newCss = await postcss([tailwindCss(tailwindConfig.default) as any])
+    const { getHashSync } = await import("scripted");
+    const newCss = await postcss([
+      tailwindCss(tailwindConfig.default) as any,
+      cssnano(),
+      autoprefixer(),
+    ])
       .process(tailwindConfig.globalCss, { from: undefined })
       .then((v) => v.css);
     const hash = getHashSync(newCss);
@@ -137,10 +141,7 @@ export default async ({
       Home,
       Upsert,
       Browse,
-    ].reduce(
-      (acc, module) => ({ ...acc, ...route(module) }),
-      {},
-    ),
+    ].reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
     [staticFileRoute.config.routeOverride!]: staticFileRoute.createHandler({
       baseUrl: import.meta.url,
     }),
