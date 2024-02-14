@@ -167,8 +167,8 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
               media={media}
               checked={value?.some((v) => v.key === media.key)}
               onChecked={(selected) => toggleMedia(media, selected)}
-              maxWidth={30}
-              className="w-10"
+              maxWidth={50}
+              className="w-10 min-w-[2.5rem]"
               size="small"
             />
           ))}
