@@ -41,6 +41,7 @@ export const Uploader = forwardRef(
           ref={inputRef}
           type="file"
           multiple
+          webkitdirectory={true}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             upload(e.target?.files ?? [])
           }

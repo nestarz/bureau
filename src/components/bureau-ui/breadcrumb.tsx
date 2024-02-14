@@ -46,7 +46,7 @@ export const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
         {...props}
         ref={forwardedRef}
       >
-        <ol className="flex items-center">{clones}</ol>
+        <ol className="flex items-center flex-wrap">{clones}</ol>
       </nav>
     );
   }

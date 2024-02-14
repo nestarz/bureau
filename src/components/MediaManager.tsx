@@ -33,6 +33,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@/src/components/bureau-ui/breadcrumb.tsx";
+import { Badge } from "@/src/components/ui/badge.tsx";
 
 const MediaCard = ({
   className,
@@ -160,7 +161,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
           </Uploader>
         </div>
         <div className="flex overflow-x-auto max-w-full gap-2 min-h-10">
-          {value.map((media) => (
+          {value?.map((media) => (
             <MediaCard
               key={media.key}
               media={media}
@@ -268,6 +269,7 @@ export function MediaManager({
         : defaultValue) ?? null
   );
 
+  const MAX = 3;
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -280,14 +282,19 @@ export function MediaManager({
           />
           <div className="flex items-center gap-1 w-full">
             <span className="mr-auto">Choose a media</span>
-            {selection?.map((media) => (
-              <Media
-                key={media.key}
-                media={media}
-                maxWidth={50}
-                className="w-5 h-5 object-cover"
-              />
-            ))}
+            <div className="flex items-center gap-1 w-max">
+              {selection?.slice(0, MAX).map((media) => (
+                <Media
+                  key={media.key}
+                  media={media}
+                  maxWidth={20}
+                  mediaClassName="w-6 h-6 flex-1 rounded object-cover"
+                />
+              ))}
+              {(selection?.length ?? 0) - MAX > 0 ? (
+                <Badge variant="outline">+{selection.length - MAX}</Badge>
+              ) : null}
+            </div>
           </div>
         </Button>
       </DialogTrigger>

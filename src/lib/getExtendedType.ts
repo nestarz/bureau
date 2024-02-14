@@ -8,7 +8,11 @@ export const getExtendedType = (type: string, name: string) =>
     { type: "image", re: "svg(s|)_json" },
     { type: "video", re: "video(s|)_json" },
     { type: "video", re: "mp4(s|)_json" },
-    { type: "timestamp", re: "((timestamp(tz|))|(datetime))" },
+    {
+      type: "timestamp",
+      re:
+        "((timestamp(tz|))|(datetime)|(.*?_at$))",
+    },
     { type: "date", re: "date" },
   ].find(({ re }) => new RegExp(`(_|^)${re}(_|$)`, "gi").test(name))?.type ??
     type;
