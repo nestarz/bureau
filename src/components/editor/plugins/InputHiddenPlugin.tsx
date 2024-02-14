@@ -2,8 +2,7 @@ const { useLexicalComposerContext } = (
   await import("@lexical/react/LexicalComposerContext.js")
 ).default;
 const { $generateNodesFromDOM } = (await import("@lexical/html")).default;
-const { $insertNodes, $getRoot, $selectAll } =
-  (await import("lexical")).default;
+const { $insertNodes, $selectAll } = (await import("lexical")).default;
 const { $generateHtmlFromNodes } = (await import("@lexical/html")).default;
 
 import { Fragment, useEffect, useRef } from "react";
@@ -35,7 +34,11 @@ const HtmlGeneratorPlugin = ({ onChange }) => {
   const [editor] = useLexicalComposerContext();
 
   editor.registerUpdateListener(() =>
-    editor.update(() => onChange?.($generateHtmlFromNodes(editor, null)))
+    editor.update(() =>
+      globalThis?.document
+        ? onChange?.($generateHtmlFromNodes(editor, null))
+        : null
+    )
   );
 
   return null;
