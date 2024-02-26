@@ -1,28 +1,35 @@
-import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import {
+  FreshContext,
+  Handlers,
+  RouteConfig,
+} from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
 import { CustomInput } from "@/src/components/CustomInput.tsx";
-import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 import { Button } from "@/src/components/ui/button.tsx";
 import { Column } from "@/src/middlewares/client.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import urlcat from "outils/urlcat.ts";
 import createAdjacentOrderRetrieval from "@/src/lib/createAdjacentOrderRetrieval.ts";
 import { TrashIcon } from "@radix-ui/react-icons";
-import { jsonArrayFrom } from "npm:kysely/helpers/sqlite";
-import deserializeNestedJSON from "outils/deserializeNestedJSON.ts";
+import { jsonArrayFrom } from "kysely/helpers/sqlite";
+import deserializeNestedJSON, {
+  type JsonArray,
+} from "outils/deserializeNestedJSON.ts";
 import DataTable from "@/src/components/DataTable.tsx";
-import { sql } from "npm:kysely";
+import { sql } from "kysely";
 import { Fragment } from "react";
+import type { Table } from "@/src/middlewares/client.ts";
 
-export const config: RouteConfig["config"] = {
+export const config: RouteConfig = {
   routeOverride: "/upsert/:tableName{/}?",
 };
 
-export const handler = {
-  POST: async (
-    req: Request,
-    ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-  ) => {
+export const handler: Handlers<
+  null,
+  ClientMiddleware & SqliteMiddlewareState<any>
+> = {
+  POST: async (req, ctx) => {
     const tableConfig = ctx.state.tables.find(
       (table) => table.name === ctx.params.tableName
     )!;
@@ -102,6 +109,8 @@ export default async (
   const tableConfig = ctx.state.tables.find(
     (table) => table.name === ctx.params.tableName
   );
+  if (!tableConfig?.name) return new Response(null, { status: 404 });
+
   const mode =
     Object.entries(primaryKeys ?? {}).length > 0
       ? ("update" as const)
@@ -123,123 +132,137 @@ export default async (
       : [];
   const referencesSet = Array.from(
     new Set(
-      (tableConfig?.columns ?? [])
-        .filter((v) => v.references)
-        .map((v) => v.references)
+      (tableConfig?.columns ?? []).flatMap((v) =>
+        v.references ? [v.references] : []
+      )
     )
   );
-  const results = await ctx.state.clientQuery.default((qb) => {
-    for (const references of referencesSet) {
-      qb = qb.with(`cte_${tableConfig.name}_${references}`, (wb) => {
-        wb = wb.selectFrom(references).distinct().selectAll(references);
-        return wb;
-      });
-    }
-    if (referencedTables.length > 0) {
-      for (const referencedTable of referencedTables) {
-        const referencesArray = Array.from(
-          Map.groupBy(
-            (referencedTable?.columns ?? []).filter((v) => v.references),
-            (v) => v.references
+  const results: { [x: string]: string }[] =
+    await ctx.state.clientQuery.default((qb) => {
+      for (const references of referencesSet) {
+        qb = qb.with(`cte_${tableConfig.name}_${references}`, (wb: any) => {
+          wb = wb
+            .selectFrom(references)
+            .distinct()
+            .selectAll(references) as any;
+          return wb;
+        }) as any;
+      }
+      if (referencedTables.length > 0) {
+        for (const referencedTable of referencedTables) {
+          const referencesArray = Array.from(
+            Map.groupBy(
+              (referencedTable?.columns ?? []).filter((v) => v.references),
+              (v) => v.references
+            )
+          );
+          for (const [references, columns] of referencesArray) {
+            qb = qb.with(
+              `cte_${referencedTable.name}_${references}`,
+              (wb: any) => {
+                const newWb = (wb as typeof qb)
+                  .selectFrom(references!)
+                  .distinct()
+                  .selectAll(references!);
+                wb = newWb as any;
+                for (const column of columns) {
+                  const colWb = (wb as unknown as typeof newWb).innerJoin(
+                    referencedTable.name,
+                    sql.ref(`${referencedTable.name}.${column.name}`) as any,
+                    sql.ref(`${column.references}.${column.to}`) as any
+                  );
+                  wb = colWb as any;
+                }
+                return wb;
+              }
+            ) as any;
+          }
+        }
+        const newQb = qb.with("cte_referenced_cte", (wb) =>
+          wb.selectNoFrom((qb) =>
+            referencedTables.map((table) =>
+              jsonArrayFrom(
+                qb
+                  .selectFrom(table.name)
+                  .select(table.columns.map((column) => column.name))
+                  .$if(mode === "update", (wb) => {
+                    for (const [key, value] of Object.entries(primaryKeys)) {
+                      const fk = table.columns.find(
+                        (c) => c.references === tableConfig.name && key === c.to
+                      );
+                      if (fk) wb = wb.where(fk.name, "=", value);
+                    }
+                    return wb;
+                  })
+              ).as(table.name)
+            )
           )
         );
-        for (const [references, columns] of referencesArray) {
-          qb = qb.with(`cte_${referencedTable.name}_${references}`, (wb) => {
-            wb = wb.selectFrom(references).distinct().selectAll(references);
-            for (const column of columns) {
-              wb = wb.innerJoin(
-                referencedTable.name,
-                sql.ref(`${referencedTable.name}.${column.name}`),
-                sql.ref(`${column.references}.${column.to}`)
-              );
-            }
-            return wb;
-          });
-        }
-      }
-      qb = qb.with("cte_referenced_cte", (wb) =>
-        wb.selectNoFrom((qb) =>
-          referencedTables.map((table) =>
-            jsonArrayFrom(
-              qb
-                .selectFrom(table.name)
-                .select(table.columns.map((column) => column.name))
-                .$if(mode === "update", (wb) => {
-                  for (const [key, value] of Object.entries(primaryKeys)) {
-                    const fk = table.columns.find(
-                      (c) => c.references === tableConfig.name && key === c.to
-                    );
-                    wb = wb.where(fk.name, "=", value);
-                  }
-                  return wb;
-                })
-            ).as(table.name)
-          )
-        )
-      );
-    }
 
-    return qb
-      .with("cte_current_cte", (wb) =>
-        wb
-          .selectFrom(tableConfig.name)
-          .$if(orderKey, (wb) => wb.orderBy(orderKey))
-          .$if(mode === "update", (wb) => {
-            for (const [key, value] of Object.entries(primaryKeys)) {
-              wb = wb.where(key, "=", value);
-              wb = wb.orderBy(key, "desc");
-            }
-            return wb.limit(1);
-          })
-          .$if(mode === "insert", (wb) => wb.limit(0))
-          .selectAll()
-      )
-      .with("cte_previous_cte", (qb) =>
-        qb
-          .selectFrom([tableConfig.name, "cte_current_cte"])
-          .selectAll(tableConfig.name)
-          .$if(mode === "update", adjacentOrderRetrieval("desc"))
-      )
-      .with("cte_next_cte", (qb) =>
-        qb
-          .selectFrom([tableConfig.name, "cte_current_cte"])
-          .selectAll(tableConfig.name)
-          .$if(mode === "update", adjacentOrderRetrieval("asc"))
-      )
-      .selectNoFrom((qb) =>
-        [
+        qb = newQb as any;
+      }
+
+      return qb
+        .with("cte_current_cte", (wb) =>
+          wb
+            .selectFrom(tableConfig.name)
+            .$if(!!orderKey, (wb) => (orderKey ? wb.orderBy(orderKey) : wb))
+            .$if(mode === "update", (wb) => {
+              for (const [key, value] of Object.entries(primaryKeys)) {
+                wb = wb.where(key, "=", value);
+                wb = wb.orderBy(key, "desc");
+              }
+              return wb.limit(1);
+            })
+            .$if(mode === "insert", (wb) => wb.limit(0))
+            .selectAll()
+        )
+        .with("cte_previous_cte", (qb) =>
+          qb
+            .selectFrom([tableConfig.name, "cte_current_cte"])
+            .selectAll(tableConfig.name)
+            .$if(mode === "update", adjacentOrderRetrieval("desc"))
+        )
+        .with("cte_next_cte", (qb) =>
+          qb
+            .selectFrom([tableConfig.name, "cte_current_cte"])
+            .selectAll(tableConfig.name)
+            .$if(mode === "update", adjacentOrderRetrieval("asc"))
+        )
+        .selectNoFrom((qb) =>
           [
-            "referenced_cte",
-            referencedTables.map((table) => ({ name: table.name })),
-          ],
-          ["current_cte", tableConfig.columns],
-          ["next_cte", tableConfig.columns],
-          ["previous_cte", tableConfig.columns],
-          ...referencedTables.flatMap((table) =>
-            (table?.columns ?? [])
-              .filter((v) => v.references)
-              .map((subtable) => [
-                `${table.name}_${subtable.references}`,
-                tables.find((table) => table.name === subtable.references)
-                  .columns,
-              ])
-          ),
-          ...referencesSet.map((references) => [
-            `${tableConfig.name}_${references}`,
-            tables.find((table) => table.name === references).columns,
-          ]),
-        ]
-          .filter(([, columns]) => columns.length > 0)
-          .map(([references, columns]) =>
-            jsonArrayFrom(
-              qb
-                .selectFrom(`cte_${references}`)
-                .select(columns.map((column) => column.name))
-            ).as(references)
-          )
-      )
-      .compile();
-  });
+            [
+              "referenced_cte",
+              referencedTables.map((table) => ({ name: table.name })),
+            ],
+            ["current_cte", tableConfig.columns],
+            ["next_cte", tableConfig.columns],
+            ["previous_cte", tableConfig.columns],
+            ...referencedTables.flatMap((table) =>
+              (table?.columns ?? [])
+                .filter((v) => v.references)
+                .map((subtable) => [
+                  `${table.name}_${subtable.references}`,
+                  tables.find((table) => table.name === subtable.references)
+                    ?.columns,
+                ])
+            ),
+            ...referencesSet.map((references) => [
+              `${tableConfig.name}_${references}`,
+              tables.find((table) => table.name === references)?.columns,
+            ]),
+          ]
+            .filter(([, columns]) => (columns?.length ?? 0) > 0)
+            .map(([references, columns]) =>
+              jsonArrayFrom(
+                qb
+                  .selectFrom(`cte_${references}`)
+                  .select((columns as Column[])!.map((column) => column.name))
+              ).as(references as string)
+            )
+        )
+        .compile() as any;
+    });
 
   const referencesData = Object.fromEntries(
     referencesSet.map((references) => [
@@ -251,18 +274,22 @@ export default async (
   );
   const name = tableConfig?.name;
   const columns = tableConfig?.columns as Column[];
-  const referencedJson =
+  const referencedJson: [Table, JsonArray][] =
     referencedTables?.length > 0
       ? Object.entries(JSON.parse(results[0].referenced_cte)?.[0]).map(
           ([key, value]) => [
-            ctx.state.tables.find((table) => table.name === key),
-            deserializeNestedJSON(JSON.parse(value)),
+            ctx.state.tables.find((table) => table.name === key)!,
+            deserializeNestedJSON<JsonArray>(JSON.parse(value as string)),
           ]
         )
       : [];
-  const data = deserializeNestedJSON(JSON.parse(results[0].current_cte))?.[0];
-  const rowNext = deserializeNestedJSON(JSON.parse(results[0].next_cte))?.[0];
-  const rowPrev = deserializeNestedJSON(
+  const data = deserializeNestedJSON<{ [a: string]: any }[]>(
+    JSON.parse(results[0].current_cte)
+  )?.[0];
+  const rowNext = deserializeNestedJSON<{ [a: string]: any }[]>(
+    JSON.parse(results[0].next_cte)
+  )?.[0];
+  const rowPrev = deserializeNestedJSON<{ [a: string]: any }[]>(
     JSON.parse(results[0].previous_cte)
   )?.[0];
 
@@ -316,7 +343,7 @@ export default async (
                     href={
                       prevPk
                         ? urlcat("/admin/upsert/:name", { pk: prevPk, name })
-                        : null
+                        : undefined
                     }
                   >
                     Previous
@@ -327,7 +354,7 @@ export default async (
                     href={
                       nextPk
                         ? urlcat("/admin/upsert/:name", { pk: nextPk, name })
-                        : null
+                        : undefined
                     }
                   >
                     Next
@@ -346,11 +373,13 @@ export default async (
               disabled={column.pk === 1}
               name={column.name}
               defaultValue={data?.[column.name]}
-              required={column.notnull}
+              required={column.notnull > 0}
               type={column.type}
               className="w-full"
               references={column.references}
-              referencesRows={referencesData[column.references]}
+              referencesRows={
+                column.references ? referencesData[column.references] : null
+              }
               referencesTo={column.to}
             />
           ))}
@@ -369,7 +398,9 @@ export default async (
                   subtable.references,
                   deserializeNestedJSON(
                     JSON.parse(
-                      results[0][`${tableConfig.name}_${subtable.references}`]
+                      results[0][
+                        `${tableConfig.name}_${subtable.references}`
+                      ] as unknown as string
                     )
                   ),
                 ])

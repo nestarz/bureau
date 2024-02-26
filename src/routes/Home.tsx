@@ -1,8 +1,8 @@
-import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import { FreshContext, RouteConfig } from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
-import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 
-export const config: RouteConfig["config"] = {
+export const config: RouteConfig = {
   routeOverride: "/",
 };
 

@@ -3,9 +3,17 @@ import { cn } from "@/src/lib/utils.ts";
 import { Button } from "@/src/components/ui/button.tsx";
 import { Badge } from "@/src/components/ui/badge.tsx";
 
+interface Path {
+  active?: boolean;
+  href?: string;
+  label: string;
+  icon?: React.ComponentType<any>;
+  paths?: Path[];
+}
+
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  className: string;
   name: string;
+  paths: Path[];
 }
 
 export function Sidebar({ className, paths, name }: SidebarProps) {

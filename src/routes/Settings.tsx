@@ -1,20 +1,21 @@
-import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import {
+  FreshContext,
+  Handlers,
+  RouteConfig,
+} from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
-import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 import { Button } from "@/src/components/ui/button.tsx";
-import { Badge } from "@/src/components/ui/badge.tsx";
 
-export const config: RouteConfig["config"] = {
+export const config: RouteConfig = {
   routeOverride: "/settings{/}?",
 };
 
-export const handler = {
-  POST: async (
-    req: Request,
-    ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-  ) => {
-    const formData = await req.formData();
-    ctx.state.session.flash("x-data", returning);
+export const handler: Handlers<
+  null,
+  ClientMiddleware & SqliteMiddlewareState<any>
+> = {
+  POST: (req, _ctx) => {
     return new Response(null, {
       status: 302,
       headers: { Location: req.url },
@@ -46,7 +47,7 @@ export default async (
       <div className="flex gap-2 items-center">
         <Button asChild disabled={!!ctx.state.databaseKey}>
           <a
-            href={ctx.state.getS3Uri(ctx.state.databaseKey)}
+            href={ctx.state.getS3Uri(ctx.state.databaseKey).href}
             className="flex gap-2 items-center"
           >
             Export Database
@@ -54,7 +55,11 @@ export default async (
         </Button>
         <Button asChild disabled={!!ctx.state.analyticsKey}>
           <a
-            href={ctx.state.getS3Uri(ctx.state.analyticsKey)}
+            href={
+              ctx.state.analyticsKey
+                ? ctx.state.getS3Uri(ctx.state.analyticsKey).href
+                : undefined
+            }
             className="flex gap-2 items-center"
           >
             Export Analytics

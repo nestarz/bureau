@@ -1,6 +1,6 @@
-import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import { FreshContext, RouteConfig } from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
-import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 import {
   Card,
   CardContent,
@@ -15,11 +15,11 @@ import {
   TabsTrigger,
 } from "@/src/components/ui/tabs.tsx";
 
-export const config: RouteConfig["config"] = {
+export const config: RouteConfig = {
   routeOverride: "/analytics{/}?",
 };
 
-const createColumnsFromData = (data) =>
+const createColumnsFromData = (data: any): any =>
   Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
     name: key,
     type: typeof value,
@@ -84,8 +84,11 @@ export default async (
   _req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any, "analytics">>
 ) => {
+  console.log(ctx);
   const table: AnalyticsData = await ctx.state.clientQuery
     .analytics((qb) => ({
+      query: null!,
+      parameters: [],
       sql: `WITH
     filtered AS (SELECT * FROM analytics_visits WHERE hostname NOT LIKE '%deno.dev' AND hostname NOT LIKE '%localhost%'),
     ua AS (
@@ -144,7 +147,7 @@ export default async (
     ) as result
   FROM hits, uniques, "sessions", bounces;`,
     }))
-    .then((r) => JSON.parse(r[0].result))
+    .then((r) => JSON.parse((r[0] as any).result))
     .catch(() => null);
 
   const tabs = [
@@ -235,7 +238,7 @@ export default async (
         {tabs.map(({ data, title }) => (
           <TabsContent
             value={title}
-            forceMount={!globalThis?.document}
+            forceMount={!globalThis?.document ? true : undefined}
             className="data-[state=inactive]:hidden"
           >
             <DataTable

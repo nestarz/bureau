@@ -16,9 +16,22 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
+
+interface CustomInputProps {
+  type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
+  name: string;
+  references?: string | null;
+  referencesRows?: any[];
+  referencesTo?: string;
+  disabled?: boolean;
+  defaultValue?: any;
+  required?: boolean;
+  label?: string;
+  className?: string;
+}
 
 export const CustomInput = ({
   type,
@@ -27,16 +40,15 @@ export const CustomInput = ({
   referencesRows,
   referencesTo,
   ...props
-}: {
-  type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
-  name: string;
-  references?: string | null;
-}) => {
+}: CustomInputProps) => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
   );
 
-  const components = {
+  const components: Record<
+    string,
+    (arg: CustomInputProps & { children?: any }) => any
+  > = {
     TEXT: ({ children: _v, ...props }) => <Input {...props} type="text" />,
     INTEGER: ({ children: _v, ...props }) => <Input {...props} type="number" />,
     REAL: ({ children: _v, ...props }) => (
@@ -53,13 +65,13 @@ export const CustomInput = ({
     date: ({ children: _v, ...props }) => <Input {...props} type="date" />,
   };
   const Component = references
-    ? ({ ...props }) => (
+    ? ({ ...props }: CustomInputProps & { children?: any }) => (
         <ComboBoxResponsive
           {...props}
           optionsName={references}
-          options={referencesRows.map((row) => ({
+          options={(referencesRows ?? []).map((row) => ({
             label: row.name ?? row.title ?? row.label ?? row.key,
-            value: row[referencesTo],
+            value: row[referencesTo!],
           }))}
         />
       )

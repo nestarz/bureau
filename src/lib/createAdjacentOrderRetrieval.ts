@@ -1,4 +1,4 @@
-import { type SelectQueryBuilder, sql } from "npm:kysely";
+import { type SelectQueryBuilder, sql } from "kysely";
 
 export const createAdjacentOrderRetrieval = (
   targetName: string,

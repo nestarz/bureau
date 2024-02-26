@@ -1,14 +1,56 @@
-import { lookup } from "https://deno.land/x/mrmime@v1.0.1/mod.ts";
-import type { RouteConfig } from "outils/createRenderPipe.ts";
-import type { S3Client } from "https://deno.land/x/s3_lite_client@0.6.1/mod.ts";
+import { lookup } from "mrmime";
+import type { Handler, RouteConfig } from "outils/fresh/types.ts";
 
-export const config: RouteConfig["config"] = {
+export interface S3Object {
+  type: "Object";
+  key: string;
+  lastModified: Date;
+  etag: string;
+  size: number;
+}
+
+export interface S3Client {
+  defaultBucket?: string;
+  listObjects(options?: {
+    prefix?: string;
+    bucketName?: string;
+    maxResults?: number;
+    pageSize?: number;
+  }): AsyncGenerator<S3Object, void, undefined>;
+  getObject(
+    objectName: string,
+    options?: {
+      bucketName?: string;
+      versionId?: string;
+    }
+  ): Promise<Response>;
+  deleteObject(
+    objectName: string,
+    options?: {
+      bucketName?: string;
+      versionId?: string;
+      governanceBypass?: boolean;
+    }
+  ): Promise<void>;
+  getPresignedUrl(
+    method: "GET" | "PUT" | "HEAD" | "DELETE",
+    objectName: string,
+    options: {
+      bucketName?: string;
+      parameters?: Record<string, string>;
+      expirySeconds?: number;
+      requestDate?: Date;
+    }
+  ): Promise<string>;
+}
+
+export const config: RouteConfig = {
   routeOverride: "/api/medias{/}?",
 };
 
 const filterByAcceptRule = (
   object: { [key: string]: any; "content-type": string },
-  acceptRule: string,
+  acceptRule: string
 ): boolean => {
   const rules = acceptRule.split(",").map((rule) => rule.trim());
   for (const rule of rules) {
@@ -24,22 +66,22 @@ const filterByAcceptRule = (
   return false;
 };
 
-export const handler = async (
-  req: Request,
-  ctx: { s3Client: S3Client; getS3Uri: (key: string) => string | URL },
-) => {
+export const handler: Handler<
+  null,
+  { s3Client: S3Client; getS3Uri: (key: string) => string | URL }
+> = async (req, ctx) => {
   const { getS3Uri, s3Client: s3 } = ctx.state;
   if (req.method === "PUT") {
     const objectName = new URL(req.url).searchParams.get("object_name");
     return typeof objectName !== "string"
       ? new Response(null, {
-        status: 500,
-        statusText: "Missing object_name",
-      })
+          status: 500,
+          statusText: "Missing object_name",
+        })
       : new Response(
-        await s3.getPresignedUrl("PUT", objectName, { expirySeconds: 5 }),
-        { headers: { "content-type": "text/raw" } },
-      );
+          await s3.getPresignedUrl("PUT", objectName, { expirySeconds: 5 }),
+          { headers: { "content-type": "text/raw" } }
+        );
   }
   if (req.method === "DELETE") {
     const { medias = [] } = await req.json().catch(() => ({}));
@@ -67,13 +109,11 @@ export const handler = async (
     });
   }
   const results: any[] = [];
-  for await (
-    const result of s3.listObjects({
-      prefix: ["medias", prefix].filter((v) => v).join("/"),
-      pageSize,
-      maxResults,
-    })
-  ) {
+  for await (const result of s3.listObjects({
+    prefix: ["medias", prefix].filter((v) => v).join("/"),
+    pageSize,
+    maxResults,
+  })) {
     if (result.key.includes("ds_store")) continue;
     const url = getS3Uri(result.key);
     results.push({ ...result, url, "content-type": lookup(result.key) });
@@ -85,10 +125,10 @@ export const handler = async (
         .filter(
           ({ key }) =>
             typeof _ilike !== "string" ||
-            key.match(new RegExp(`^${(_ilike ?? "")?.replace(/%/g, ".*")}$`)),
+            key.match(new RegExp(`^${(_ilike ?? "")?.replace(/%/g, ".*")}$`))
         )
-        .filter((v) => filterByAcceptRule(v, accept ?? "*")),
+        .filter((v) => filterByAcceptRule(v, accept ?? "*"))
     ),
-    { headers: { "Content-Type": "application/json" } },
+    { headers: { "Content-Type": "application/json" } }
   );
 };

@@ -2,9 +2,14 @@ import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useRef } from "react";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
+
+export interface MediaProp {
+  key: string;
+  "content-type": string;
+}
 
 let endpoint: string;
 export const MediaContext = ({ endpoint: value }: { endpoint: string }) => {
@@ -12,8 +17,8 @@ export const MediaContext = ({ endpoint: value }: { endpoint: string }) => {
   return null;
 };
 
-const Video = ({ src, className }) => {
-  const ref = useRef();
+const Video = ({ src, className }: { src?: string; className?: string }) => {
+  const ref = useRef<HTMLVideoElement>(null!);
   return (
     <video
       ref={ref}
@@ -37,14 +42,16 @@ export const Media = ({
   media,
   maxWidth,
 }: {
-  media: { key: string; "content-type": string };
+  className?: string;
+  mediaClassName?: string;
+  media: MediaProp;
   maxWidth: number;
 }) => {
   return (
     <div className={className}>
       {/image\//.test(media["content-type"]) ? (
         <Picture
-          src={endpoint ? new URL(media.key, endpoint).href : null}
+          src={endpoint ? new URL(media.key, endpoint).href : undefined}
           maxWidth={maxWidth}
           className={cn(
             "aspect-square object-contain w-full h-auto",
@@ -53,7 +60,7 @@ export const Media = ({
         />
       ) : /video\//.test(media["content-type"]) ? (
         <Video
-          src={endpoint ? new URL(media.key, endpoint).href : null}
+          src={endpoint ? new URL(media.key, endpoint).href : undefined}
           className={mediaClassName}
         />
       ) : (

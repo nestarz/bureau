@@ -1,165 +1,140 @@
+// @deno-types="npm:@types/react-dom@18.2/server"
 import { renderToReadableStream } from "react-dom/server";
-import * as Islands from "islet/server";
-import * as staticFileRoute from "outils/staticFileRoute.ts";
-import * as Hmr from "outils/hmr.ts";
-import createRenderPipe from "outils/createRenderPipe.ts";
-import middleware from "outils/fresh/middleware.ts";
-import toArray from "outils/toArray.ts";
+import * as Islands from "@bureaudouble/islet/server";
+import { join } from "@std/path/join";
+
+import type { PluginMiddleware } from "outils/fresh/types.ts";
+import createRenderer from "outils/fresh/createRenderPipe.ts";
+import createSqlitePlugin from "outils/database/sqlite/createSqlitePlugin.ts";
+import createHmrPlugin from "outils/fresh/createHmrPlugin.ts";
+import createStaticFilePlugin from "outils/fresh/createStaticFilePlugin.ts";
+import createTailwindPlugin from "outils/fresh/createTailwindPlugin.ts";
+import { composeRoutes, type rutt } from "outils/fresh/composeRoutes.ts";
+
+import {
+  type AnalyticsConfig,
+  createAnalyticsPlugin,
+} from "@/src/routes/analytics/createAnalyticsPlugin.ts";
+import { namespace } from "@/src/lib/useClient.ts";
+import { createClientMiddleware } from "@/src/middlewares/client.ts";
+import * as Layout from "@/src/routes/_Layout.tsx";
 import * as Home from "@/src/routes/Home.tsx";
 import * as Upsert from "@/src/routes/Upsert.tsx";
 import * as Browse from "@/src/routes/Browse.tsx";
-import { createHandler } from "@/src/middlewares/client.ts";
 import * as MiddlewareSession from "@/src/middlewares/session.ts";
-import createSqliteMiddleware from "outils/sqliteMiddleware.ts";
-import adaptFreshPlugin from "outils/fresh/adaptFreshPlugin.ts";
-import { join } from "std/path/join.ts";
-import { namespace } from "@/src/lib/useClient.ts";
-import { createAnalyticsPlugin } from "@/src/routes/analytics/createAnalyticsPlugin.ts";
-import * as Layout from "@/src/routes/_Layout.tsx";
 import * as Settings from "@/src/routes/Settings.tsx";
 import * as ApiMedias from "@/src/routes/api/medias.ts";
 import * as SqlEditor from "@/src/routes/SqlEditor.tsx";
 import * as Analytics from "@/src/routes/Analytics.tsx";
 import * as ApiReorder from "@/src/routes/api/reorder.ts";
-import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
 
-const withWritePermission =
+const withWritePermission: boolean =
   (await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
     "granted";
 
+interface BureauConfig {
+  database: any;
+  databaseKey?: string;
+  basePath?: string;
+  getS3Uri: () => URL; // Replace with the actual function signature if different
+  s3Client: ApiMedias.S3Client;
+  analyticsConfig?: AnalyticsConfig;
+  isDev?: boolean;
+  middleware?: PluginMiddleware[];
+}
+
 export default async ({
-  parentPathSegment,
+  basePath = "/admin/",
   database,
   databaseKey = "database.sqlite",
-  analytics,
-  analyticsKey,
   getS3Uri,
   s3Client,
-  getIpData,
   isDev,
   middleware: middlewareFns,
-  analyticsPathSegment = "../analytics",
-}: {
-  parentPathSegment: string;
-  database: any;
-}) => {
-  const getPrefixFn = (parentPathSegment: string) => (key: string) => {
-    const path = join("_islet", parentPathSegment, "tailwindcss", key);
-    return new URL(import.meta.resolve("./".concat(path)));
-  };
-  const getPrefix = getPrefixFn(parentPathSegment);
-  if (withWritePermission && import.meta.url.startsWith("file://")) {
-    const tailwindConfig = await import("./tailwind.config.ts");
-    const postcss = (await import("postcss")).default;
-    const cssnano = (await import("cssnano")).default;
-    const autoprefixer = (await import("autoprefixer")).default;
-    const tailwindCss = (await import("tailwindcss")).default;
-    const { getHashSync } = await import("scripted");
-    const newCss = await postcss([
-      tailwindCss(tailwindConfig.default) as any,
-      cssnano(),
-      autoprefixer(),
-    ])
-      .process(tailwindConfig.globalCss, { from: undefined })
-      .then((v) => v.css);
-    const hash = getHashSync(newCss);
-    const filename = getPrefix(`${hash}.css`);
-    await Deno.remove(getPrefix(""), { recursive: true }).catch(() => null);
-    await Deno.mkdir(getPrefix(""), { recursive: true });
-    await Deno.writeTextFile(
-      getPrefix("snapshot.json"),
-      JSON.stringify({ filename: `${hash}.css` }),
-    );
-    await Deno.writeTextFile(filename, newCss);
-  }
-  const newCss = await fetch(getPrefix("snapshot.json"))
-    .then((response) => response.json())
-    .then((snapshot) => fetch(getPrefix(snapshot.filename)))
-    .then((response) => response.text())
-    .catch(console.error)
-    .catch(() => null);
+  analyticsConfig,
+}: BureauConfig): Promise<any> => {
+  Islands.setNamespaceParentPathSegment(namespace, basePath ?? "");
 
-  const renderPipe = createRenderPipe((vn) =>
-    Promise.resolve(vn)
-      .then(renderToReadableStream)
-      .then(Islands.addScripts as any)
-      .then(async (stream) => {
-        const string = await new Response(stream).text();
-        return string.replace(
-          string.includes("</head>") ? /(<\/head>)/ : /(.*)/,
-          (_, $1) => (newCss ? `<style tailwind>${newCss}</style>${$1}` : $1),
-        );
-      })
-  );
-
-  if (analytics) await createRequiredTables(analytics);
-  const [sqliteMiddleware, analyticsMiddleware] = [
-    ["default", database],
-    ...(analytics ? [["analytics", analytics]] : []),
-  ].map(([namespace, database]) =>
-    createSqliteMiddleware({
-      namespace,
-      database,
-      withDeserializeNestedJSON: true,
-    })
-  );
-
-  const route = (module: Parameters<typeof renderPipe>[0]) => ({
-    [module.config!.routeOverride!]: middleware(
-      ...toArray(
-        typeof middlewareFns === "function"
-          ? middlewareFns(module)
-          : middlewareFns,
-      ),
-      Hmr.middleware,
-      ...MiddlewareSession.middleware.handler,
-      sqliteMiddleware.handler,
-      analyticsMiddleware.handler,
-      createHandler({
-        parentPathSegment,
-        getS3Uri,
-        s3Client,
-        databaseKey,
-        analyticsKey,
-      }),
-      renderPipe(module, { Layout }),
-    ),
+  const analytics = analyticsConfig
+    ? await createAnalyticsPlugin(analyticsConfig)
+    : null;
+  const sqlitePlugin = createSqlitePlugin({
+    namespace: "default",
+    database,
+    withDeserializeNestedJSON: true,
   });
+  const hmr = await createHmrPlugin({
+    path: "/__hmr",
+    hmrEventName: Islands.hmrNewIsletSnapshotEventName,
+  });
+  const islet = await Islands.createIsletPlugin({
+    jsxImportSource: "react",
+    baseUrl: new URL(import.meta.url),
+    namespace,
+    prefix: join(basePath ?? "", "/islands/"),
+    importMapFileName: "deno.json",
+    esbuildOptions: {
+      minify: !(isDev ?? withWritePermission),
+      logLevel: "verbose",
+    },
+  });
+  const tailwindPlugin = await createTailwindPlugin({
+    basePath,
+    baseUrl: new URL(".", import.meta.url).href,
+    tailwindConfig: () => import("@/tailwind.config.ts"),
+  });
+  const staticFilePlugin = createStaticFilePlugin({ baseUrl: import.meta.url });
 
-  Islands.setNamespaceParentPathSegment(namespace, parentPathSegment);
+  const routes: rutt.Routes[] = [
+    composeRoutes({
+      routes: [
+        ApiMedias,
+        ApiReorder,
+        Analytics,
+        SqlEditor,
+        Settings,
+        Home,
+        Upsert,
+        Browse,
+      ],
+      middlewares: [
+        middlewareFns,
+        hmr.middlewares,
+        sqlitePlugin.middlewares,
+        analytics?.middlewares,
+        MiddlewareSession.createMiddleware(),
+        createClientMiddleware({
+          basePath,
+          getS3Uri,
+          s3Client,
+          databaseKey,
+          analyticsKey: analyticsConfig?.databaseKey,
+        }),
+      ],
+      renderer: createRenderer<React.ReactElement>({
+        Layout,
+        virtualNodePipe: (vn) =>
+          Promise.resolve(vn)
+            .then(renderToReadableStream)
+            .then(Islands.addScripts)
+            .then(tailwindPlugin.transformEnd),
+      }),
+    }),
+    composeRoutes({
+      routes: analytics?.routes,
+      middlewares: analytics?.middlewares,
+    }),
+    composeRoutes({
+      routes: [
+        staticFilePlugin.routes,
+        hmr.routes,
+        islet.routes,
+      ],
+    }),
+  ];
 
-  return {
-    ...createAnalyticsPlugin({
-      database: analytics,
-      parentPathSegment: analyticsPathSegment,
-      getIpData,
-    })
-      .map(adaptFreshPlugin)
-      .flatMap((module) => module.routes)
-      .reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
-    ...[
-      ApiMedias,
-      ApiReorder,
-      Analytics,
-      SqlEditor,
-      Settings,
-      Home,
-      Upsert,
-      Browse,
-    ].reduce((acc, module) => ({ ...acc, ...route(module) }), {}),
-    [staticFileRoute.config.routeOverride!]: staticFileRoute.createHandler({
-      baseUrl: import.meta.url,
-    }),
-    [Hmr.config.routeOverride!]: await Hmr.createHandler({
-      hmrEventName: Islands.hmrNewIsletSnapshotEventName,
-    }),
-    [Islands.config.routeOverride]: await Islands.createHandler({
-      jsxImportSource: "react",
-      baseUrl: new URL(import.meta.url),
-      namespace,
-      prefix: join(parentPathSegment, "/islands/"),
-      importMapFileName: "deno.json",
-      esbuildOptions: { minify: !(isDev ?? withWritePermission) },
-    }),
-  };
+  return Object.assign(
+    {},
+    ...Object.values(Object.assign({}, ...routes)),
+  ) as rutt.Routes;
 };

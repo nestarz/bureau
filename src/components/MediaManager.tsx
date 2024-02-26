@@ -12,8 +12,8 @@ import {
 import { Input } from "@/src/components/ui/input.tsx";
 import { Label } from "@/src/components/ui/label.tsx";
 import { Fragment, useState } from "react";
-import useSWR from "npm:swr";
-import { toast } from "npm:sonner";
+import useSWR from "swr";
+import { toast } from "sonner";
 import { CheckCircledIcon, CircleIcon, TrashIcon } from "@radix-ui/react-icons";
 import slugify from "outils/slugify.ts";
 
@@ -23,7 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card.tsx";
-import Media from "@/src/components/Media.tsx";
+import Media, { type MediaProp } from "@/src/components/Media.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useDebounce } from "@/src/lib/useDebounce.ts";
 import { Uploader } from "@/src/components/bureau-ui/uploader.tsx";
@@ -35,6 +35,17 @@ import {
 } from "@/src/components/bureau-ui/breadcrumb.tsx";
 import { Badge } from "@/src/components/ui/badge.tsx";
 
+interface MediaCardProps {
+  className?: string;
+  folder?: string;
+  media: MediaProp;
+  checked?: boolean;
+  onChecked?: (checked: boolean) => void;
+  maxWidth?: number;
+  onDelete?: () => void;
+  size?: "small" | "large";
+}
+
 const MediaCard = ({
   className,
   folder,
@@ -44,14 +55,14 @@ const MediaCard = ({
   maxWidth,
   onDelete,
   size,
-}) => (
+}: MediaCardProps) => (
   <Card
     className={cn(
       checked ? "border-accent-foreground" : "",
       "overflow-hidden",
       className
     )}
-    onClick={size === "small" ? () => onChecked?.(!checked) : null}
+    onClick={size === "small" ? () => onChecked?.(!checked) : undefined}
   >
     {size !== "small" && (
       <div className="w-full h-0 relative z-10 flex gap-1 justify-between">
@@ -76,7 +87,7 @@ const MediaCard = ({
     {size !== "small" && (
       <CardHeader className="p-2 pt-0 space-y-0">
         <CardTitle className="truncate text-xs">
-          {media.key.replace(folder, "").replace(/^\//, "")}
+          {media.key.replace(folder ?? "", "").replace(/^\//, "")}
         </CardTitle>
         <CardDescription className="text-xs">
           {media["content-type"]}
@@ -86,9 +97,19 @@ const MediaCard = ({
   </Card>
 );
 
-const MediaManagerContent = ({ onChange, value, accept }) => {
-  const [ilike, setIlike] = useState();
-  const debouncedIlike = useDebounce(ilike, 1000);
+interface MediaManagerContentProps {
+  onChange?: (newVal?: null | MediaProp[]) => void;
+  value?: MediaProp[] | null;
+  accept?: string; // assuming accept is a string, modify as needed
+}
+
+const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
+  onChange,
+  value,
+  accept,
+}) => {
+  const [ilike, setIlike] = useState<string | undefined | null>();
+  const debouncedIlike = useDebounce({ value: ilike, delay: 1000 });
   const { data, mutate } = useSWR(
     ["/admin/api/medias", accept, debouncedIlike],
     ([url, accept, ilike]) =>
@@ -97,7 +118,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
         body: JSON.stringify({ accept, ilike }),
       }).then((r) => r.json())
   );
-  const toggleMedia = (media, isSelected) => {
+  const toggleMedia = (media: MediaProp, isSelected: boolean): void => {
     onChange?.(
       isSelected
         ? [...(value ?? []), media]
@@ -113,7 +134,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
     getFolder,
     getFolderName,
     addFolder,
-  } = useFileBrowser({
+  } = useFileBrowser<MediaProp>({
     initialPath: "medias",
     files: data ?? [],
     getKey: ({ key }) => key,
@@ -142,7 +163,7 @@ const MediaManagerContent = ({ onChange, value, accept }) => {
             variant="outline"
             onClick={() => {
               const name = prompt("Choose a name");
-              if (name?.trim()) addFolder(name, slugify);
+              if (name?.trim()) addFolder(name, (v) => slugify(v)!);
             }}
           >
             New Folder
@@ -254,6 +275,15 @@ const parseJSON = (obj: any) => {
   }
 };
 
+interface MediaManagerProps {
+  defaultValue?: string;
+  name: string;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+  accept?: string;
+}
+
 export function MediaManager({
   defaultValue,
   name,
@@ -261,8 +291,8 @@ export function MediaManager({
   accept,
   required,
   className,
-}) {
-  const [selection, setSelection] = useState<Media[]>(
+}: MediaManagerProps) {
+  const [selection, setSelection] = useState<MediaProp[] | null | undefined>(
     () =>
       (typeof defaultValue === "string"
         ? parseJSON(defaultValue)
@@ -292,7 +322,9 @@ export function MediaManager({
                 />
               ))}
               {(selection?.length ?? 0) - MAX > 0 ? (
-                <Badge variant="outline">+{selection.length - MAX}</Badge>
+                <Badge variant="outline">
+                  +{(selection ?? []).length - MAX}
+                </Badge>
               ) : null}
             </div>
           </div>
@@ -301,7 +333,7 @@ export function MediaManager({
       <DialogContent className="sm:max-w-4xl h-full max-h-[90vh] flex flex-col">
         <MediaManagerContent
           value={selection}
-          onChange={setSelection}
+          onChange={(v) => setSelection(v)}
           accept={accept}
         />
       </DialogContent>

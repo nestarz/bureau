@@ -1,5 +1,5 @@
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
 
 import * as React from "react";
@@ -79,6 +79,11 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
 }: {
   options: T[];
   className?: string;
+  defaultValue?: string | number;
+  name: string;
+  optionsName: string;
+  disabled?: boolean;
+  required?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");

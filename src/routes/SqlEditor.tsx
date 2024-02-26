@@ -1,22 +1,30 @@
-import { FreshContext, RouteConfig } from "outils/createRenderPipe.ts";
+import {
+  FreshContext,
+  Handlers,
+  RouteConfig,
+} from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
-import type { SqliteMiddlewareState } from "outils/sqliteMiddleware.ts";
+import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 import { SqlInput } from "@/src/components/SqlInput.tsx";
 import { Button } from "@/src/components/ui/button.tsx";
 import DataTable from "@/src/components/DataTable.tsx";
 
-export const config: RouteConfig["config"] = {
+export const config: RouteConfig = {
   routeOverride: "/sqleditor{/}?",
 };
 
-export const handler = {
-  POST: async (
-    req: Request,
-    ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-  ) => {
+export const handler: Handlers<
+  null,
+  ClientMiddleware & SqliteMiddlewareState<any>
+> = {
+  POST: async (req, ctx) => {
     const formData = await req.formData();
     const returning = await ctx.state.clientQuery
-      .default(() => ({ sql: formData.get("sql") }))
+      .default(() => ({
+        sql: formData.get("sql") as string,
+        query: null!,
+        parameters: [],
+      }))
       .then((data) => ({ data }))
       .catch((error) => ({ error: error.toString() }));
 
@@ -54,10 +62,12 @@ export default async (
       </div>
       <DataTable
         name={"query"}
-        columns={Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
-          name: key,
-          type: typeof value,
-        }))}
+        columns={
+          Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
+            name: key,
+            type: typeof value as any,
+          })) as any
+        }
         data={data ?? []}
       />
     </form>

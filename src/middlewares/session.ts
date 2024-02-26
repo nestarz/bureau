@@ -1,8 +1,5 @@
-import type { Middleware } from "$fresh/src/server/types.ts";
-import {
-  cookieSession,
-  type WithSession,
-} from "https://deno.land/x/fresh_session@0.2.2/mod.ts";
+import { cookieSession, type WithSession } from "fresh_session";
+import type { MiddlewareModule } from "outils/fresh/types.ts";
 
 export interface SessionMiddlewareState extends WithSession {
   lang: string;
@@ -14,11 +11,13 @@ const session = cookieSession({
   sameSite: "Strict",
 });
 
-export const middleware: Middleware<SessionMiddlewareState> = {
+export const createMiddleware = (): MiddlewareModule<
+  SessionMiddlewareState
+> => ({
   handler: [
     (req, ctx) => session(req, ctx),
-    (req, ctx) => {
+    (_req, ctx) => {
       return ctx.next();
     },
   ],
-};
+});

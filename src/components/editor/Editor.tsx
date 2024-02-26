@@ -47,10 +47,11 @@ function Placeholder() {
 }
 
 const editorConfig = {
+  namespace: "",
   // The editor theme
   theme: ExampleTheme,
   // Handling of errors during update
-  onError(error) {
+  onError(error: any) {
     throw error;
   },
   // Any custom nodes go here
@@ -69,13 +70,29 @@ const editorConfig = {
   ],
 };
 
-export function Editor({ defaultValue, name, disabled, required, className }) {
+// Define the prop types for the Editor component
+interface EditorProps {
+  defaultValue?: string;
+  name: string;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+}
+
+// Destructure the props in the component definition using the EditorProps interface
+export function Editor({
+  defaultValue,
+  name,
+  disabled,
+  required,
+  className,
+}: EditorProps): JSX.Element {
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div
         className={cn(
           "relative leading-5 font-normal text-left rounded-md w-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm",
-          className,
+          className
         )}
       >
         <InputHiddenPlugin
@@ -91,7 +108,7 @@ export function Editor({ defaultValue, name, disabled, required, className }) {
               <ContentEditable className="min-h-40 outline-none resize-none text-sm caret-primary relative px-3 py-4 prose prose-black min-w-none" />
             }
             placeholder={<Placeholder />}
-            ErrorBoundary={LexicalErrorBoundary}
+            ErrorBoundary={LexicalErrorBoundary as any}
           />
           <HistoryPlugin />
           <AutoFocusPlugin />

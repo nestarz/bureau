@@ -30,7 +30,11 @@ export function LoadHtmlPlugin({
   return null;
 }
 
-const HtmlGeneratorPlugin = ({ onChange }) => {
+const HtmlGeneratorPlugin = ({
+  onChange,
+}: {
+  onChange?: (arg: string) => any;
+}) => {
   const [editor] = useLexicalComposerContext();
 
   editor.registerUpdateListener(() =>
@@ -50,9 +54,12 @@ export function InputHiddenPlugin({
   disabled,
   required,
 }: {
+  name: string;
+  disabled?: boolean;
+  required?: boolean;
   defaultValue?: string;
 }) {
-  const ref = useRef();
+  const ref = useRef<HTMLInputElement>(null);
 
   return (
     <Fragment>
@@ -65,7 +72,11 @@ export function InputHiddenPlugin({
         required={required}
       />
       <LoadHtmlPlugin string={defaultValue} />
-      <HtmlGeneratorPlugin onChange={(value) => (ref.current.value = value)} />
+      <HtmlGeneratorPlugin
+        onChange={(value) => {
+          if (ref.current) ref.current.value = value;
+        }}
+      />
     </Fragment>
   );
 }

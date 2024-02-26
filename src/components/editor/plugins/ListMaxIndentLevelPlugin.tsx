@@ -1,15 +1,25 @@
-const { $getListDepth, $isListItemNode, $isListNode } = (await import("@lexical/list")).default;
-const { useLexicalComposerContext } = (await import("@lexical/react/LexicalComposerContext.js")).default;
-const { $getSelection, $isElementNode, $isRangeSelection, INDENT_CONTENT_COMMAND, COMMAND_PRIORITY_HIGH } = (await import("lexical")).default;
+const { $getListDepth, $isListItemNode, $isListNode } = (
+  await import("@lexical/list")
+).default;
+const { useLexicalComposerContext } = (
+  await import("@lexical/react/LexicalComposerContext.js")
+).default;
+const {
+  $getSelection,
+  $isElementNode,
+  $isRangeSelection,
+  INDENT_CONTENT_COMMAND,
+  COMMAND_PRIORITY_HIGH,
+} = (await import("lexical")).default;
 import { useEffect } from "react";
 
-function getElementNodesInSelection(selection) {
-  const nodesInSelection = selection.getNodes();
+function getElementNodesInSelection(selection: any): Set<any> {
+  const nodesInSelection = selection.getNodes() as any[];
 
   if (nodesInSelection.length === 0) {
     return new Set([
       selection.anchor.getNode().getParentOrThrow(),
-      selection.focus.getNode().getParentOrThrow()
+      selection.focus.getNode().getParentOrThrow(),
     ]);
   }
 
@@ -18,7 +28,7 @@ function getElementNodesInSelection(selection) {
   );
 }
 
-function isIndentPermitted(maxDepth) {
+function isIndentPermitted(maxDepth: number): boolean {
   const selection = $getSelection();
 
   if (!$isRangeSelection(selection)) {
@@ -47,7 +57,11 @@ function isIndentPermitted(maxDepth) {
   return totalDepth <= maxDepth;
 }
 
-export default function ListMaxIndentLevelPlugin({ maxDepth }) {
+export default function ListMaxIndentLevelPlugin({
+  maxDepth,
+}: {
+  maxDepth?: number;
+}): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

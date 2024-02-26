@@ -655,7 +655,7 @@ export const globalCss = `
 const config = {
   darkMode: ["class"],
   content: [
-    import.meta.dirname?.concat("/src/**/*.{ts,tsx}"),
+    import.meta.dirname?.concat("/src/**/*.{ts,tsx}")!,
   ],
   prefix: "",
   theme: {

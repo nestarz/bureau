@@ -1,11 +1,25 @@
-import convertToPlain from "outils/convertToPlain.ts";
-import Media from "@/src/components/Media.tsx";
+import Media, { type MediaProp } from "@/src/components/Media.tsx";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import { Badge } from "@/src/components/ui/badge.tsx";
 
 const MAX = 3;
 
-export default ({ href, value, type, references }) => {
+export default ({
+  href,
+  value,
+  type,
+  references,
+}: {
+  href: string;
+  value: any;
+  type: string;
+  references?: {
+    name?: string;
+    title?: string;
+    label?: string;
+    key?: string;
+  } | null;
+}) => {
   const Comp = href ? "a" : "div";
   return (
     <Comp className="flex space-x-2" href={href}>
@@ -15,7 +29,7 @@ export default ({ href, value, type, references }) => {
         ) : typeof value === "object" ? (
           type === "image" ? (
             <div className="flex items-center gap-1 w-max">
-              {value?.slice(0, MAX).map((media) => (
+              {(value as MediaProp[])?.slice(0, MAX).map((media) => (
                 <Media
                   key={media.key}
                   media={media}
@@ -31,7 +45,7 @@ export default ({ href, value, type, references }) => {
             JSON.stringify(value)
           )
         ) : typeof value === "string" ? (
-          convertToPlain(value)
+          value
         ) : (
           value
         )}

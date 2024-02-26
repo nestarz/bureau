@@ -1,5 +1,6 @@
-import { S3Client } from "s3_lite_client";
-import sqliteMemorySync from "outils/sqliteMemorySync.ts";
+import { S3Client } from "https://deno.land/x/s3_lite_client@0.6.2/mod.ts";
+import sqliteMemorySync from "outils/database/sqlite/memorySync.ts";
+import { DB } from "https://deno.land/x/sqlite@v3.8/mod.ts";
 
 export const getS3Uri = (key: string) =>
   new URL(key, Deno.env.get("S3_PUBLIC_URL")!);
@@ -16,6 +17,7 @@ export const s3Client = new S3Client({
 
 const createDatabase = (filename: string) =>
   sqliteMemorySync(
+    DB,
     () => s3Client.getObject(filename).then((r) => r.arrayBuffer()),
     (buffer) => s3Client.putObject(filename, buffer).then(() => true),
     () => s3Client.statObject(filename).then((r) => r.etag),

@@ -1,10 +1,7 @@
-import sql from "https://esm.sh/noop-tag@2.0.0";
-import type { DB } from "../../mod.ts";
-
-export default async (db: DB) => {
+export default async (db: any) => {
   await db
     .query(
-      sql`
+      /* sql */ `
   CREATE TABLE IF NOT EXISTS "analytics_visits" (
     id INTEGER DEFAULT (
       CAST(
@@ -34,7 +31,7 @@ export default async (db: DB) => {
     .catch(() => null);
   await db
     .query(
-      sql`
+      /* sql */ `
   CREATE TABLE IF NOT EXISTS "analytics_events" (
     id INTEGER DEFAULT (
       CAST(

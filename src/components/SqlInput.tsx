@@ -1,11 +1,7 @@
 import React from "react";
-import { EditorView, basicSetup } from "npm:codemirror";
-import { EditorState, Compartment } from "npm:@codemirror/state";
-import {
-  sql,
-  SQLDialect,
-  type SQLConfig,
-} from "npm:@codemirror/lang-sql";
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState, Compartment } from "@codemirror/state";
+import { sql, SQLDialect, type SQLConfig } from "@codemirror/lang-sql";
 
 const SQLite = SQLDialect.define({
   // Based on https://www.sqlite.org/lang_keywords.html based on likely keywords to be used in select queries
@@ -20,8 +16,8 @@ const SQLite = SQLDialect.define({
   specialVar: "@:?$",
 });
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
 
 export const SqlInput = ({
@@ -30,13 +26,18 @@ export const SqlInput = ({
   name,
   sqlConfig,
 }: {
+  className?: string;
+  name: string;
+  defaultValue?: string;
   sqlConfig?: SQLConfig;
 }) => {
-  const ref = React.useRef();
-  const inputRef = React.useRef();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     const language = new Compartment();
     const tabSize = new Compartment();
+    if (!ref.current) return;
+
     const editor = new EditorView({
       state: EditorState.create({
         doc: "",
@@ -49,6 +50,7 @@ export const SqlInput = ({
           tabSize.of(EditorState.tabSize.of(2)),
           EditorView.updateListener.of((e) => {
             const value = e.state.doc.toString();
+            if (!inputRef.current) return;
             inputRef.current.value = value;
           }),
         ],

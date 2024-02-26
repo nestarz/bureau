@@ -1,4 +1,4 @@
-const slugify = (text) =>
+const slugify = (text?: string | null): string | undefined | null =>
   text
     ?.toString()
     ?.normalize("NFD")
@@ -12,10 +12,15 @@ const slugify = (text) =>
 const getFilesFromFormData = (formData: FormData): File[] => {
   return [...formData.entries()]
     .map(([, v]) => v)
-    .filter((file) => file instanceof File && file.name);
+    .filter((file) => file instanceof File && file.name)
+    .map((v) => v as File);
 };
 
-const getSafeName = (string: string) => {
+const getSafeName = (string: string): {
+  name: string;
+  basename?: string | null;
+  extension: string | null;
+} => {
   const defaultP = [null, string, ""];
   const [, raw, extension] = /^(.+)(\.[^.]+)$/.exec(string) ?? defaultP;
   const basename = slugify(raw);
@@ -31,9 +36,12 @@ interface UseUpload {
 }
 
 export default ({ folder, onProgress, uploadFn, onEnded }: UseUpload) => {
-  const handleFileSubmit = (fn) => (e) => {
+  const handleFileSubmit = (fn?: (files: File[]) => any) =>
+  (
+    e: Event & { target: HTMLFormElement },
+  ) => {
     e.preventDefault();
-    return fn(getFilesFromFormData(new FormData(e.target)));
+    return fn?.(getFilesFromFormData(new FormData(e.target)));
   };
 
   const upload = async (files: File[] | FileList) => {

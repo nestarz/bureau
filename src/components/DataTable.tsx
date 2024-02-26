@@ -50,25 +50,28 @@ import DisplayValue from "@/src/components/DisplayValue.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import { Fragment, useMemo } from "react";
-import { toast } from "npm:sonner";
+import { toast } from "sonner";
+import { Column } from "@/src/middlewares/client.ts";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData> {
   name: string;
-  columns: ColumnDef<TData, TValue>[];
+  columns: (Partial<Column> & { name: Column["name"]; type: Column["type"] })[];
   data: TData[];
+  children?: any;
+  references?: { [key: string]: { [key: string]: any }[] };
 }
 
-export default <TData, TValue>({
+export default <TData = Record<string, unknown>,>({
   name,
   columns,
   data,
   children,
   references,
-}: DataTableProps<TData, TValue>) => {
+}: DataTableProps<TData>) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageSize: 12,
@@ -81,7 +84,7 @@ export default <TData, TValue>({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [rowOrder, setRowOrder] = React.useState<[number, number]>([]);
+  const [rowOrder, setRowOrder] = React.useState<[number, number][]>([]);
   const reorderedData = useMemo(
     () =>
       rowOrder.reduce(
@@ -151,39 +154,47 @@ export default <TData, TValue>({
         enableSorting: false,
         enableHiding: false,
       },
-
-      ...(columns ?? []).map((column) => ({
-        accessorKey: column.name,
-        header: () => (
-          <div className="whitespace-nowrap">
-            {formatColumnName(column.name) === "Order"
-              ? null
-              : formatColumnName(column.name)}
-          </div>
-        ),
-        cell: ({ row }) => {
-          const value = row.getValue(column.name);
-          return (
-            <DisplayValue
-              href={urlcat("/admin/upsert/:table_name", {
-                table_name: name,
-                pk: JSON.stringify(
-                  Object.fromEntries(
-                    columns
-                      .filter((column) => column.pk === 1)
-                      .map((column) => [column.name, row.original[column.name]])
-                  )
-                ),
-              })}
-              value={value}
-              type={getExtendedType(column.type, column.name)}
-              references={references?.[column.references]?.find(
-                (row) => row[column.to] === value
-              )}
-            />
-          );
-        },
-      })),
+      ...(columns ?? []).map(
+        (column): ColumnDef<any, any> => ({
+          accessorKey: column.name,
+          header: () => (
+            <div className="whitespace-nowrap">
+              {formatColumnName(column.name) === "Order"
+                ? null
+                : formatColumnName(column.name)}
+            </div>
+          ),
+          cell: ({ row }) => {
+            const value = row.getValue(column.name);
+            return (
+              <DisplayValue
+                href={urlcat("/admin/upsert/:table_name", {
+                  table_name: name,
+                  pk: JSON.stringify(
+                    Object.fromEntries(
+                      columns
+                        .filter((column) => column.pk === 1)
+                        .map((column) => [
+                          column.name,
+                          row.original[column.name],
+                        ])
+                    )
+                  ),
+                })}
+                value={value}
+                type={getExtendedType(column.type, column.name)}
+                references={
+                  column.references && column.to && references
+                    ? references[column.references!]?.find(
+                        (row) => row[column.to!] === value
+                      )
+                    : null
+                }
+              />
+            );
+          },
+        })
+      ),
       {
         id: "_actions",
         enableHiding: false,
@@ -289,7 +300,7 @@ export default <TData, TValue>({
                   Object.fromEntries([
                     ...columns
                       .filter((column) => column.pk === 1)
-                      .map((column) => [column.name, data[column.name]]),
+                      .map((column) => [column.name, (data as any)[column.name]]),
                     [orderKey, index],
                   ])
                 )
@@ -354,7 +365,9 @@ export default <TData, TValue>({
           <TableBody>
             <DraggableArray
               onMove={(prev, next, event) => {
-                if (event.target.dataset.draggable !== "false") {
+                if (
+                  (event?.target as HTMLElement)?.dataset.draggable !== "false"
+                ) {
                   setRowOrder((arr) => [...arr, [prev, next]]);
                 }
               }}

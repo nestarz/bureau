@@ -1,10 +1,10 @@
 import { router } from "rutt";
 import renderToString from "preact-render-to-string";
 import createContentManagementSystem from "bureau/mod.ts";
-import createRenderPipe from "outils/createRenderPipe.ts";
-import createBasicAuth from "outils/createBasicAuth.ts";
-import { createCors } from "outils/cors.ts";
-import { middleware } from "outils/fresh/middleware.ts";
+import createRenderPipe from "old_outils/createRenderPipe.ts";
+import createBasicAuth from "old_outils/createBasicAuth.ts";
+import { createCors } from "old_outils/cors.ts";
+import { middleware } from "old_outils/fresh/middleware.ts";
 
 import { databases, getS3Uri, s3Client } from "./database.ts";
 
@@ -28,21 +28,12 @@ Deno.serve(
       s3Client,
       getS3Uri,
       database: databases.main,
-      analytics: databases.analytics,
-      analyticsKey: "analytics.sqlite",
-      parentPathSegment: "/admin",
-      analyticsPathSegment: "../analytics",
-      middleware: (module) => [
-        ...(!module.config.routeOverride.startsWith("../analytics")
-          ? [
-              createBasicAuth(
-                Deno.env.get("BASIC_AUTH_USERNAME")!,
-                Deno.env.get("BASIC_AUTH_PASSWORD")!
-              )((_req, ctx) => ctx.next()),
-            ]
-          : []),
-        createCors({ hostnames: ["localhost"] })((_req, ctx) => ctx.next()),
-      ],
+      analyticsConfig: {
+        database: databases.analytics,
+        databaseKey: "analytics.sqlite",
+        basePath: "../analytics",
+      },
+      basePath: "/admin",
     }),
     ...[{ config: { routeOverride: "/" }, default: () => "ok" }].reduce(
       (acc, module) => ({ ...acc, ...route(module) }),

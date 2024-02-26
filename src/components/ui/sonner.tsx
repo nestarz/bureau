@@ -1,8 +1,8 @@
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url)
+export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
 );
 import { useEffect } from "react";
-import { Toaster as Sonner, toast } from "npm:sonner";
+import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -27,7 +27,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   );
 };
 
-export const Toast = ({ string }: { string: string }) => {
+export const Toast = ({ string }: { string: string | null }) => {
   useEffect(() => {
     console.log("toast", string);
     if (string) setTimeout(() => toast(string), 10);
