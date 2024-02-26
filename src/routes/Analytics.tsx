@@ -84,7 +84,6 @@ export default async (
   _req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any, "analytics">>
 ) => {
-  console.log(ctx);
   const table: AnalyticsData = await ctx.state.clientQuery
     .analytics((qb) => ({
       query: null!,

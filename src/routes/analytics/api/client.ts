@@ -85,7 +85,7 @@ export const createApiClientPluginRoute = ({
   basePath,
 }: {
   basePath?: string;
-}): PluginRoute<SqliteMiddlewareState<any>> => ({
+}): PluginRoute<SqliteMiddlewareState<any, "analytics">> => ({
   path: join(basePath ?? "", "/client.js"),
   handler: {
     GET: (req: Request) => {

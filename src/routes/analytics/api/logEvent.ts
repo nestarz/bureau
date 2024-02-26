@@ -7,7 +7,7 @@ export const createApiLogEventPluginRoute = ({
   basePath,
 }: {
   basePath?: string;
-}): PluginRoute<SqliteMiddlewareState<any>> => ({
+}): PluginRoute<SqliteMiddlewareState<any, "analytics">> => ({
   path: join(basePath ?? "", "/api/log/event{/}?"),
   handler: {
     POST: async (req: Request, ctx) => {

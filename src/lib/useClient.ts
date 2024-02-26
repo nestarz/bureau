@@ -9,7 +9,6 @@ export default async (url: string) => {
   if (!globalThis.document) {
     const island = (await import("@bureaudouble/islet/client")).default;
     island(url, namespace);
-    console.log(url, namespace);
   }
   return { h, hydrate };
 };

@@ -2,6 +2,7 @@
 import { renderToReadableStream } from "react-dom/server";
 import * as Islands from "@bureaudouble/islet/server";
 import { join } from "@std/path/join";
+import * as React from "react";
 
 import type { PluginMiddleware } from "outils/fresh/types.ts";
 import createRenderer from "outils/fresh/createRenderPipe.ts";
@@ -64,6 +65,7 @@ export default async ({
     withDeserializeNestedJSON: true,
   });
   const hmr = await createHmrPlugin({
+    basePath,
     path: "/__hmr",
     hmrEventName: Islands.hmrNewIsletSnapshotEventName,
   });
@@ -126,9 +128,9 @@ export default async ({
     }),
     composeRoutes({
       routes: [
-        staticFilePlugin.routes,
-        hmr.routes,
         islet.routes,
+        hmr.routes,
+        staticFilePlugin.routes,
       ],
     }),
   ];

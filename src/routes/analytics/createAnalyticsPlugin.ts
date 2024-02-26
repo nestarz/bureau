@@ -20,7 +20,7 @@ export interface AnalyticsConfig {
 
 export const createAnalyticsPlugin = async (
   config: AnalyticsConfig,
-): Promise<Plugin<SqliteMiddlewareState<any>>> => {
+): Promise<Plugin<SqliteMiddlewareState<any, "analytics">>> => {
   if (config.database) await createRequiredTables(config.database);
 
   const sqlitePlugin = await createSqlitePlugin({
