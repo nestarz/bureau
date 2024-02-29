@@ -1,15 +1,15 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/src/lib/utils.ts";
 
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
-const Checkbox: any = React.forwardRef<
+const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
 >(({ className, ...props }, ref) => (

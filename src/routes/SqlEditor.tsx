@@ -1,13 +1,11 @@
-import {
-  FreshContext,
-  Handlers,
-  RouteConfig,
-} from "outils/fresh/types.ts";
+import { FreshContext, Handlers, RouteConfig } from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
 import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
 import { SqlInput } from "@/src/components/SqlInput.tsx";
 import { Button } from "@/src/components/ui/button.tsx";
 import DataTable from "@/src/components/DataTable.tsx";
+// @deno-types="@types/react"
+import * as React from "react";
 
 export const config: RouteConfig = {
   routeOverride: "/sqleditor{/}?",
@@ -36,10 +34,10 @@ export const handler: Handlers<
   },
 };
 
-export default async (
+export default (
   _req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-) => {
+): React.ReactElement => {
   const { data, error } = ctx.state.session.flash("x-data") ?? {};
 
   return (

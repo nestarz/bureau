@@ -1,8 +1,8 @@
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
 export const h = useClient.h;
 export const hydrate = useClient.hydrate;
 
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
@@ -10,7 +10,7 @@ import { cn } from "@/src/lib/utils.ts";
 
 const Tabs = TabsPrimitive.Root;
 
-const TabsList: any = React.forwardRef<
+const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => (
@@ -25,7 +25,7 @@ const TabsList: any = React.forwardRef<
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-const TabsTrigger: any = React.forwardRef<
+const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 >(({ className, ...props }, ref) => (
@@ -40,10 +40,10 @@ const TabsTrigger: any = React.forwardRef<
 ));
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-const TabsContent: any = React.forwardRef<
+const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref): React.ReactNode => (
+>(({ className, ...props }, ref): React.ReactElement => (
   <TabsPrimitive.Content
     ref={ref}
     className={cn(

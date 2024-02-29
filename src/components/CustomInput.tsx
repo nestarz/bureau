@@ -11,15 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu.tsx";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { useState } from "react";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 interface CustomInputProps {
   type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
@@ -41,7 +41,7 @@ export const CustomInput = ({
   referencesRows,
   referencesTo,
   ...props
-}: CustomInputProps): React.ReactNode => {
+}: CustomInputProps): React.ReactElement => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
   );

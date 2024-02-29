@@ -13,7 +13,7 @@ const clientScript = (endpoint: string | URL) => {
   const EVENT = new URL("./api/log/event", endpoint);
   const IGNORE_KEY = "analytics:ignore";
   const newIgnore = new URL(document.location.href).searchParams.get(
-    IGNORE_KEY
+    IGNORE_KEY,
   );
   if (typeof newIgnore === "string") {
     localStorage.setItem(IGNORE_KEY, String(newIgnore !== "false"));
@@ -27,10 +27,9 @@ const clientScript = (endpoint: string | URL) => {
       e,
       new Blob([JSON.stringify(v)], {
         type: "application/json; charset=UTF-8",
-      })
+      }),
     );
-  Object.fromEntries =
-    Object.fromEntries ||
+  Object.fromEntries = Object.fromEntries ||
     ((arr: any[]) => arr.reduce((acc, [k, v]) => ((acc[k] = v), acc), {}));
   const id = Date.now();
   post(VISIT, {
@@ -41,7 +40,7 @@ const clientScript = (endpoint: string | URL) => {
     referrer: document.referrer,
     user_agent: navigator.userAgent,
     parameters: Object.fromEntries(
-      new URL(document.location.href).searchParams
+      new URL(document.location.href).searchParams,
     ),
     screen_width: window.screen.width,
     screen_height: window.screen.height,
@@ -49,7 +48,7 @@ const clientScript = (endpoint: string | URL) => {
   const logEvent = (
     action: string,
     category: string,
-    value: Record<string, unknown>
+    value: Record<string, unknown>,
   ) =>
     beacon(EVENT, {
       visit_id: id,
@@ -67,9 +66,8 @@ const clientScript = (endpoint: string | URL) => {
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
-      const load_time =
-        (window.performance.timing.loadEventEnd -
-          window.performance.timing.navigationStart) /
+      const load_time = (window.performance.timing.loadEventEnd -
+        window.performance.timing.navigationStart) /
         1000;
       beacon(QUIT, {
         id,

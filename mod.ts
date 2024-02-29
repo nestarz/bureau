@@ -2,7 +2,7 @@
 import { renderToReadableStream } from "react-dom/server";
 import * as Islands from "@bureaudouble/islet/server";
 import { join } from "@std/path/join";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 
 import type { PluginMiddleware } from "outils/fresh/types.ts";

@@ -1,13 +1,13 @@
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
-// @deno-types="npm:@types/react@18.2.0"
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
+// @deno-types="@types/react"
 import { useEffect } from "react";
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps): React.ReactNode => {
+const Toaster = ({ ...props }: ToasterProps): React.ReactElement => {
   return (
     <Sonner
       theme="system"
@@ -28,7 +28,7 @@ const Toaster = ({ ...props }: ToasterProps): React.ReactNode => {
   );
 };
 
-export const Toast = ({ string }: { string: string | null }): React.ReactNode => {
+export const Toast = ({ string }: { string: string | null }): React.ReactElement => {
   useEffect(() => {
     console.log("toast", string);
     if (string) setTimeout(() => toast(string), 10);

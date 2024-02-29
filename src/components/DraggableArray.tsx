@@ -1,4 +1,4 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { Children, cloneElement, ReactElement, ReactNode, useRef } from "react";
 
 interface DraggableArrayProps {

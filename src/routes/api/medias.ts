@@ -22,7 +22,7 @@ export interface S3Client {
     options?: {
       bucketName?: string;
       versionId?: string;
-    }
+    },
   ): Promise<Response>;
   deleteObject(
     objectName: string,
@@ -30,7 +30,7 @@ export interface S3Client {
       bucketName?: string;
       versionId?: string;
       governanceBypass?: boolean;
-    }
+    },
   ): Promise<void>;
   getPresignedUrl(
     method: "GET" | "PUT" | "HEAD" | "DELETE",
@@ -40,7 +40,7 @@ export interface S3Client {
       parameters?: Record<string, string>;
       expirySeconds?: number;
       requestDate?: Date;
-    }
+    },
   ): Promise<string>;
 }
 
@@ -49,8 +49,8 @@ export const config: RouteConfig = {
 };
 
 const filterByAcceptRule = (
-  object: { [key: string]: any; "content-type": string },
-  acceptRule: string
+  object: { [key: string]: any; "content-type"?: string },
+  acceptRule: string,
 ): boolean => {
   const rules = acceptRule.split(",").map((rule) => rule.trim());
   for (const rule of rules) {
@@ -75,13 +75,13 @@ export const handler: Handler<
     const objectName = new URL(req.url).searchParams.get("object_name");
     return typeof objectName !== "string"
       ? new Response(null, {
-          status: 500,
-          statusText: "Missing object_name",
-        })
+        status: 500,
+        statusText: "Missing object_name",
+      })
       : new Response(
-          await s3.getPresignedUrl("PUT", objectName, { expirySeconds: 5 }),
-          { headers: { "content-type": "text/raw" } }
-        );
+        await s3.getPresignedUrl("PUT", objectName, { expirySeconds: 5 }),
+        { headers: { "content-type": "text/raw" } },
+      );
   }
   if (req.method === "DELETE") {
     const { medias = [] } = await req.json().catch(() => ({}));
@@ -108,12 +108,15 @@ export const handler: Handler<
       },
     });
   }
-  const results: any[] = [];
-  for await (const result of s3.listObjects({
-    prefix: ["medias", prefix].filter((v) => v).join("/"),
-    pageSize,
-    maxResults,
-  })) {
+  const results: (S3Object & { url: string | URL; "content-type"?: string })[] =
+    [];
+  for await (
+    const result of s3.listObjects({
+      prefix: ["medias", prefix].filter((v) => v).join("/"),
+      pageSize,
+      maxResults,
+    })
+  ) {
     if (result.key.includes("ds_store")) continue;
     const url = getS3Uri(result.key);
     results.push({ ...result, url, "content-type": lookup(result.key) });
@@ -125,10 +128,10 @@ export const handler: Handler<
         .filter(
           ({ key }) =>
             typeof _ilike !== "string" ||
-            key.match(new RegExp(`^${(_ilike ?? "")?.replace(/%/g, ".*")}$`))
+            key.match(new RegExp(`^${(_ilike ?? "")?.replace(/%/g, ".*")}$`)),
         )
-        .filter((v) => filterByAcceptRule(v, accept ?? "*"))
+        .filter((v) => filterByAcceptRule(v, accept ?? "*")),
     ),
-    { headers: { "Content-Type": "application/json" } }
+    { headers: { "Content-Type": "application/json" } },
   );
 };

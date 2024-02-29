@@ -58,7 +58,7 @@ export function parse(xml: string): Document {
 
     // tag.
     // deno-lint-ignore no-explicit-any
-    const node: any = {
+    const node = {
       attributes: {},
     };
 

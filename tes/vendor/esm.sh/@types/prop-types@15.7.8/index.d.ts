@@ -66,7 +66,7 @@ export type InferProps<V> =
 export const any: Requireable<any>;
 export const array: Requireable<any[]>;
 export const bool: Requireable<boolean>;
-export const func: Requireable<(...args: any[]) => any>;
+export const func: Requireable<(...args[]) => any>;
 export const number: Requireable<number>;
 export const object: Requireable<object>;
 export const string: Requireable<string>;

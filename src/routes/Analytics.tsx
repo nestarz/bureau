@@ -19,7 +19,7 @@ export const config: RouteConfig = {
   routeOverride: "/analytics{/}?",
 };
 
-const createColumnsFromData = (data: any): any =>
+const createColumnsFromData = (data): any =>
   Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
     name: key,
     type: typeof value,

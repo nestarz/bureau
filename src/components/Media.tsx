@@ -1,11 +1,11 @@
 import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { useRef } from "react";
 
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 export interface MediaProp {
   key: string;
@@ -22,7 +22,7 @@ export const MediaContext = (
 
 const Video = (
   { src, className }: { src?: string; className?: string },
-): React.ReactNode => {
+): React.ReactElement => {
   const ref = useRef<HTMLVideoElement>(null!);
   return (
     <video
@@ -51,7 +51,7 @@ export const Media = ({
   mediaClassName?: string;
   media: MediaProp;
   maxWidth: number;
-}): React.ReactNode => {
+}): React.ReactElement => {
   return (
     <div className={className}>
       {/image\//.test(media["content-type"])

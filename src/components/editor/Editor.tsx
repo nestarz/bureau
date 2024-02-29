@@ -86,7 +86,7 @@ export function Editor({
   disabled,
   required,
   className,
-}: EditorProps): React.ReactNode {
+}: EditorProps): React.ReactElement {
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div

@@ -1,3 +1,4 @@
+// @deno-types="@types/react"
 import * as React from "react"
 
 import { cn } from "@/src/lib/utils.ts"

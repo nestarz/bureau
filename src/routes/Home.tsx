@@ -8,10 +8,15 @@ export const config: RouteConfig = {
 
 export default async (
   _req: Request,
-  _ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
+  _ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>,
 ) => {
   return new Response(null, {
     status: 302,
     headers: { Location: "/admin/analytics" },
   });
 };
+
+
+import React from "react";
+const A = (): React.ReactElement => <div />;
+const B = (): React.ReactElement => <A />;

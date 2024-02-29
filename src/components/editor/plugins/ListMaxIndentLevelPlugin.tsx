@@ -11,7 +11,7 @@ const {
   INDENT_CONTENT_COMMAND,
   COMMAND_PRIORITY_HIGH,
 } = (await import("lexical")).default;
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { useEffect } from "react";
 
 function getElementNodesInSelection(selection: any): Set<any> {

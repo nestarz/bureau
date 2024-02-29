@@ -31,7 +31,7 @@ import {
   useRef,
   useState,
   Fragment,
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 } from "react";
 const {
   $createParagraphNode,
@@ -115,7 +115,7 @@ const blockTypeToBlockName = {
   ul: "Bulleted List",
 };
 
-function Divider(): React.ReactNode {
+function Divider(): React.ReactElement {
   return <div className="divider" />;
 }
 
@@ -136,7 +136,7 @@ function positionEditorElement(
   }
 }
 
-function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): React.ReactNode {
+function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): React.ReactElement {
   const editorRef = useRef(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mouseDownRef = useRef(false);
@@ -282,7 +282,7 @@ function Select({
   className,
   options,
   value,
-}: SelectProps): React.ReactNode {
+}: SelectProps): React.ReactElement {
   return (
     <select className={className} onChange={onChange} value={value}>
       <option hidden={true} value="" />
@@ -316,7 +316,7 @@ function BlockOptionsDropdownList({
   blockType,
   toolbarRef,
   setShowBlockOptionsDropDown,
-}: BlockOptionsDropdownListProps): React.ReactNode {
+}: BlockOptionsDropdownListProps): React.ReactElement {
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -484,7 +484,7 @@ const blockTypesIcons = {
   paragraph: RiParagraph,
 };
 
-export default function ToolbarPlugin(): React.ReactNode {
+export default function ToolbarPlugin(): React.ReactElement {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);

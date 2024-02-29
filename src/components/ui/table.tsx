@@ -1,8 +1,9 @@
+// @deno-types="@types/react"
 import * as React from "react"
 
 import { cn } from "@/src/lib/utils.ts"
 
-const Table: any = React.forwardRef<
+const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
@@ -16,7 +17,7 @@ const Table: any = React.forwardRef<
 ))
 Table.displayName = "Table"
 
-const TableHeader: any = React.forwardRef<
+const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
@@ -24,7 +25,7 @@ const TableHeader: any = React.forwardRef<
 ))
 TableHeader.displayName = "TableHeader"
 
-const TableBody: any = React.forwardRef<
+const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
@@ -36,7 +37,7 @@ const TableBody: any = React.forwardRef<
 ))
 TableBody.displayName = "TableBody"
 
-const TableFooter: any = React.forwardRef<
+const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
@@ -51,7 +52,7 @@ const TableFooter: any = React.forwardRef<
 ))
 TableFooter.displayName = "TableFooter"
 
-const TableRow: any = React.forwardRef<
+const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
 >(({ className, ...props }, ref) => (
@@ -66,7 +67,7 @@ const TableRow: any = React.forwardRef<
 ))
 TableRow.displayName = "TableRow"
 
-const TableHead: any = React.forwardRef<
+const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
@@ -81,7 +82,7 @@ const TableHead: any = React.forwardRef<
 ))
 TableHead.displayName = "TableHead"
 
-const TableCell: any = React.forwardRef<
+const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
@@ -96,7 +97,7 @@ const TableCell: any = React.forwardRef<
 ))
 TableCell.displayName = "TableCell"
 
-const TableCaption: any = React.forwardRef<
+const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (

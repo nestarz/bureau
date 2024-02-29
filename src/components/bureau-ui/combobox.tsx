@@ -1,8 +1,8 @@
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 
 import { useMediaQuery } from "@/src/lib/useMediaQuery.ts";
@@ -85,7 +85,7 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
   optionsName: string;
   disabled?: boolean;
   required?: boolean;
-}): React.ReactNode {
+}): React.ReactElement {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [selected, setSelected] = React.useState<T | null>();

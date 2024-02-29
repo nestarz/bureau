@@ -2,7 +2,7 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@bureaudouble/islet@0.0.13": "jsr:@bureaudouble/islet@0.0.13",
+      "jsr:@bureaudouble/islet@0.0.14": "jsr:@bureaudouble/islet@0.0.14",
       "jsr:@bureaudouble/outils@0.0.13": "jsr:@bureaudouble/outils@0.0.13",
       "jsr:@bureaudouble/outils@0.0.20": "jsr:@bureaudouble/outils@0.0.20",
       "jsr:@bureaudouble/outils@0.0.9": "jsr:@bureaudouble/outils@0.0.9",
@@ -76,8 +76,8 @@
       "npm:vaul@^0.9.0": "npm:vaul@0.9.0_react@18.2.0_react-dom@18.2.0__react@18.2.0_@types+react@18.2.0_@types+react-dom@18.2.0"
     },
     "jsr": {
-      "@bureaudouble/islet@0.0.13": {
-        "integrity": "579c6bdf08f9c082cfae7dce473511f069825721ecb37bb82284d567d72727b4",
+      "@bureaudouble/islet@0.0.14": {
+        "integrity": "88cb47a0251953d961b2284598497306f26c1b98ebec2cce1759db54eb04d9ad",
         "dependencies": [
           "jsr:@bureaudouble/outils@0.0.13",
           "jsr:@bureaudouble/scripted@0.0.2",
@@ -86,7 +86,7 @@
           "jsr:@std/encoding@0.216",
           "jsr:@std/fs@0.216",
           "jsr:@std/path@0.216",
-          "npm:@types/react@18.2",
+          "npm:@types/react@18.2.0",
           "npm:esbuild@0.20.1",
           "npm:react@18.2"
         ]
@@ -2544,7 +2544,7 @@
   "remote": {},
   "workspace": {
     "dependencies": [
-      "jsr:@bureaudouble/islet@0.0.13",
+      "jsr:@bureaudouble/islet@0.0.14",
       "jsr:@bureaudouble/outils@0.0.20",
       "jsr:@bureaudouble/scripted@0.0.2",
       "jsr:@std/encoding@0.217",
@@ -2577,6 +2577,7 @@
       "npm:@radix-ui/react-toggle@^1.0.3",
       "npm:@tailwindcss/typography@^0.5.10",
       "npm:@tanstack/react-table@^8.11.7",
+      "npm:@types/react@18.2.0",
       "npm:autoprefixer@10.4.17",
       "npm:class-variance-authority@^0.7.0",
       "npm:clsx@^2.1.0",

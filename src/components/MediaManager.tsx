@@ -11,7 +11,7 @@ import {
 } from "@/src/components/ui/dialog.tsx";
 import { Input } from "@/src/components/ui/input.tsx";
 import { Label } from "@/src/components/ui/label.tsx";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { Fragment, useState } from "react";
 import useSWR from "swr";
 import { toast } from "sonner";
@@ -267,7 +267,7 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
   );
 };
 
-const parseJSON = (obj: any) => {
+const parseJSON = (obj) => {
   try {
     return JSON.parse(obj);
   } catch (error) {

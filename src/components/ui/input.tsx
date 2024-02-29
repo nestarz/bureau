@@ -1,4 +1,4 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 
 import { cn } from "@/src/lib/utils.ts";
@@ -6,8 +6,8 @@ import { cn } from "@/src/lib/utils.ts";
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
 
-const Input: any = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref): React.ReactNode => {
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref): React.ReactElement => {
     return (
       <input
         type={type}

@@ -1,8 +1,4 @@
-import {
-  FreshContext,
-  Handlers,
-  RouteConfig,
-} from "outils/fresh/types.ts";
+import { FreshContext, Handlers, RouteConfig } from "outils/fresh/types.ts";
 import type { ClientMiddleware } from "@/src/middlewares/client.ts";
 import { CustomInput } from "@/src/components/CustomInput.tsx";
 import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqlitePlugin.ts";
@@ -18,8 +14,8 @@ import deserializeNestedJSON, {
 } from "outils/deserializeNestedJSON.ts";
 import DataTable from "@/src/components/DataTable.tsx";
 import { sql } from "kysely";
-// @deno-types="npm:@types/react@18.2.0"
-import { Fragment } from "react";
+// @deno-types="@types/react"
+import * as React from "react";
 import type { Table } from "@/src/middlewares/client.ts";
 
 export const config: RouteConfig = {
@@ -32,22 +28,21 @@ export const handler: Handlers<
 > = {
   POST: async (req, ctx) => {
     const tableConfig = ctx.state.tables.find(
-      (table) => table.name === ctx.params.tableName
+      (table) => table.name === ctx.params.tableName,
     )!;
     const searchParams = new URL(req.url).searchParams;
     const extendedMethod = (searchParams.get("method") ?? "POST").toUpperCase();
     const primaryKeys = JSON.parse(searchParams.get("pk") || "null");
     if (extendedMethod === "DELETE") {
-      const returning =
-        Object.keys(primaryKeys).length > 0
-          ? await ctx.state.clientQuery.default((qb) => {
-              let wb = qb.deleteFrom(tableConfig.name);
-              for (const [key, value] of Object.entries(primaryKeys)) {
-                wb = wb.where(key, "=", value);
-              }
-              return wb.compile();
-            })
-          : null;
+      const returning = Object.keys(primaryKeys).length > 0
+        ? await ctx.state.clientQuery.default((qb) => {
+          let wb = qb.deleteFrom(tableConfig.name);
+          for (const [key, value] of Object.entries(primaryKeys)) {
+            wb = wb.where(key, "=", value);
+          }
+          return wb.compile();
+        })
+        : null;
 
       ctx.state.session.flash("x-sonner", returning);
       return new Response(null, {
@@ -61,33 +56,30 @@ export const handler: Handlers<
     const formData = await req.formData();
     const values = [...formData.entries()].reduce((prev, [key, value]) => {
       const type = tableConfig.columns.find((v) => v.name === key)?.type;
-      return !type
-        ? prev
-        : {
-            ...prev,
-            [key]:
-              typeof value !== "string" || value === "null"
-                ? null
-                : ["REAL", "INTEGER"].includes(type)
-                ? parseFloat(value)
-                : value,
-          };
+      return !type ? prev : {
+        ...prev,
+        [key]: typeof value !== "string" || value === "null"
+          ? null
+          : ["REAL", "INTEGER"].includes(type)
+          ? parseFloat(value)
+          : value,
+      };
     }, {});
     const returning = await ctx.state.clientQuery
       .default((qb) =>
         (Object.entries(primaryKeys ?? {}).length > 0
           ? qb
-              .updateTable(tableConfig.name)
-              .set(values)
-              .$if(true, (wb) => {
-                for (const [key, value] of Object.entries(primaryKeys)) {
-                  wb = wb.where(key, "=", value);
-                }
-                return wb;
-              })
-              .returningAll()
-          : qb.insertInto(tableConfig.name).values(values).returningAll()
-        ).compile()
+            .updateTable(tableConfig.name)
+            .set(values)
+            .$if(true, (wb) => {
+              for (const [key, value] of Object.entries(primaryKeys)) {
+                wb = wb.where(key, "=", value);
+              }
+              return wb;
+            })
+            .returningAll()
+          : qb.insertInto(tableConfig.name).values(values).returningAll())
+          .compile()
       )
       .then((data) => ({ data }))
       .catch((error) => ({ error }));
@@ -102,44 +94,42 @@ export const handler: Handlers<
 
 export default async (
   req: Request,
-  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-) => {
+  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>,
+): React.ReactElement => {
   const tables = ctx.state.tables;
   const pk = new URL(req.url).searchParams.get("pk");
   const primaryKeys = JSON.parse(pk || "null");
   const tableConfig = ctx.state.tables.find(
-    (table) => table.name === ctx.params.tableName
+    (table) => table.name === ctx.params.tableName,
   );
   if (!tableConfig?.name) return new Response(null, { status: 404 });
 
-  const mode =
-    Object.entries(primaryKeys ?? {}).length > 0
-      ? ("update" as const)
-      : ("insert" as const);
+  const mode = Object.entries(primaryKeys ?? {}).length > 0
+    ? ("update" as const)
+    : ("insert" as const);
   const orderKey = tableConfig?.columns.find(
-    (d) => formatColumnName(d.name) === "Order"
+    (d) => formatColumnName(d.name) === "Order",
   )?.name;
   const adjacentOrderRetrieval = createAdjacentOrderRetrieval(
     "cte_current_cte",
     tableConfig.name,
     primaryKeys,
-    orderKey
+    orderKey,
   );
-  const referencedTables =
-    mode === "update"
-      ? tables.filter((v) =>
-          v.columns.some((v) => v.references === tableConfig.name)
-        )
-      : [];
+  const referencedTables = mode === "update"
+    ? tables.filter((v) =>
+      v.columns.some((v) => v.references === tableConfig.name)
+    )
+    : [];
   const referencesSet = Array.from(
     new Set(
       (tableConfig?.columns ?? []).flatMap((v) =>
         v.references ? [v.references] : []
-      )
-    )
+      ),
+    ),
   );
-  const results: { [x: string]: string }[] =
-    await ctx.state.clientQuery.default((qb) => {
+  const results: { [x: string]: string }[] = await ctx.state.clientQuery
+    .default((qb) => {
       for (const references of referencesSet) {
         qb = qb.with(`cte_${tableConfig.name}_${references}`, (wb: any) => {
           wb = wb
@@ -154,8 +144,8 @@ export default async (
           const referencesArray = Array.from(
             Map.groupBy(
               (referencedTable?.columns ?? []).filter((v) => v.references),
-              (v) => v.references
-            )
+              (v) => v.references,
+            ),
           );
           for (const [references, columns] of referencesArray) {
             qb = qb.with(
@@ -170,34 +160,37 @@ export default async (
                   const colWb = (wb as unknown as typeof newWb).innerJoin(
                     referencedTable.name,
                     sql.ref(`${referencedTable.name}.${column.name}`) as any,
-                    sql.ref(`${column.references}.${column.to}`) as any
+                    sql.ref(`${column.references}.${column.to}`) as any,
                   );
                   wb = colWb as any;
                 }
                 return wb;
-              }
+              },
             ) as any;
           }
         }
-        const newQb = qb.with("cte_referenced_cte", (wb) =>
-          wb.selectNoFrom((qb) =>
-            referencedTables.map((table) =>
-              jsonArrayFrom(
-                qb
-                  .selectFrom(table.name)
-                  .select(table.columns.map((column) => column.name))
-                  .$if(mode === "update", (wb) => {
-                    for (const [key, value] of Object.entries(primaryKeys)) {
-                      const fk = table.columns.find(
-                        (c) => c.references === tableConfig.name && key === c.to
-                      );
-                      if (fk) wb = wb.where(fk.name, "=", value);
-                    }
-                    return wb;
-                  })
-              ).as(table.name)
-            )
-          )
+        const newQb = qb.with(
+          "cte_referenced_cte",
+          (wb) =>
+            wb.selectNoFrom((qb) =>
+              referencedTables.map((table) =>
+                jsonArrayFrom(
+                  qb
+                    .selectFrom(table.name)
+                    .select(table.columns.map((column) => column.name))
+                    .$if(mode === "update", (wb) => {
+                      for (const [key, value] of Object.entries(primaryKeys)) {
+                        const fk = table.columns.find(
+                          (c) =>
+                            c.references === tableConfig.name && key === c.to,
+                        );
+                        if (fk) wb = wb.where(fk.name, "=", value);
+                      }
+                      return wb;
+                    }),
+                ).as(table.name)
+              )
+            ),
         );
 
         qb = newQb as any;
@@ -216,20 +209,17 @@ export default async (
               return wb.limit(1);
             })
             .$if(mode === "insert", (wb) => wb.limit(0))
-            .selectAll()
-        )
+            .selectAll())
         .with("cte_previous_cte", (qb) =>
           qb
             .selectFrom([tableConfig.name, "cte_current_cte"])
             .selectAll(tableConfig.name)
-            .$if(mode === "update", adjacentOrderRetrieval("desc"))
-        )
+            .$if(mode === "update", adjacentOrderRetrieval("desc")))
         .with("cte_next_cte", (qb) =>
           qb
             .selectFrom([tableConfig.name, "cte_current_cte"])
             .selectAll(tableConfig.name)
-            .$if(mode === "update", adjacentOrderRetrieval("asc"))
-        )
+            .$if(mode === "update", adjacentOrderRetrieval("asc")))
         .selectNoFrom((qb) =>
           [
             [
@@ -258,7 +248,7 @@ export default async (
               jsonArrayFrom(
                 qb
                   .selectFrom(`cte_${references}`)
-                  .select((columns as Column[])!.map((column) => column.name))
+                  .select((columns as Column[])!.map((column) => column.name)),
               ).as(references as string)
             )
         )
@@ -269,44 +259,43 @@ export default async (
     referencesSet.map((references) => [
       references,
       deserializeNestedJSON(
-        JSON.parse(results[0][`${tableConfig.name}_${references}`])
+        JSON.parse(results[0][`${tableConfig.name}_${references}`]),
       ),
-    ])
+    ]),
   );
   const name = tableConfig?.name;
   const columns = tableConfig?.columns as Column[];
-  const referencedJson: [Table, JsonArray][] =
-    referencedTables?.length > 0
-      ? Object.entries(JSON.parse(results[0].referenced_cte)?.[0]).map(
-          ([key, value]) => [
-            ctx.state.tables.find((table) => table.name === key)!,
-            deserializeNestedJSON<JsonArray>(JSON.parse(value as string)),
-          ]
-        )
-      : [];
-  const data = deserializeNestedJSON<{ [a: string]: any }[]>(
-    JSON.parse(results[0].current_cte)
+  const referencedJson: [Table, JsonArray][] = referencedTables?.length > 0
+    ? Object.entries(JSON.parse(results[0].referenced_cte)?.[0]).map(
+      ([key, value]) => [
+        ctx.state.tables.find((table) => table.name === key)!,
+        deserializeNestedJSON<JsonArray>(JSON.parse(value as string)),
+      ],
+    )
+    : [];
+  const data = deserializeNestedJSON<{ [a: string] }[]>(
+    JSON.parse(results[0].current_cte),
   )?.[0];
-  const rowNext = deserializeNestedJSON<{ [a: string]: any }[]>(
-    JSON.parse(results[0].next_cte)
+  const rowNext = deserializeNestedJSON<{ [a: string] }[]>(
+    JSON.parse(results[0].next_cte),
   )?.[0];
-  const rowPrev = deserializeNestedJSON<{ [a: string]: any }[]>(
-    JSON.parse(results[0].previous_cte)
+  const rowPrev = deserializeNestedJSON<{ [a: string] }[]>(
+    JSON.parse(results[0].previous_cte),
   )?.[0];
 
   const nextPk = rowNext
     ? JSON.stringify(
-        Object.fromEntries(
-          Object.keys(primaryKeys ?? {}).map((key) => [key, rowNext[key]])
-        )
-      )
+      Object.fromEntries(
+        Object.keys(primaryKeys ?? {}).map((key) => [key, rowNext[key]]),
+      ),
+    )
     : null;
   const prevPk = rowPrev
     ? JSON.stringify(
-        Object.fromEntries(
-          Object.keys(primaryKeys ?? {}).map((key) => [key, rowPrev[key]])
-        )
-      )
+      Object.fromEntries(
+        Object.keys(primaryKeys ?? {}).map((key) => [key, rowPrev[key]]),
+      ),
+    )
     : null;
 
   return (
@@ -320,13 +309,12 @@ export default async (
             <div className="text-sm text-muted-foreground">
               {mode === "update"
                 ? "Make changes to your data here."
-                : "Insert a new record here."}{" "}
-              Click save when you're done.
+                : "Insert a new record here."} Click save when you're done.
             </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
             {mode === "update" && (
-              <Fragment>
+              <React.Fragment>
                 <Button
                   size="icon"
                   variant="destructive"
@@ -341,27 +329,23 @@ export default async (
                 </Button>
                 <Button variant="outline" asChild>
                   <a
-                    href={
-                      prevPk
-                        ? urlcat("/admin/upsert/:name", { pk: prevPk, name })
-                        : undefined
-                    }
+                    href={prevPk
+                      ? urlcat("/admin/upsert/:name", { pk: prevPk, name })
+                      : undefined}
                   >
                     Previous
                   </a>
                 </Button>
                 <Button variant="outline" asChild>
                   <a
-                    href={
-                      nextPk
-                        ? urlcat("/admin/upsert/:name", { pk: nextPk, name })
-                        : undefined
-                    }
+                    href={nextPk
+                      ? urlcat("/admin/upsert/:name", { pk: nextPk, name })
+                      : undefined}
                   >
                     Next
                   </a>
                 </Button>
-              </Fragment>
+              </React.Fragment>
             )}
             <Button type="submit">Save changes</Button>
           </div>
@@ -378,9 +362,9 @@ export default async (
               type={column.type}
               className="w-full"
               references={column.references}
-              referencesRows={
-                column.references ? referencesData[column.references] : null
-              }
+              referencesRows={column.references
+                ? referencesData[column.references]
+                : null}
               referencesTo={column.to}
             />
           ))}
@@ -401,10 +385,10 @@ export default async (
                     JSON.parse(
                       results[0][
                         `${tableConfig.name}_${subtable.references}`
-                      ] as unknown as string
-                    )
+                      ] as unknown as string,
+                    ),
                   ),
-                ])
+                ]),
             )}
           >
             {tableConfig?.name && (

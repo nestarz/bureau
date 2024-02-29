@@ -16,7 +16,7 @@ export const createApiLogExitPluginRoute = ({
       const keys = Object.keys(payload).map(columnSafe).filter(upCols);
       const updates = keys.map((key) => `"${key}" = ?`).join(", ");
       const query = `UPDATE analytics_visits SET ${updates} WHERE id = ?;`;
-      const values = Object.values(payload).map((d: any) =>
+      const values = Object.values(payload).map((d) =>
         typeof d === "object" && d !== null ? JSON.stringify(d) : d ?? null
       );
       const res = await ctx.state.db.query(query, [...values, id]);

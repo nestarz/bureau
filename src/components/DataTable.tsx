@@ -1,4 +1,4 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 import { ChevronDownIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
@@ -50,14 +50,14 @@ import urlcat from "outils/urlcat.ts";
 import DisplayValue from "@/src/components/DisplayValue.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { Fragment, useMemo } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 interface DataTableProps<TData> {
   name: string;
@@ -73,7 +73,7 @@ export default <TData = Record<string, unknown>>({
   data,
   children,
   references,
-}: DataTableProps<TData>): React.ReactNode => {
+}: DataTableProps<TData>): React.ReactElement => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageSize: 12,

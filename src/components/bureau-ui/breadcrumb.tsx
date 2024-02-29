@@ -1,10 +1,10 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import * as React from "react";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/src/lib/utils.ts";
 
-export function getValidChildren(children: React.ReactNode) {
+export function getValidChildren(children: React.ReactElement) {
   return React.Children.toArray(children).filter((child) =>
     React.isValidElement(child)
   ) as React.ReactElement[];
@@ -12,7 +12,7 @@ export function getValidChildren(children: React.ReactNode) {
 
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<"nav"> {
   /* The visual separator between each breadcrumb item */
-  separator?: React.ReactNode;
+  separator?: React.ReactElement;
   /**
    * If `true`, adds a separator between each breadcrumb item.
    * @default true

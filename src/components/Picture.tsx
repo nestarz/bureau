@@ -1,5 +1,5 @@
 import urlcat from "outils/urlcat.ts";
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import React from "react";
 
 interface CreatePictureParams {

@@ -1,4 +1,4 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import { useMemo, useState } from "react";
 import { unique } from "outils/unique.ts";
 
@@ -38,7 +38,7 @@ const getFilesInPath = <T extends { [a: string]: unknown }>(
   return filesAndFolders;
 };
 
-const useFileBrowser = <T extends { [a: string]: any } = { key: string }>({
+const useFileBrowser = <T extends { [a: string] } = { key: string }>({
   initialPath,
   files,
   getKey,

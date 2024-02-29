@@ -37,7 +37,7 @@ export default async (
   const results: null | { [x: string]: string }[] =
     await ctx.state.clientQuery.default((qb) => {
       for (const [references, columns] of referencesArray) {
-        const newQb = qb.with(`cte_${references}`, (wb: any) => {
+        const newQb = qb.with(`cte_${references}`, (wb) => {
           wb = wb.selectFrom(references).distinct().selectAll(references);
           for (const column of columns) {
             wb = wb.innerJoin(

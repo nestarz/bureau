@@ -1,4 +1,4 @@
-// @deno-types="npm:@types/react@18.2.0"
+// @deno-types="@types/react"
 import React from "react";
 import { basicSetup, EditorView } from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
@@ -17,9 +17,9 @@ const SQLite: SQLDialect = SQLDialect.define({
   specialVar: "@:?$",
 });
 
-const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h: any = useClient.h;
-export const hydrate: any = useClient.hydrate;
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 export const SqlInput = ({
   className,
@@ -31,7 +31,7 @@ export const SqlInput = ({
   name: string;
   defaultValue?: string;
   sqlConfig?: SQLConfig;
-}): React.ReactNode => {
+}): React.ReactElement => {
   const ref = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
