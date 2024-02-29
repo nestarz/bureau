@@ -21,7 +21,7 @@ export const MediaContext = (
 
 const Video = (
   { src, className }: { src?: string; className?: string },
-): React.ReactElement => {
+): JSX.Element => {
   const ref = useRef<HTMLVideoElement>(null!);
   return (
     <video
@@ -50,7 +50,7 @@ export const Media = ({
   mediaClassName?: string;
   media: MediaProp;
   maxWidth: number;
-}): React.ReactElement => {
+}): JSX.Element => {
   return (
     <div className={className}>
       {/image\//.test(media["content-type"])

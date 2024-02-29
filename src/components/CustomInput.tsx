@@ -40,7 +40,7 @@ export const CustomInput = ({
   referencesRows,
   referencesTo,
   ...props
-}: CustomInputProps): React.ReactElement => {
+}: CustomInputProps): JSX.Element => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
   );

@@ -53,13 +53,19 @@ import { Fragment, useMemo } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
-const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+const useClient = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
+);
 export const h = useClient.h;
 export const hydrate = useClient.hydrate;
 
 interface DataTableProps<TData> {
   name: string;
-  columns: (Partial<Column> & { name: Column["name"]; type: Column["type"] })[];
+  columns:
+    (Partial<Omit<Column, "type">> & {
+      name: Column["name"];
+      type: Column["type"] | string;
+    })[];
   data: TData[];
   children?: any;
   references?: { [key: string]: { [key: string]: any }[] };
@@ -71,7 +77,7 @@ export default <TData = Record<string, unknown>>({
   data,
   children,
   references,
-}: DataTableProps<TData>): React.ReactElement => {
+}: DataTableProps<TData>): JSX.Element => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageSize: 12,

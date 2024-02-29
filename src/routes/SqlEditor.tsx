@@ -36,7 +36,7 @@ export const handler: Handlers<
 export default (
   _req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
-): React.ReactElement => {
+): JSX.Element => {
   const { data, error } = ctx.state.session.flash("x-data") ?? {};
 
   return (

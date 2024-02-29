@@ -94,7 +94,7 @@ export const handler: Handlers<
 export default async (
   req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>,
-): React.ReactElement => {
+): Promise<JSX.Element | Response> => {
   const tables = ctx.state.tables;
   const pk = new URL(req.url).searchParams.get("pk");
   const primaryKeys = JSON.parse(pk || "null");

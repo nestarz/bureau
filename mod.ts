@@ -113,7 +113,7 @@ export default async ({
           analyticsKey: analyticsConfig?.databaseKey,
         }),
       ],
-      renderer: createRenderer<React.ReactElement>({
+      renderer: createRenderer<JSX.Element>({
         Layout,
         virtualNodePipe: (vn) =>
           Promise.resolve(vn)

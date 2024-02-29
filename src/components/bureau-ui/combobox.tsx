@@ -84,7 +84,7 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
   optionsName: string;
   disabled?: boolean;
   required?: boolean;
-}): React.ReactElement {
+}): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [selected, setSelected] = React.useState<T | null>();

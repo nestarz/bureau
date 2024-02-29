@@ -114,7 +114,7 @@ const blockTypeToBlockName = {
   ul: "Bulleted List",
 };
 
-function Divider(): React.ReactElement {
+function Divider(): JSX.Element {
   return <div className="divider" />;
 }
 
@@ -135,7 +135,7 @@ function positionEditorElement(
   }
 }
 
-function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): React.ReactElement {
+function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): JSX.Element {
   const editorRef = useRef(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mouseDownRef = useRef(false);
@@ -281,7 +281,7 @@ function Select({
   className,
   options,
   value,
-}: SelectProps): React.ReactElement {
+}: SelectProps): JSX.Element {
   return (
     <select className={className} onChange={onChange} value={value}>
       <option hidden={true} value="" />
@@ -315,7 +315,7 @@ function BlockOptionsDropdownList({
   blockType,
   toolbarRef,
   setShowBlockOptionsDropDown,
-}: BlockOptionsDropdownListProps): React.ReactElement {
+}: BlockOptionsDropdownListProps): JSX.Element {
   const dropDownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -483,7 +483,7 @@ const blockTypesIcons = {
   paragraph: RiParagraph,
 };
 
-export default function ToolbarPlugin(): React.ReactElement {
+export default function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);

@@ -30,7 +30,7 @@ export const SqlInput = ({
   name: string;
   defaultValue?: string;
   sqlConfig?: SQLConfig;
-}): React.ReactElement => {
+}): JSX.Element => {
   const ref = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {

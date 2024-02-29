@@ -6,7 +6,7 @@ import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps): React.ReactElement => {
+const Toaster = ({ ...props }: ToasterProps): JSX.Element => {
   return (
     <Sonner
       theme="system"
@@ -27,7 +27,7 @@ const Toaster = ({ ...props }: ToasterProps): React.ReactElement => {
   );
 };
 
-export const Toast = ({ string }: { string: string | null }): React.ReactElement => {
+export const Toast = ({ string }: { string: string | null }): JSX.Element => {
   useEffect(() => {
     console.log("toast", string);
     if (string) setTimeout(() => toast(string), 10);

@@ -51,7 +51,7 @@ export interface BadgeProps
   className?: string;
 }
 
-function Badge({ className, variant, ...props }: BadgeProps): React.ReactElement {
+function Badge({ className, variant, ...props }: BadgeProps): JSX.Element {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );

@@ -3,15 +3,15 @@ import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/src/lib/utils.ts";
 
-export function getValidChildren(children: React.ReactElement) {
+export function getValidChildren(children: JSX.Element) {
   return React.Children.toArray(children).filter((child) =>
     React.isValidElement(child)
-  ) as React.ReactElement[];
+  ) as JSX.Element[];
 }
 
 export interface BreadcrumbProps extends React.ComponentPropsWithoutRef<"nav"> {
   /* The visual separator between each breadcrumb item */
-  separator?: React.ReactElement;
+  separator?: JSX.Element;
   /**
    * If `true`, adds a separator between each breadcrumb item.
    * @default true
