@@ -2,9 +2,9 @@ import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useRef } from "react";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
 export interface MediaProp {
   key: string;
@@ -12,12 +12,16 @@ export interface MediaProp {
 }
 
 let endpoint: string;
-export const MediaContext = ({ endpoint: value }: { endpoint: string }) => {
+export const MediaContext = (
+  { endpoint: value }: { endpoint: string },
+): null => {
   endpoint = value;
   return null;
 };
 
-const Video = ({ src, className }: { src?: string; className?: string }) => {
+const Video = (
+  { src, className }: { src?: string; className?: string },
+): JSX.Element => {
   const ref = useRef<HTMLVideoElement>(null!);
   return (
     <video
@@ -46,26 +50,28 @@ export const Media = ({
   mediaClassName?: string;
   media: MediaProp;
   maxWidth: number;
-}) => {
+}): JSX.Element => {
   return (
     <div className={className}>
-      {/image\//.test(media["content-type"]) ? (
-        <Picture
-          src={endpoint ? new URL(media.key, endpoint).href : undefined}
-          maxWidth={maxWidth}
-          className={cn(
-            "aspect-square object-contain w-full h-auto",
-            mediaClassName
-          )}
-        />
-      ) : /video\//.test(media["content-type"]) ? (
-        <Video
-          src={endpoint ? new URL(media.key, endpoint).href : undefined}
-          className={mediaClassName}
-        />
-      ) : (
-        <div className="aspect-square w-full bg-foreground" />
-      )}
+      {/image\//.test(media["content-type"])
+        ? (
+          <Picture
+            src={endpoint ? new URL(media.key, endpoint).href : undefined}
+            maxWidth={maxWidth}
+            className={cn(
+              "aspect-square object-contain w-full h-auto",
+              mediaClassName,
+            )}
+          />
+        )
+        : /video\//.test(media["content-type"])
+        ? (
+          <Video
+            src={endpoint ? new URL(media.key, endpoint).href : undefined}
+            className={mediaClassName}
+          />
+        )
+        : <div className="aspect-square w-full bg-foreground" />}
     </div>
   );
 };

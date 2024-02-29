@@ -5,9 +5,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/src/lib/utils.ts";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url),
-);
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 const Sheet = SheetPrimitive.Root;
 

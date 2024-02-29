@@ -1,4 +1,3 @@
-// @deno-types="npm:@types/react-dom@18.2/server"
 import { renderToReadableStream } from "react-dom/server";
 import * as Islands from "@bureaudouble/islet/server";
 import { join } from "@std/path/join";
@@ -127,11 +126,7 @@ export default async ({
       middlewares: analytics?.middlewares,
     }),
     composeRoutes({
-      routes: [
-        islet.routes,
-        hmr.routes,
-        staticFilePlugin.routes,
-      ],
+      routes: [islet.routes, hmr.routes, staticFilePlugin.routes],
     }),
   ];
 
@@ -140,3 +135,29 @@ export default async ({
     ...Object.values(Object.assign({}, ...routes)),
   ) as rutt.Routes;
 };
+
+if (withWritePermission && import.meta.url.includes("file://")) {
+  setTimeout(async () => {
+    const islands = await import("@bureaudouble/islet/client");
+    const exports: Record<string, string> = { ".": "./mod.ts" };
+    islands.getIslands(namespace).data.forEach((island) => {
+      const path = island.url;
+      const value = "./" +
+        path.replace("file://" + import.meta.dirname + "/", "");
+      const key = value.replace(/.(j|t)s(x|)$/, "");
+      exports[key.replace("@", "_")] = value;
+      exports[value.replace("@", "_")] = value;
+    });
+
+    let denoConfig: any = {};
+    const configPath = join(import.meta.dirname!, "deno.json");
+    try {
+      denoConfig = JSON.parse(await Deno.readTextFile(configPath));
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) throw error; // Ignore file not found to create a new one
+    }
+    if (JSON.stringify(denoConfig.export) === JSON.stringify(exports)) return;
+    denoConfig.exports = exports;
+    await Deno.writeTextFile(configPath, JSON.stringify(denoConfig, null, 2));
+  }, 10);
+}

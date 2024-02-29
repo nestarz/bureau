@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import { useMemo, useState } from "react";
 import { unique } from "outils/unique.ts";
 

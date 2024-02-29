@@ -1,4 +1,4 @@
-export const getExtendedType = (type: string, name: string) =>
+export const getExtendedType = (type: string, name: string): string =>
   [
     { type: "order", re: "order" },
     { type: "html", re: "html" },
@@ -10,8 +10,7 @@ export const getExtendedType = (type: string, name: string) =>
     { type: "video", re: "mp4(s|)_json" },
     {
       type: "timestamp",
-      re:
-        "((timestamp(tz|))|(datetime)|(.*?_at$))",
+      re: "((timestamp(tz|))|(datetime)|(.*?_at$))",
     },
     { type: "date", re: "date" },
   ].find(({ re }) => new RegExp(`(_|^)${re}(_|$)`, "gi").test(name))?.type ??

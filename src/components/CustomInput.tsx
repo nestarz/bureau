@@ -16,9 +16,9 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
 interface CustomInputProps {
   type: "TEXT" | "INTEGER" | "REAL" | "BLOB";
@@ -40,7 +40,7 @@ export const CustomInput = ({
   referencesRows,
   referencesTo,
   ...props
-}: CustomInputProps) => {
+}: CustomInputProps): JSX.Element => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
   );

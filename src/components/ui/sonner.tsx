@@ -1,12 +1,12 @@
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 import { useEffect } from "react";
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ ...props }: ToasterProps): JSX.Element => {
   return (
     <Sonner
       theme="system"
@@ -27,7 +27,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   );
 };
 
-export const Toast = ({ string }: { string: string | null }) => {
+export const Toast = ({ string }: { string: string | null }): JSX.Element => {
   useEffect(() => {
     console.log("toast", string);
     if (string) setTimeout(() => toast(string), 10);

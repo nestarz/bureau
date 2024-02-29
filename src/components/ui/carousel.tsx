@@ -7,9 +7,9 @@ import useEmblaCarousel, {
 import { cn } from "@/src/lib/utils.ts";
 import { Button } from "@/src/components/ui/button.tsx";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url),
-);
+const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h = useClient.h;
+export const hydrate = useClient.hydrate;
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;

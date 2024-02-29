@@ -1,4 +1,4 @@
-export const formatColumnName = (name: string) =>
+export const formatColumnName = (name: string): string =>
   name
     .replace(/_json/gi, "")
     .replace(/(^|_)id($|_)/gi, "$1ID$2")

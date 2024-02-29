@@ -53,9 +53,9 @@ import { Fragment, useMemo } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
 interface DataTableProps<TData> {
   name: string;
@@ -65,23 +65,24 @@ interface DataTableProps<TData> {
   references?: { [key: string]: { [key: string]: any }[] };
 }
 
-export default <TData = Record<string, unknown>,>({
+export default <TData = Record<string, unknown>>({
   name,
   columns,
   data,
   children,
   references,
-}: DataTableProps<TData>) => {
+}: DataTableProps<TData>): JSX.Element => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageSize: 12,
     pageIndex: 0,
   });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<
+    VisibilityState
+  >({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowOrder, setRowOrder] = React.useState<[number, number][]>([]);
@@ -94,13 +95,13 @@ export default <TData = Record<string, unknown>,>({
             if (idx === b) return data[a];
             return current;
           }),
-        data
+        data,
       ),
-    [JSON.stringify({ rowOrder, data })]
+    [JSON.stringify({ rowOrder, data })],
   );
 
   const orderKey = columns?.find(
-    (d) => formatColumnName(d.name) === "Order"
+    (d) => formatColumnName(d.name) === "Order",
   )?.name;
   const table = useReactTable({
     onSortingChange: setSorting,
@@ -132,13 +133,10 @@ export default <TData = Record<string, unknown>,>({
         id: "_select",
         header: ({ table }) => (
           <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
+            checked={table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")}
+            onCheckedChange={(value: boolean) =>
+              table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
           />
         ),
@@ -146,7 +144,7 @@ export default <TData = Record<string, unknown>,>({
           <Fragment>
             <Checkbox
               checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onCheckedChange={(value: any) => row.toggleSelected(!!value)}
               aria-label="Select row"
             />
           </Fragment>
@@ -177,23 +175,21 @@ export default <TData = Record<string, unknown>,>({
                         .map((column) => [
                           column.name,
                           row.original[column.name],
-                        ])
-                    )
+                        ]),
+                    ),
                   ),
                 })}
                 value={value}
                 type={getExtendedType(column.type, column.name)}
-                references={
-                  column.references && column.to && references
-                    ? references[column.references!]?.find(
-                        (row) => row[column.to!] === value
-                      )
-                    : null
-                }
+                references={column.references && column.to && references
+                  ? references[column.references!]?.find(
+                    (row) => row[column.to!] === value,
+                  )
+                  : null}
               />
             );
           },
-        })
+        }),
       ),
       {
         id: "_actions",
@@ -221,8 +217,8 @@ export default <TData = Record<string, unknown>,>({
                               .map((column) => [
                                 column.name,
                                 row.original[column.name],
-                              ])
-                          )
+                              ]),
+                          ),
                         ),
                       })}
                     >
@@ -260,8 +256,8 @@ export default <TData = Record<string, unknown>,>({
                             .map((column) => [
                               column.name,
                               row.original[column.name],
-                            ])
-                        )
+                            ]),
+                        ),
                       ),
                     })}
                   >
@@ -284,7 +280,7 @@ export default <TData = Record<string, unknown>,>({
         <Input
           placeholder={`Filter ${name}`}
           value={globalFilter ?? ""}
-          onChange={(event) => setGlobalFilter(String(event.target.value))}
+          onChange={(event: any) => setGlobalFilter(String(event.target.value))}
           className="max-w-sm mr-auto"
         />
         {children}
@@ -300,11 +296,13 @@ export default <TData = Record<string, unknown>,>({
                   Object.fromEntries([
                     ...columns
                       .filter((column) => column.pk === 1)
-                      .map((column) => [column.name, (data as any)[column.name]]),
+                      .map((
+                        column,
+                      ) => [column.name, (data as any)[column.name]]),
                     [orderKey, index],
                   ])
-                )
-              )
+                ),
+              ),
             );
             await fetch(urlcat("/admin/api/reorder/:name", { name }), {
               method: "POST",
@@ -331,9 +329,8 @@ export default <TData = Record<string, unknown>,>({
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value: any) =>
+                      column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
@@ -350,12 +347,10 @@ export default <TData = Record<string, unknown>,>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      {header.isPlaceholder ? null : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                     </TableHead>
                   );
                 })}
@@ -372,37 +367,38 @@ export default <TData = Record<string, unknown>,>({
                 }
               }}
             >
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        data-draggable={
-                          formatColumnName(cell.column.id) === "Order"
-                        }
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+              {table.getRowModel().rows?.length
+                ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          data-draggable={formatColumnName(cell.column.id) ===
+                            "Order"}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )
+                : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
+                )}
             </DraggableArray>
           </TableBody>
         </Table>

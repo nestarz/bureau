@@ -1,6 +1,6 @@
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
 import * as React from "react";
 
@@ -51,7 +51,7 @@ function Options<T extends { value: string; label: string }>({
               onSelect={() => {
                 setSelected(
                   options.find((priority) => priority.value === item.value) ||
-                    null
+                    null,
                 );
                 setOpen(false);
               }}
@@ -84,7 +84,7 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
   optionsName: string;
   disabled?: boolean;
   required?: boolean;
-}) {
+}): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [selected, setSelected] = React.useState<T | null>();
@@ -107,16 +107,16 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
             variant="outline"
             className={cn("w-[150px] justify-start", className)}
           >
-            {selected ? (
-              <>
-                <Badge variant="outline" className="-ml-2 mr-2">
-                  {selected.value}
-                </Badge>
-                {selected.label}
-              </>
-            ) : (
-              <></>
-            )}
+            {selected
+              ? (
+                <>
+                  <Badge variant="outline" className="-ml-2 mr-2">
+                    {selected.value}
+                  </Badge>
+                  {selected.label}
+                </>
+              )
+              : <></>}
             {InputHidden}
           </Button>
         </PopoverTrigger>

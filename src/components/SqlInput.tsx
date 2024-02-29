@@ -1,9 +1,9 @@
 import React from "react";
-import { EditorView, basicSetup } from "codemirror";
-import { EditorState, Compartment } from "@codemirror/state";
-import { sql, SQLDialect, type SQLConfig } from "@codemirror/lang-sql";
+import { basicSetup, EditorView } from "codemirror";
+import { Compartment, EditorState } from "@codemirror/state";
+import { sql, type SQLConfig, SQLDialect } from "@codemirror/lang-sql";
 
-const SQLite = SQLDialect.define({
+const SQLite: SQLDialect = SQLDialect.define({
   // Based on https://www.sqlite.org/lang_keywords.html based on likely keywords to be used in select queries
   // https://github.com/simonw/datasette/pull/1893#issuecomment-1316401895:
   keywords:
@@ -16,9 +16,9 @@ const SQLite = SQLDialect.define({
   specialVar: "@:?$",
 });
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then((v) =>
-  v.default(import.meta.url)
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
 export const SqlInput = ({
   className,
@@ -30,7 +30,7 @@ export const SqlInput = ({
   name: string;
   defaultValue?: string;
   sqlConfig?: SQLConfig;
-}) => {
+}): JSX.Element => {
   const ref = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
@@ -44,7 +44,7 @@ export const SqlInput = ({
         extensions: [
           basicSetup,
           language.of(
-            sql({ dialect: SQLite, upperCaseKeywords: true, ...sqlConfig })
+            sql({ dialect: SQLite, upperCaseKeywords: true, ...sqlConfig }),
           ),
           EditorView.lineWrapping,
           tabSize.of(EditorState.tabSize.of(2)),

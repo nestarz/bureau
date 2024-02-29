@@ -4,11 +4,11 @@ import { CheckIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/src/lib/utils.ts";
 
-export const { h, hydrate } = await import("@/src/lib/useClient.ts").then(
-  (v) => v.default(import.meta.url),
-);
+const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: any = useClient.h;
+export const hydrate: any = useClient.hydrate;
 
-const Checkbox = React.forwardRef<
+const Checkbox: any = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
 >(({ className, ...props }, ref) => (
