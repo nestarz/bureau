@@ -1,6 +1,5 @@
 // @deno-types="npm:@types/react-dom@18.2.0/client"
 import { hydrateRoot as hydrate } from "react-dom/client";
-// @deno-types="@types/react"
 import { createElement as h } from "react";
 
 export const namespace = "@bureaudouble/bureau";

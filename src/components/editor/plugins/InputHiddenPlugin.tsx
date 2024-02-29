@@ -5,7 +5,6 @@ const { $generateNodesFromDOM } = (await import("@lexical/html")).default;
 const { $insertNodes, $selectAll } = (await import("lexical")).default;
 const { $generateHtmlFromNodes } = (await import("@lexical/html")).default;
 
-// @deno-types="@types/react"
 import { Fragment, useEffect, useRef } from "react";
 
 export function LoadHtmlPlugin({

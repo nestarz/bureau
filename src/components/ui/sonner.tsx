@@ -1,7 +1,6 @@
 const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
 export const h = useClient.h;
 export const hydrate = useClient.hydrate;
-// @deno-types="@types/react"
 import { useEffect } from "react";
 import { Toaster as Sonner, toast } from "sonner";
 

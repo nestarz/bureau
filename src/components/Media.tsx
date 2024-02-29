@@ -1,6 +1,5 @@
 import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
-// @deno-types="@types/react"
 import { useRef } from "react";
 
 const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));

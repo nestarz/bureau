@@ -1,4 +1,3 @@
-// @deno-types="@types/react"
 import * as React from "react";
 import { ChevronDownIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
@@ -50,7 +49,6 @@ import urlcat from "outils/urlcat.ts";
 import DisplayValue from "@/src/components/DisplayValue.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
-// @deno-types="@types/react"
 import { Fragment, useMemo } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";

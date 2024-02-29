@@ -4,7 +4,6 @@ import type { SqliteMiddlewareState } from "outils/database/sqlite/createSqliteP
 import { SqlInput } from "@/src/components/SqlInput.tsx";
 import { Button } from "@/src/components/ui/button.tsx";
 import DataTable from "@/src/components/DataTable.tsx";
-// @deno-types="@types/react"
 import * as React from "react";
 
 export const config: RouteConfig = {

@@ -14,7 +14,6 @@ import deserializeNestedJSON, {
 } from "outils/deserializeNestedJSON.ts";
 import DataTable from "@/src/components/DataTable.tsx";
 import { sql } from "kysely";
-// @deno-types="@types/react"
 import * as React from "react";
 import type { Table } from "@/src/middlewares/client.ts";
 
@@ -273,13 +272,13 @@ export default async (
       ],
     )
     : [];
-  const data = deserializeNestedJSON<{ [a: string] }[]>(
+  const data = deserializeNestedJSON<{ [a: string]: any }[]>(
     JSON.parse(results[0].current_cte),
   )?.[0];
-  const rowNext = deserializeNestedJSON<{ [a: string] }[]>(
+  const rowNext = deserializeNestedJSON<{ [a: string]: any }[]>(
     JSON.parse(results[0].next_cte),
   )?.[0];
-  const rowPrev = deserializeNestedJSON<{ [a: string] }[]>(
+  const rowPrev = deserializeNestedJSON<{ [a: string]: any }[]>(
     JSON.parse(results[0].previous_cte),
   )?.[0];
 

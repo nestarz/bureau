@@ -2,7 +2,6 @@ const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(i
 export const h = useClient.h;
 export const hydrate = useClient.hydrate;
 
-// @deno-types="@types/react"
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 

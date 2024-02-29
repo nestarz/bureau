@@ -19,7 +19,9 @@ export const config: RouteConfig = {
   routeOverride: "/analytics{/}?",
 };
 
-const createColumnsFromData = (data): any =>
+const createColumnsFromData = (
+  data: { [key: string]: any }[],
+): { name: string; type: string }[] =>
   Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
     name: key,
     type: typeof value,
@@ -82,7 +84,7 @@ interface AnalyticsData {
 
 export default async (
   _req: Request,
-  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any, "analytics">>
+  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any, "analytics">>,
 ) => {
   const table: AnalyticsData = await ctx.state.clientQuery
     .analytics((qb) => ({
@@ -192,8 +194,8 @@ export default async (
             label: "Load time (ms)",
             value: table.load_time
               ? (table.load_time * 1000)?.toLocaleString("fr", {
-                  maximumFractionDigits: 0,
-                })
+                maximumFractionDigits: 0,
+              })
               : null,
           },
           {

@@ -19,7 +19,9 @@
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "@bureaudouble/islet/react",
-    "types": ["npm:@types/react@18.2.0"]
+    "types": [
+      "npm:@types/react@18.2.0"
+    ]
   },
   "exclude": [
     "test/",

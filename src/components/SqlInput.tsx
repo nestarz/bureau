@@ -1,4 +1,3 @@
-// @deno-types="@types/react"
 import React from "react";
 import { basicSetup, EditorView } from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";

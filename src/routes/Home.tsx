@@ -15,8 +15,3 @@ export default async (
     headers: { Location: "/admin/analytics" },
   });
 };
-
-
-import React from "react";
-const A = (): React.ReactElement => <div />;
-const B = (): React.ReactElement => <A />;

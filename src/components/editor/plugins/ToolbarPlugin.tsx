@@ -31,7 +31,6 @@ import {
   useRef,
   useState,
   Fragment,
-// @deno-types="@types/react"
 } from "react";
 const {
   $createParagraphNode,

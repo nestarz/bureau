@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu.tsx";
-// @deno-types="@types/react"
 import { useState } from "react";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";

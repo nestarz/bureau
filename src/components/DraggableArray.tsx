@@ -1,4 +1,3 @@
-// @deno-types="@types/react"
 import { Children, cloneElement, ReactElement, ReactNode, useRef } from "react";
 
 interface DraggableArrayProps {

@@ -1,4 +1,3 @@
-// @deno-types="@types/react"
 import * as React from "react";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 

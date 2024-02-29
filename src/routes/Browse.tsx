@@ -16,37 +16,37 @@ export const config: RouteConfig = {
 
 export default async (
   _req: Request,
-  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
+  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>,
 ) => {
   const tables = ctx.state.tables;
   const tableConfig = tables.find(
-    (table) => table.name === ctx.params.tableName
+    (table) => table.name === ctx.params.tableName,
   );
   const tableName = tableConfig?.name;
   if (!tableName) return new Response(null, { status: 404 });
 
   const orderKey = tableConfig?.columns.find(
-    (d) => formatColumnName(d.name) === "Order"
+    (d) => formatColumnName(d.name) === "Order",
   )?.name;
   const referencesArray = Array.from(
     Map.groupBy(
       (tableConfig?.columns ?? []).filter((v) => v.references),
-      (v) => v.references!
-    )
+      (v) => v.references!,
+    ),
   );
-  const results: null | { [x: string]: string }[] =
-    await ctx.state.clientQuery.default((qb) => {
+  const results: null | { [x: string]: string }[] = await ctx.state.clientQuery
+    .default((qb) => {
       for (const [references, columns] of referencesArray) {
-        const newQb = qb.with(`cte_${references}`, (wb) => {
-          wb = wb.selectFrom(references).distinct().selectAll(references);
+        const newQb = qb.with(`cte_${references}`, (wb): any => {
+          let sq = wb.selectFrom(references).distinct().selectAll(references);
           for (const column of columns) {
-            wb = wb.innerJoin(
+            sq = sq.innerJoin(
               tableName,
-              sql.ref(`${tableName}.${column.name}`),
-              sql.ref(`${column.references}.${column.to}`)
+              sql.ref(`${tableName}.${column.name}`) as any,
+              sql.ref(`${column.references}.${column.to}`) as any,
             );
           }
-          return wb;
+          return sq;
         });
         qb = newQb as any;
       }
@@ -56,8 +56,7 @@ export default async (
           wb
             .selectFrom(tableName)
             .$if(!!orderKey, (wb) => wb.orderBy(orderKey!))
-            .selectAll()
-        )
+            .selectAll())
         .selectNoFrom((qb) =>
           [
             ["target_cte", tableConfig.columns],
@@ -69,7 +68,7 @@ export default async (
             jsonArrayFrom(
               qb
                 .selectFrom(`cte_${references}`)
-                .select((columns as Column[]).map((column) => column.name))
+                .select((columns as Column[]).map((column) => column.name)),
             ).as(references as string)
           )
         )
@@ -80,12 +79,10 @@ export default async (
     referencesArray.map(([references]) => [
       references,
       deserializeNestedJSON(JSON.parse(results[0][references])),
-    ])
+    ]),
   );
 
-  return !tableConfig ? (
-    <div></div>
-  ) : (
+  return !tableConfig ? <div></div> : (
     <div className="col-span-4 p-4">
       <DataTable
         name={tableConfig?.name}

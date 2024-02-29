@@ -6,7 +6,7 @@ import { cn } from "@/src/lib/utils.ts"
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
+>(({ className, ...props }, ref): JSX.Element => (
   <div className="relative w-full overflow-auto">
     <table
       ref={ref}

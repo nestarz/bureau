@@ -38,7 +38,7 @@ const getFilesInPath = <T extends { [a: string]: unknown }>(
   return filesAndFolders;
 };
 
-const useFileBrowser = <T extends { [a: string] } = { key: string }>({
+const useFileBrowser = <T extends { [a: string]: any } = { key: string }>({
   initialPath,
   files,
   getKey,
