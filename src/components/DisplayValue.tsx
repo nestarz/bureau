@@ -19,7 +19,7 @@ export default ({
     label?: string;
     key?: string;
   } | null;
-}): JSX.Element => {
+}): React.ReactNode => {
   const Comp = href ? "a" : "div";
   return (
     <Comp className="flex space-x-2" href={href}>

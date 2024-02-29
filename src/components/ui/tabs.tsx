@@ -2,6 +2,7 @@ const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.defa
 export const h = useClient.h;
 export const hydrate = useClient.hydrate;
 
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
@@ -42,7 +43,7 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 const TabsContent: any = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
->(({ className, ...props }, ref): JSX.Element => (
+>(({ className, ...props }, ref): React.ReactNode => (
   <TabsPrimitive.Content
     ref={ref}
     className={cn(

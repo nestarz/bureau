@@ -18,6 +18,7 @@ import deserializeNestedJSON, {
 } from "outils/deserializeNestedJSON.ts";
 import DataTable from "@/src/components/DataTable.tsx";
 import { sql } from "kysely";
+// @deno-types="npm:@types/react@18.2.0"
 import { Fragment } from "react";
 import type { Table } from "@/src/middlewares/client.ts";
 

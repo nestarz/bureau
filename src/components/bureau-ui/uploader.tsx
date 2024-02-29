@@ -1,5 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import useUpload from "@/src/lib/useUpload.ts";
+// @deno-types="npm:@types/react@18.2.0"
 import { Fragment, forwardRef, useRef, ReactNode } from "react";
 
 interface UploaderProps {

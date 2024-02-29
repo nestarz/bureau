@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import { useEffect, useState } from "react";
 
 interface UseDebounceProps<T> {

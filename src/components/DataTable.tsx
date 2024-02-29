@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import { ChevronDownIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
@@ -49,6 +50,7 @@ import urlcat from "outils/urlcat.ts";
 import DisplayValue from "@/src/components/DisplayValue.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
+// @deno-types="npm:@types/react@18.2.0"
 import { Fragment, useMemo } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
@@ -71,7 +73,7 @@ export default <TData = Record<string, unknown>>({
   data,
   children,
   references,
-}: DataTableProps<TData>): JSX.Element => {
+}: DataTableProps<TData>): React.ReactNode => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageSize: 12,

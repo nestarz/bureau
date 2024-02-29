@@ -1,5 +1,6 @@
 import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
+// @deno-types="npm:@types/react@18.2.0"
 import { useRef } from "react";
 
 const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
@@ -21,7 +22,7 @@ export const MediaContext = (
 
 const Video = (
   { src, className }: { src?: string; className?: string },
-): JSX.Element => {
+): React.ReactNode => {
   const ref = useRef<HTMLVideoElement>(null!);
   return (
     <video
@@ -50,7 +51,7 @@ export const Media = ({
   mediaClassName?: string;
   media: MediaProp;
   maxWidth: number;
-}): JSX.Element => {
+}): React.ReactNode => {
   return (
     <div className={className}>
       {/image\//.test(media["content-type"])

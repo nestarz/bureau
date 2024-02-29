@@ -1,12 +1,13 @@
 const useClient: any = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
 export const h: any = useClient.h;
 export const hydrate: any = useClient.hydrate;
+// @deno-types="npm:@types/react@18.2.0"
 import { useEffect } from "react";
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps): JSX.Element => {
+const Toaster = ({ ...props }: ToasterProps): React.ReactNode => {
   return (
     <Sonner
       theme="system"
@@ -27,7 +28,7 @@ const Toaster = ({ ...props }: ToasterProps): JSX.Element => {
   );
 };
 
-export const Toast = ({ string }: { string: string | null }): JSX.Element => {
+export const Toast = ({ string }: { string: string | null }): React.ReactNode => {
   useEffect(() => {
     console.log("toast", string);
     if (string) setTimeout(() => toast(string), 10);

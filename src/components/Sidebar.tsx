@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import { cn } from "@/src/lib/utils.ts";
 import { Button } from "@/src/components/ui/button.tsx";
@@ -7,7 +8,7 @@ interface Path {
   active?: boolean;
   href?: string;
   label: string;
-  icon?: React.ComponentType<any>;
+  icon?: any;
   paths?: Path[];
 }
 

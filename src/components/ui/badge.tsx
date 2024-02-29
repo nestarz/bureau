@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import type {
@@ -51,7 +52,7 @@ export interface BadgeProps
   className?: string;
 }
 
-function Badge({ className, variant, ...props }: BadgeProps): JSX.Element {
+function Badge({ className, variant, ...props }: BadgeProps): React.ReactNode {
   return (
     <div className={cn(badgeVariants({ variant }), className)} {...props} />
   );

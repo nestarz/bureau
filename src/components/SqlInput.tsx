@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import React from "react";
 import { basicSetup, EditorView } from "codemirror";
 import { Compartment, EditorState } from "@codemirror/state";
@@ -30,7 +31,7 @@ export const SqlInput = ({
   name: string;
   defaultValue?: string;
   sqlConfig?: SQLConfig;
-}): JSX.Element => {
+}): React.ReactNode => {
   const ref = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {

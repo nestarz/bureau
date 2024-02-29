@@ -33,6 +33,6 @@ const MATCHERS = [
   },
 ];
 
-export default function PlaygroundAutoLinkPlugin(): JSX.Element {
+export default function PlaygroundAutoLinkPlugin(): React.ReactNode {
   return <AutoLinkPlugin matchers={MATCHERS} />;
 }

@@ -1,3 +1,4 @@
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import {
@@ -30,7 +31,7 @@ const DropdownMenuSubTrigger: any = React.forwardRef<
     inset?: boolean;
   }
 >(
-  ({ className, inset, children, ...props }, ref): JSX.Element => (
+  ({ className, inset, children, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.SubTrigger
       ref={ref}
       className={cn(
@@ -52,7 +53,7 @@ const DropdownMenuSubContent: any = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
 >(
-  ({ className, ...props }, ref): JSX.Element => (
+  ({ className, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.SubContent
       ref={ref}
       className={cn(
@@ -70,7 +71,7 @@ const DropdownMenuContent: any = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
 >(
-  ({ className, sideOffset = 4, ...props }, ref): JSX.Element => (
+  ({ className, sideOffset = 4, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         ref={ref}
@@ -93,7 +94,7 @@ const DropdownMenuItem: any = React.forwardRef<
     inset?: boolean;
   }
 >(
-  ({ className, inset, ...props }, ref): JSX.Element => (
+  ({ className, inset, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.Item
       ref={ref}
       className={cn(
@@ -111,7 +112,7 @@ const DropdownMenuCheckboxItem: any = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
 >(
-  ({ className, children, checked, ...props }, ref): JSX.Element => (
+  ({ className, children, checked, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.CheckboxItem
       ref={ref}
       className={cn(
@@ -137,7 +138,7 @@ const DropdownMenuRadioItem: any = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
 >(
-  ({ className, children, ...props }, ref): JSX.Element => (
+  ({ className, children, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.RadioItem
       ref={ref}
       className={cn(
@@ -163,7 +164,7 @@ const DropdownMenuLabel: any = React.forwardRef<
     inset?: boolean;
   }
 >(
-  ({ className, inset, ...props }, ref): JSX.Element => (
+  ({ className, inset, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.Label
       ref={ref}
       className={cn(
@@ -181,7 +182,7 @@ const DropdownMenuSeparator: any = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
 >(
-  ({ className, ...props }, ref): JSX.Element => (
+  ({ className, ...props }, ref): React.ReactNode => (
     <DropdownMenuPrimitive.Separator
       ref={ref}
       className={cn("-mx-1 my-1 h-px bg-muted", className)}
@@ -194,7 +195,7 @@ DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
 const DropdownMenuShortcut = ({
   className,
   ...props
-}: React.HTMLAttributes<HTMLSpanElement>): JSX.Element => {
+}: React.HTMLAttributes<HTMLSpanElement>): React.ReactNode => {
   return (
     <span
       className={cn("ml-auto text-xs tracking-widest opacity-60", className)}

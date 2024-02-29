@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu.tsx";
+// @deno-types="npm:@types/react@18.2.0"
 import { useState } from "react";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
@@ -40,7 +41,7 @@ export const CustomInput = ({
   referencesRows,
   referencesTo,
   ...props
-}: CustomInputProps): JSX.Element => {
+}: CustomInputProps): React.ReactNode => {
   const [extendedType, setExtendedType] = useState(() =>
     getExtendedType(type, name)
   );
