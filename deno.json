@@ -1,7 +1,10 @@
 {
   "name": "@bureaudouble/bureau",
-  "version": "0.0.9",
+  "version": "0.0.16",
   "nodeModulesDir": false,
+  "tasks": {
+    "test": "deno run --unstable-hmr -A --config=./deno.json --env=test/.env ./test/main.ts"
+  },
   "lint": {
     "rules": {
       "tags": [
@@ -11,6 +14,7 @@
     }
   },
   "compilerOptions": {
+    "noErrorTruncation": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -60,7 +64,7 @@
     "@bureaudouble/islet/server": "jsr:@bureaudouble/islet@0.0.14/server",
     "@bureaudouble/islet/client": "jsr:@bureaudouble/islet@0.0.14/client",
     "@bureaudouble/islet/react/jsx-runtime": "jsr:@bureaudouble/islet@0.0.14/react/jsx-runtime",
-    "outils/": "jsr:/@bureaudouble/outils@0.0.20/",
+    "outils/": "jsr:/@bureaudouble/outils@0.0.29/",
     "@std/path/": "jsr:/@std/path@0.217/",
     "@radix-ui/react-icons": "npm:@radix-ui/react-icons@^1.3.0",
     "class-variance-authority": "npm:class-variance-authority@^0.7.0",

@@ -2,7 +2,6 @@
 import { renderToReadableStream } from "react-dom/server";
 import * as Islands from "@bureaudouble/islet/server";
 import { join } from "@std/path/join";
-import * as React from "react";
 
 import type { PluginMiddleware } from "outils/fresh/types.ts";
 import createRenderer from "outils/fresh/createRenderPipe.ts";
@@ -37,11 +36,12 @@ interface BureauConfig {
   database: any;
   databaseKey?: string;
   basePath?: string;
-  getS3Uri: () => URL; // Replace with the actual function signature if different
+  getS3Uri: (key: string) => URL;
   s3Client: ApiMedias.S3Client;
   analyticsConfig?: AnalyticsConfig;
   isDev?: boolean;
   middleware?: PluginMiddleware[];
+  outDirectory?: string;
 }
 
 export default async ({
@@ -53,6 +53,7 @@ export default async ({
   isDev,
   middleware: middlewareFns,
   analyticsConfig,
+  outDirectory,
 }: BureauConfig): Promise<any> => {
   Islands.setNamespaceParentPathSegment(namespace, basePath ?? "");
 
@@ -63,6 +64,7 @@ export default async ({
     namespace: "default",
     database,
     withDeserializeNestedJSON: true,
+    disableWritingTypes: true,
   });
   const hmr = await createHmrPlugin({
     basePath,
@@ -74,6 +76,7 @@ export default async ({
     baseUrl: new URL(import.meta.url),
     namespace,
     prefix: join(basePath ?? "", "/islands/"),
+    buildDir: outDirectory,
     importMapFileName: "deno.json",
     esbuildOptions: {
       minify: !(isDev ?? withWritePermission),
@@ -87,8 +90,8 @@ export default async ({
   });
   const staticFilePlugin = createStaticFilePlugin({ baseUrl: import.meta.url });
 
-  const routes: rutt.Routes[] = [
-    composeRoutes({
+  const routes: rutt.Routes = composeRoutes([
+    {
       routes: [
         ApiMedias,
         ApiReorder,
@@ -121,44 +124,10 @@ export default async ({
             .then(Islands.addScripts)
             .then(tailwindPlugin.transformEnd),
       }),
-    }),
-    composeRoutes({
-      routes: analytics?.routes,
-      middlewares: analytics?.middlewares,
-    }),
-    composeRoutes({
-      routes: [islet.routes, hmr.routes, staticFilePlugin.routes],
-    }),
-  ];
+    },
+    { routes: analytics?.routes, middlewares: analytics?.middlewares },
+    { routes: [islet.routes, hmr.routes, staticFilePlugin.routes] },
+  ]);
 
-  return Object.assign(
-    {},
-    ...Object.values(Object.assign({}, ...routes)),
-  ) as rutt.Routes;
+  return routes;
 };
-
-if (withWritePermission && import.meta.url.includes("file://")) {
-  setTimeout(async () => {
-    const islands = await import("@bureaudouble/islet/client");
-    const exports: Record<string, string> = { ".": "./mod.ts" };
-    islands.getIslands(namespace).data.forEach((island) => {
-      const path = island.url;
-      const value = "./" +
-        path.replace("file://" + import.meta.dirname + "/", "");
-      const key = value.replace(/.(j|t)s(x|)$/, "");
-      exports[key.replace("@", "_")] = value;
-      exports[value.replace("@", "_")] = value;
-    });
-
-    let denoConfig: any = {};
-    const configPath = join(import.meta.dirname!, "deno.json");
-    try {
-      denoConfig = JSON.parse(await Deno.readTextFile(configPath));
-    } catch (error) {
-      if (!(error instanceof Deno.errors.NotFound)) throw error; // Ignore file not found to create a new one
-    }
-    if (JSON.stringify(denoConfig.export) === JSON.stringify(exports)) return;
-    denoConfig.exports = exports;
-    await Deno.writeTextFile(configPath, JSON.stringify(denoConfig, null, 2));
-  }, 10);
-}

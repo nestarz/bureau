@@ -16,9 +16,10 @@ const SQLite: SQLDialect = SQLDialect.define({
   specialVar: "@:?$",
 });
 
-const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h = useClient.h;
-export const hydrate = useClient.hydrate;
+import type { UseClient } from "@/src/lib/useClient.ts";
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: UseClient["h"] = useClient.h;
+export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
 export const SqlInput = ({
   className,

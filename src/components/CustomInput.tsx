@@ -16,9 +16,10 @@ import formatColumnName from "@/src/lib/formatColumnName.ts";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
-const useClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
-export const h = useClient.h;
-export const hydrate = useClient.hydrate;
+import type { UseClient } from "@/src/lib/useClient.ts";
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+export const h: UseClient["h"] = useClient.h;
+export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
 interface CustomInputProps {
   type: "TEXT" | "INTEGER" | "REAL" | "BLOB";

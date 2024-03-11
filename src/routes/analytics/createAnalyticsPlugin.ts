@@ -27,6 +27,7 @@ export const createAnalyticsPlugin = async (
     namespace: "analytics",
     database: config.database,
     withDeserializeNestedJSON: true,
+    disableWritingTypes: true,
   });
 
   return {
