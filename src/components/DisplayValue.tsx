@@ -28,7 +28,7 @@ export default ({
           ? <DragHandleDots2Icon className="mx-auto" />
           : typeof value === "object"
           ? (
-            type === "image"
+            ["image", "media", "video"].includes(type)
               ? (
                 <div className="flex items-center gap-1 w-max">
                   {(value as MediaProp[])?.slice(0, MAX).map((media) => (

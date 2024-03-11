@@ -38,6 +38,7 @@ export default (
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
 ): JSX.Element => {
   const { data, error } = ctx.state.session.flash("x-data") ?? {};
+  console.log(data);
 
   return (
     <form className="col-span-4 p-4 flex flex-col gap-2" method="POST">

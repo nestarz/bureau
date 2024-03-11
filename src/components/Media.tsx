@@ -1,9 +1,12 @@
 import Picture from "@/src/components/Picture.tsx";
 import { cn } from "@/src/lib/utils.ts";
 import { useRef } from "react";
+import { FileTextIcon } from "@radix-ui/react-icons";
 
 import type { UseClient } from "@/src/lib/useClient.ts";
-const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
+);
 export const h: UseClient["h"] = useClient.h;
 export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
@@ -72,7 +75,11 @@ export const Media = ({
             className={mediaClassName}
           />
         )
-        : <div className="aspect-square w-full bg-foreground" />}
+        : (
+          <div className="aspect-square w-full">
+            <FileTextIcon />
+          </div>
+        )}
     </div>
   );
 };
