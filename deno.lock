@@ -2,9 +2,10 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@bureaudouble/deno-dom@0.1.38": "jsr:@bureaudouble/deno-dom@0.1.38",
       "jsr:@bureaudouble/islet@0.0.18": "jsr:@bureaudouble/islet@0.0.18",
       "jsr:@bureaudouble/outils@0.0.13": "jsr:@bureaudouble/outils@0.0.13",
-      "jsr:@bureaudouble/outils@0.0.31": "jsr:@bureaudouble/outils@0.0.31",
+      "jsr:@bureaudouble/outils@0.0.33": "jsr:@bureaudouble/outils@0.0.33",
       "jsr:@bureaudouble/outils@0.0.9": "jsr:@bureaudouble/outils@0.0.9",
       "jsr:@bureaudouble/scripted@0.0.2": "jsr:@bureaudouble/scripted@0.0.2",
       "jsr:@luca/esbuild-deno-loader@0.9.0": "jsr:@luca/esbuild-deno-loader@0.9.0",
@@ -65,7 +66,6 @@
       "npm:jsdom": "npm:jsdom@24.0.0",
       "npm:kysely@0.27.2": "npm:kysely@0.27.2",
       "npm:lexical@0.13.1": "npm:lexical@0.13.1",
-      "npm:linkedom@0.16.8": "npm:linkedom@0.16.8",
       "npm:mrmime@2.0.0": "npm:mrmime@2.0.0",
       "npm:postcss@8.4.33": "npm:postcss@8.4.33",
       "npm:react": "npm:react@18.2.0",
@@ -81,6 +81,9 @@
       "npm:vaul@^0.9.0": "npm:vaul@0.9.0_react@18.2.0_react-dom@18.2.0__react@18.2.0_@types+react@18.2.0_@types+react-dom@18.2.0"
     },
     "jsr": {
+      "@bureaudouble/deno-dom@0.1.38": {
+        "integrity": "34a39ae56f84da2e6daf6e632ffbe6001ca98da4f5ae7332a0a84d2a2a003be8"
+      },
       "@bureaudouble/islet@0.0.18": {
         "integrity": "07e0b149bd946c175db828042e8195a7f2d584e6f7eb5e84ecaa0533d6dcc6ad",
         "dependencies": [
@@ -99,14 +102,14 @@
       "@bureaudouble/outils@0.0.13": {
         "integrity": "351999b11bbbc3696a84f2bf4f6d134a732e8e2dd4c3d51f9699d9906b875180"
       },
-      "@bureaudouble/outils@0.0.31": {
-        "integrity": "9be093923ea2e75332954f90925c9dccd607913d1aea761ba6be1aa9f9b02726",
+      "@bureaudouble/outils@0.0.33": {
+        "integrity": "d19015a04a666542b8c3d72d9ccae6100a470a34e02baa430e4ca63fd978f26e",
         "dependencies": [
+          "jsr:@bureaudouble/deno-dom@0.1.38",
           "jsr:@std/path@0.216",
           "npm:autoprefixer@10.4.17",
           "npm:cssnano@6.0.3",
           "npm:kysely@0.27.2",
-          "npm:linkedom@0.16.8",
           "npm:mrmime@2.0.0",
           "npm:postcss@8.4.33",
           "npm:tailwindcss@^3.2.4"
@@ -1570,10 +1573,6 @@
           "css-tree": "css-tree@2.2.1"
         }
       },
-      "cssom@0.5.0": {
-        "integrity": "sha512-iKuQcq+NdHqlAcwUY0o/HL69XQrUaQdMjmStJ8JFmUaiiQErlhrmuigkg/CU4E2J0IyUKUrMAgl36TvN67MqTw==",
-        "dependencies": {}
-      },
       "cssstyle@4.0.1": {
         "integrity": "sha512-8ZYiJ3A/3OkDd093CBT/0UKDWry7ak4BdPTFP2+QEP7cmhouyq/Up709ASSj2cK02BbZiMgk7kYjZNS4QP5qrQ==",
         "dependencies": {
@@ -1790,19 +1789,6 @@
           "whatwg-encoding": "whatwg-encoding@3.1.1"
         }
       },
-      "html-escaper@3.0.3": {
-        "integrity": "sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==",
-        "dependencies": {}
-      },
-      "htmlparser2@9.1.0": {
-        "integrity": "sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==",
-        "dependencies": {
-          "domelementtype": "domelementtype@2.3.0",
-          "domhandler": "domhandler@5.0.3",
-          "domutils": "domutils@3.1.0",
-          "entities": "entities@4.5.0"
-        }
-      },
       "http-proxy-agent@7.0.0": {
         "integrity": "sha512-+ZT+iBxVUQ1asugqnD6oWoRiS25AkjNfG085dKJGtGxkdwLQrMKU5wJr2bOOFAXzKcTuqq+7fZlTMgG3SRfIYQ==",
         "dependencies": {
@@ -1937,16 +1923,6 @@
       "lines-and-columns@1.2.4": {
         "integrity": "sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==",
         "dependencies": {}
-      },
-      "linkedom@0.16.8": {
-        "integrity": "sha512-+HtHVHBb3yZKlP9pgcJdi1AIG9tsAuo+Qtlz+79cCTsxgQwDzajsZjYvpp+DEckCK/zoGVhzkADniYZQ57KcFQ==",
-        "dependencies": {
-          "css-select": "css-select@5.1.0",
-          "cssom": "cssom@0.5.0",
-          "html-escaper": "html-escaper@3.0.3",
-          "htmlparser2": "htmlparser2@9.1.0",
-          "uhyphen": "uhyphen@0.2.0"
-        }
       },
       "lodash.castarray@4.4.0": {
         "integrity": "sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==",
@@ -2695,10 +2671,6 @@
         "integrity": "sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==",
         "dependencies": {}
       },
-      "uhyphen@0.2.0": {
-        "integrity": "sha512-qz3o9CHXmJJPGBdqzab7qAYuW8kQGKNEuoHFYrBwV6hWIMcpAmxDLXojcHfFr9US1Pe6zUswEIJIbLI610fuqA==",
-        "dependencies": {}
-      },
       "universalify@0.2.0": {
         "integrity": "sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg==",
         "dependencies": {}
@@ -2880,7 +2852,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@bureaudouble/islet@0.0.18",
-      "jsr:@bureaudouble/outils@0.0.31",
+      "jsr:@bureaudouble/outils@0.0.33",
       "jsr:@bureaudouble/scripted@0.0.2",
       "jsr:@std/encoding@0.217",
       "jsr:@std/http@0.217",
