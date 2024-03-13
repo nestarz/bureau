@@ -3,7 +3,7 @@ const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => 
 export const h: UseClient["h"] = useClient.h;
 export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
-// @deno-types="@types/react"
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 

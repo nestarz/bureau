@@ -59,7 +59,7 @@ export function Sidebar({ className, paths, name }: SidebarProps) {
                   <Button
                     variant={path.active ? "default" : "ghost"}
                     className={cn(
-                      "w-full justify-start",
+                      "w-full justify-start capitalize",
                       i === arr.length - 1 ? "mb-4" : ""
                     )}
                     asChild

@@ -26,11 +26,13 @@ export default async (
           {
             label: "Tables",
             paths: [
-              ...tables.map((table) => ({
-                label: formatColumnName(table.name),
-                href: urlcat("/admin/browse/:id", { id: table.name }),
-                active: tableConfig?.name === table.name,
-              })),
+              ...tables
+                .toSorted((a, b) => a.name.localeCompare(b.name))
+                .map((table) => ({
+                  label: formatColumnName(table.name),
+                  href: urlcat("/admin/browse/:id", { id: table.name }),
+                  active: tableConfig?.name === table.name,
+                })),
             ],
           },
           {

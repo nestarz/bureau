@@ -43,7 +43,7 @@ export const CustomInput = ({
   ...props
 }: CustomInputProps): JSX.Element => {
   const [extendedType, setExtendedType] = useState(() =>
-    getExtendedType(type, name)
+    getExtendedType(name, type) ?? type
   );
 
   const components: Record<

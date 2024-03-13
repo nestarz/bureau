@@ -47,6 +47,7 @@ import {
 } from "@/src/components/ui/table.tsx";
 import urlcat from "outils/urlcat.ts";
 import DisplayValue from "@/src/components/DisplayValue.tsx";
+import HeaderName from "@/src/components/bureau-ui/header-name.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
 import { Fragment, useMemo } from "react";
@@ -54,17 +55,18 @@ import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
 import type { UseClient } from "@/src/lib/useClient.ts";
-const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
+);
 export const h: UseClient["h"] = useClient.h;
 export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
 interface DataTableProps<TData> {
   name: string;
-  columns:
-    (Partial<Omit<Column, "type">> & {
-      name: Column["name"];
-      type: Column["type"] | string;
-    })[];
+  columns: (Partial<Omit<Column, "type">> & {
+    name: Column["name"];
+    type: Column["type"] | string;
+  })[];
   data: TData[];
   children?: any;
   references?: { [key: string]: { [key: string]: any }[] };
@@ -164,7 +166,7 @@ export default <TData = Record<string, unknown>>({
             <div className="whitespace-nowrap">
               {formatColumnName(column.name) === "Order"
                 ? null
-                : formatColumnName(column.name)}
+                : <HeaderName name={column.name} />}
             </div>
           ),
           cell: ({ row }) => {
@@ -185,7 +187,7 @@ export default <TData = Record<string, unknown>>({
                   ),
                 })}
                 value={value}
-                type={getExtendedType(column.type, column.name)}
+                type={getExtendedType(column.name, column.type) ?? column.type}
                 references={column.references && column.to && references
                   ? references[column.references!]?.find(
                     (row) => row[column.to!] === value,
@@ -397,7 +399,7 @@ export default <TData = Record<string, unknown>>({
                 : (
                   <TableRow>
                     <TableCell
-                      colSpan={columns.length}
+                      colSpan={columns.length + 2}
                       className="h-24 text-center"
                     >
                       No results.

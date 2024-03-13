@@ -1,6 +1,6 @@
 "use client";
 
-// @deno-types="@types/react"
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { cva, type VariantProps } from "class-variance-authority";

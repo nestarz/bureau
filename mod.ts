@@ -85,6 +85,7 @@ export default async ({
   });
   const tailwindPlugin = await createTailwindPlugin({
     basePath,
+    outDirectory: "./build/",
     baseUrl: new URL(".", import.meta.url).href,
     tailwindConfig: () => import("@/tailwind.config.ts"),
   });

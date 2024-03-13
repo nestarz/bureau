@@ -1,4 +1,7 @@
-export const getExtendedType = (type: string, name: string): string =>
+export const getExtendedType = (
+  name: string,
+  _type: string,
+): string | undefined =>
   [
     { type: "order", re: "order" },
     { type: "html", re: "html" },
@@ -13,7 +16,6 @@ export const getExtendedType = (type: string, name: string): string =>
       re: "((timestamp(tz|))|(datetime)|(.*?_at$))",
     },
     { type: "date", re: "date" },
-  ].find(({ re }) => new RegExp(`(_|^)${re}(_|$)`, "gi").test(name))?.type ??
-    type;
+  ].find(({ re }) => new RegExp(`(_|^)${re}(_|$)`, "gi").test(name))?.type;
 
 export default getExtendedType;

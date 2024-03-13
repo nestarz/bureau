@@ -1,4 +1,4 @@
-// @deno-types="@types/react"
+// @deno-types="npm:@types/react@18.2.0"
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { CheckIcon } from "@radix-ui/react-icons";

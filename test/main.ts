@@ -16,14 +16,14 @@ const s3Client = new S3Client({
 
 const createDatabase = (filename: string) =>
   sqliteMemorySync(
-    DB,
+    (path, options) => new DB(path, options),
     () => s3Client.getObject(filename).then((r) => r.arrayBuffer()),
     (buffer) => s3Client.putObject(filename, buffer).then(() => true),
     () => s3Client.statObject(filename).then((r) => r.etag)
   );
 
 await Deno.serve(
-  { port: 8029 },
+  { port: 8129 },
   router({
     "/admin": await createContentManagementSystem({
       s3Client,
@@ -35,7 +35,7 @@ await Deno.serve(
         basePath: "../analytics",
       },
       basePath: "/admin",
-      outDirectory: "./test/.islet/",
+      outDirectory: "./test/.build/",
     }),
   })
 ).finished;

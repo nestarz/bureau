@@ -2,6 +2,28 @@ import Media, { type MediaProp } from "@/src/components/Media.tsx";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import { Badge } from "@/src/components/ui/badge.tsx";
 
+const getDocument: () => Document = await (async () => {
+  const document = (globalThis.document as Document) ??
+    (await import("npm:jsdom").then(
+      ({ JSDOM }) => new JSDOM("").window.document,
+    ));
+
+  return () => document;
+})();
+
+export const convertToPlain = (obj: any): string | null => {
+  const innerHTML = typeof obj === "string"
+    ? obj
+    : String(obj).length > 0
+    ? JSON.stringify(obj)
+    : null;
+  return typeof innerHTML === "string" && innerHTML?.trim()
+    ? Object.assign(getDocument().createElement("fragment"), {
+      innerHTML,
+    }).textContent
+    : "";
+};
+
 const MAX = 3;
 
 export default ({
@@ -24,7 +46,11 @@ export default ({
   return (
     <Comp className="flex space-x-2" href={href}>
       <span className="max-w-[300px] truncate font-medium">
-        {type === "order"
+        {type === "html"
+          ? (
+            convertToPlain(value)
+          )
+          : type === "order"
           ? <DragHandleDots2Icon className="mx-auto" />
           : typeof value === "object"
           ? (
