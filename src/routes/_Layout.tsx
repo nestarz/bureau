@@ -18,7 +18,6 @@ export default async (
     (table) => table.name === ctx.params.tableName
   );
   const { data, error } = ctx.state.session.flash("x-sonner") ?? {};
-
   return (
     <body className="grid grid-cols-5 min-h-screen">
       <Sidebar
