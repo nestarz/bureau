@@ -28,9 +28,9 @@ await Deno.serve(
     "/admin": await createContentManagementSystem({
       s3Client,
       getS3Uri: (key: string) => new URL(key, Deno.env.get("S3_PUBLIC_URL")!),
-      database: await createDatabase("database.sqlite"),
+      getDatabase: () => createDatabase("database.sqlite"),
       analyticsConfig: {
-        database: await createDatabase("analytics.sqlite"),
+        getDatabase: () => createDatabase("analytics.sqlite"),
         databaseKey: "analytics.sqlite",
         basePath: "../analytics",
       },

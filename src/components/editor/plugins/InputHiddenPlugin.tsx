@@ -5,6 +5,7 @@ const { $generateNodesFromDOM } = (await import("@lexical/html")).default;
 const { $insertNodes, $selectAll } = (await import("lexical")).default;
 const { $generateHtmlFromNodes } = (await import("@lexical/html")).default;
 
+import convertToPlain from "outils/convertToPlain.ts";
 import { Fragment, useEffect, useRef } from "react";
 
 export function LoadHtmlPlugin({
@@ -74,7 +75,11 @@ export function InputHiddenPlugin({
       <LoadHtmlPlugin string={defaultValue} />
       <HtmlGeneratorPlugin
         onChange={(value) => {
-          if (ref.current) ref.current.value = value;
+          if (ref.current) {
+            ref.current.value = convertToPlain(value)?.trim()
+              ? value
+              : "";
+          }
         }}
       />
     </Fragment>

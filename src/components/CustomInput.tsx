@@ -17,7 +17,10 @@ import getExtendedType from "@/src/lib/getExtendedType.ts";
 import { ComboBoxResponsive } from "@/src/components/bureau-ui/combobox.tsx";
 
 import type { UseClient } from "@/src/lib/useClient.ts";
-const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+import HeaderName from "@/src/components/bureau-ui/header-name.tsx";
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
+);
 export const h: UseClient["h"] = useClient.h;
 export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
@@ -67,15 +70,15 @@ export const CustomInput = ({
   };
   const Component = references
     ? ({ ...props }: CustomInputProps & { children?: any }) => (
-        <ComboBoxResponsive
-          {...props}
-          optionsName={references}
-          options={(referencesRows ?? []).map((row) => ({
-            label: row.name ?? row.title ?? row.label ?? row.key,
-            value: row[referencesTo!],
-          }))}
-        />
-      )
+      <ComboBoxResponsive
+        {...props}
+        optionsName={references}
+        options={(referencesRows ?? []).map((row) => ({
+          label: row.name ?? row.title ?? row.label ?? row.key,
+          value: row[referencesTo!],
+        }))}
+      />
+    )
     : components[extendedType as keyof typeof components] ?? Input;
 
   return (
@@ -83,7 +86,7 @@ export const CustomInput = ({
       <DropdownMenu>
         <DropdownMenuTrigger disabled={props.disabled} asChild>
           <Label htmlFor={name} className="text-left">
-            {formatColumnName(name)}
+            <HeaderName name={name} />
           </Label>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40" align="start">
@@ -102,7 +105,7 @@ export const CustomInput = ({
                 >
                   {type}
                 </DropdownMenuRadioItem>
-              )
+              ),
             )}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>

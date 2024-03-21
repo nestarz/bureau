@@ -1,6 +1,6 @@
 {
   "name": "@bureaudouble/bureau",
-  "version": "0.0.24",
+  "version": "0.0.28",
   "nodeModulesDir": false,
   "tasks": {
     "test": "deno run --unstable-hmr -A --config=./deno.json --env=test/.env ./test/main.ts"
@@ -62,7 +62,7 @@
     "fresh_session": "./vendor/fresh_session/cookieSession.ts",
     "@bureaudouble/scripted": "jsr:@bureaudouble/scripted@0.0.2",
     "@bureaudouble/islet/": "jsr:/@bureaudouble/islet@0.0.18/",
-    "outils/": "jsr:/@bureaudouble/outils@0.0.33/",
+    "outils/": "jsr:/@bureaudouble/outils@0.0.39/",
     "@std/path/": "jsr:/@std/path@0.217/",
     "@radix-ui/react-icons": "npm:@radix-ui/react-icons@^1.3.0",
     "class-variance-authority": "npm:class-variance-authority@^0.7.0",

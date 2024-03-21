@@ -205,7 +205,7 @@ export default async (
             }),
           },
         ].map(({ label, value }) => (
-          <Card>
+          <Card className="flex-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{label}</CardTitle>
               <svg
@@ -223,9 +223,11 @@ export default async (
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{value ?? "N/A"}</div>
-              <p className="text-xs text-muted-foreground pt-1">
-                +20% from last month
-              </p>
+              {false && (
+                <p className="text-xs text-muted-foreground pt-1">
+                  +20% from last month
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}

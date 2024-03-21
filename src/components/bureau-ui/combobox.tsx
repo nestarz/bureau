@@ -1,5 +1,7 @@
 import type { UseClient } from "@/src/lib/useClient.ts";
-const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) => v.default(import.meta.url));
+const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) =>
+  v.default(import.meta.url)
+);
 export const h: UseClient["h"] = useClient.h;
 export const hydrate: UseClient["hydrate"] = useClient.hydrate;
 
@@ -88,7 +90,11 @@ export function ComboBoxResponsive<T extends { label: string; value: string }>({
 }): JSX.Element {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [selected, setSelected] = React.useState<T | null>();
+  const [selected, setSelected] = React.useState<T | null>(
+    defaultValue
+      ? options.find((priority) => priority.value === defaultValue) || null
+      : null,
+  );
 
   const InputHidden = (
     <input

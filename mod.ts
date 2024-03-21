@@ -5,7 +5,9 @@ import { join } from "@std/path/join";
 
 import type { PluginMiddleware } from "outils/fresh/types.ts";
 import createRenderer from "outils/fresh/createRenderPipe.ts";
-import createSqlitePlugin from "outils/database/sqlite/createSqlitePlugin.ts";
+import createSqlitePlugin, {
+  type SqliteMiddlewareConfig,
+} from "outils/database/sqlite/createSqlitePlugin.ts";
 import createHmrPlugin from "outils/fresh/createHmrPlugin.ts";
 import createStaticFilePlugin from "outils/fresh/createStaticFilePlugin.ts";
 import createTailwindPlugin from "outils/fresh/createTailwindPlugin.ts";
@@ -28,12 +30,12 @@ import * as SqlEditor from "@/src/routes/SqlEditor.tsx";
 import * as Analytics from "@/src/routes/Analytics.tsx";
 import * as ApiReorder from "@/src/routes/api/reorder.ts";
 
-const withWritePermission: boolean =
-  (await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
-    "granted";
+const withWritePermissionAndLocal: boolean =
+  ((await Deno.permissions.query({ name: "write", path: Deno.cwd() })).state ===
+    "granted") && import.meta.url.startsWith("file:");
 
 interface BureauConfig {
-  database: any;
+  getDatabase: SqliteMiddlewareConfig["getDatabase"];
   databaseKey?: string;
   basePath?: string;
   getS3Uri: (key: string) => URL;
@@ -46,7 +48,7 @@ interface BureauConfig {
 
 export default async ({
   basePath = "/admin/",
-  database,
+  getDatabase,
   databaseKey = "database.sqlite",
   getS3Uri,
   s3Client,
@@ -62,7 +64,7 @@ export default async ({
     : null;
   const sqlitePlugin = createSqlitePlugin({
     namespace: "default",
-    database,
+    getDatabase,
     withDeserializeNestedJSON: true,
     disableWritingTypes: true,
   });
@@ -78,10 +80,9 @@ export default async ({
     prefix: join(basePath ?? "", "/islands/"),
     buildDir: outDirectory,
     importMapFileName: "deno.json",
-    esbuildOptions: {
-      minify: !(isDev ?? withWritePermission),
-      logLevel: "verbose",
-    },
+    esbuildOptions: !(isDev ?? withWritePermissionAndLocal)
+      ? { minify: true, logLevel: "verbose" }
+      : {},
   });
   const tailwindPlugin = await createTailwindPlugin({
     basePath,

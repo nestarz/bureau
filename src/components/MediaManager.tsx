@@ -60,7 +60,7 @@ const MediaCard = ({
     className={cn(
       checked ? "border-accent-foreground" : "",
       "overflow-hidden",
-      className
+      className,
     )}
     onClick={size === "small" ? () => onChecked?.(!checked) : undefined}
   >
@@ -116,13 +116,13 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
       fetch(url, {
         method: "POST",
         body: JSON.stringify({ accept, ilike }),
-      }).then((r) => r.json())
+      }).then((r) => r.json()),
   );
   const toggleMedia = (media: MediaProp, isSelected: boolean): void => {
     onChange?.(
       isSelected
         ? [...(value ?? []), media]
-        : value?.filter((v) => v.key !== media.key)
+        : value?.filter((v) => v.key !== media.key),
     );
   };
 
@@ -156,8 +156,9 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
           <Input
             id="search"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setIlike(e.target.value.length > 1 ? `%${e.target.value}%` : null)
-            }
+              setIlike(
+                e.target.value.length > 1 ? `%${e.target.value}%` : null,
+              )}
           />
           <Button
             variant="outline"
@@ -206,6 +207,22 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
             ))}
           </Breadcrumb>
         )}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onChange?.(currentFiles)}
+          >
+            Select All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onChange?.([])}
+          >
+            Unselect All
+          </Button>
+        </div>
         <div className="max-h-[60vh] overflow-auto flex flex-col gap-1">
           {currentFolders.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
@@ -238,7 +255,7 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
                       media.key,
                       `Are you sure ? [Yes|No]`,
                     ].join("\n\n"),
-                    "No"
+                    "No",
                   );
                   if (reply?.toLowerCase()?.trim() === "yes") {
                     await fetch("/admin/api/medias", {
@@ -296,7 +313,7 @@ export function MediaManager({
     () =>
       (typeof defaultValue === "string"
         ? parseJSON(defaultValue)
-        : defaultValue) ?? null
+        : defaultValue) ?? null,
   );
 
   const MAX = 3;
@@ -321,11 +338,13 @@ export function MediaManager({
                   mediaClassName="w-6 h-6 flex-1 rounded object-cover"
                 />
               ))}
-              {(selection?.length ?? 0) - MAX > 0 ? (
-                <Badge variant="outline">
-                  +{(selection ?? []).length - MAX}
-                </Badge>
-              ) : null}
+              {(selection?.length ?? 0) - MAX > 0
+                ? (
+                  <Badge variant="outline">
+                    +{(selection ?? []).length - MAX}
+                  </Badge>
+                )
+                : null}
             </div>
           </div>
         </Button>

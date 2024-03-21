@@ -57,7 +57,7 @@ export const handler: Handlers<
       const type = tableConfig.columns.find((v) => v.name === key)?.type;
       return !type ? prev : {
         ...prev,
-        [key]: typeof value !== "string" || value === "null"
+        [key]: typeof value !== "string" || value === "null" || value === ""
           ? null
           : ["REAL", "INTEGER"].includes(type)
           ? parseFloat(value)
@@ -299,8 +299,8 @@ export default async (
 
   return (
     <div className="col-span-4">
-      <form className="p-6" method="POST">
-        <div className="flex gap-2 w-full justify-between">
+      <form method="POST">
+        <div className="flex gap-2 w-full justify-between sticky p-6 top-0 bg-background z-10">
           <div className="flex flex-col space-y-2">
             <div className="text-lg font-semibold text-foreground capitalize">
               {mode} {formatColumnName(name)}
@@ -349,7 +349,7 @@ export default async (
             <Button type="submit">Save changes</Button>
           </div>
         </div>
-        <div className="grid gap-6 py-4">
+        <div className="grid gap-6 pb-4 px-6">
           {columns.map((column) => (
             <CustomInput
               key={column.name}
@@ -357,7 +357,7 @@ export default async (
               disabled={column.pk === 1}
               name={column.name}
               defaultValue={data?.[column.name]}
-              required={column.notnull > 0}
+              required={column.notnull > 0 && !column.dflt_value}
               type={column.type}
               className="w-full"
               references={column.references}

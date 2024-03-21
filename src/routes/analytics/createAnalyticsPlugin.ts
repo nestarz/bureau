@@ -6,33 +6,47 @@ import {
 import { createApiLogEventPluginRoute } from "@/src/routes/analytics/api/logEvent.ts";
 import { createApiClientPluginRoute } from "@/src/routes/analytics/api/client.ts";
 import { Plugin } from "outils/fresh/types.ts";
-import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
 import createSqlitePlugin, {
-  SqliteMiddlewareState,
+  type SqliteMiddlewareConfig,
+  type SqliteMiddlewareState,
 } from "outils/database/sqlite/createSqlitePlugin.ts";
+import createRequiredTables from "@/src/routes/analytics/utils/createRequiredTables.ts";
 
 export interface AnalyticsConfig {
   getIpData?: GetIpData;
   databaseKey?: string;
-  database: any;
+  getDatabase: SqliteMiddlewareConfig["getDatabase"];
   basePath?: string;
 }
 
 export const createAnalyticsPlugin = async (
   config: AnalyticsConfig,
 ): Promise<Plugin<SqliteMiddlewareState<any, "analytics">>> => {
-  if (config.database) await createRequiredTables(config.database);
-
   const sqlitePlugin = await createSqlitePlugin({
     namespace: "analytics",
-    database: config.database,
+    getDatabase: config.getDatabase,
     withDeserializeNestedJSON: true,
     disableWritingTypes: true,
   });
 
+  let createPromise: Promise<any> | undefined;
   return {
     name: "analyticsPlugin",
-    middlewares: sqlitePlugin.middlewares,
+    middlewares: [
+      ...(sqlitePlugin.middlewares ?? []),
+      {
+        path: "",
+        middleware: {
+          handler: async (_req, ctx) => {
+            createPromise ??= ctx.state.db
+              ? createRequiredTables(ctx.state.db)
+              : undefined;
+            await createPromise;
+            return ctx.next();
+          },
+        },
+      },
+    ],
     routes: [
       createApiLogEventPluginRoute(config),
       createApiLogVisitPluginRoute(config),
