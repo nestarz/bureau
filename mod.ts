@@ -44,6 +44,7 @@ interface BureauConfig {
   isDev?: boolean;
   middleware?: PluginMiddleware[];
   outDirectory?: string;
+  logLevel?: "verbose" | "debug" | "info" | "warning" | "error" | "silent";
 }
 
 export default async ({
@@ -53,6 +54,7 @@ export default async ({
   getS3Uri,
   s3Client,
   isDev,
+  logLevel,
   middleware: middlewareFns,
   analyticsConfig,
   outDirectory,
@@ -80,9 +82,7 @@ export default async ({
     prefix: join(basePath ?? "", "/islands/"),
     buildDir: outDirectory,
     importMapFileName: "deno.json",
-    esbuildOptions: !(isDev ?? withWritePermissionAndLocal)
-      ? { minify: true, logLevel: "verbose" }
-      : {},
+    esbuildOptions: { minify: isDev ?? !withWritePermissionAndLocal, logLevel },
   });
   const tailwindPlugin = await createTailwindPlugin({
     basePath,
