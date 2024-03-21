@@ -2,13 +2,12 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "jsr:@bureaudouble/deno-dom@0.1.38": "jsr:@bureaudouble/deno-dom@0.1.38",
-      "jsr:@bureaudouble/islet@0.0.18": "jsr:@bureaudouble/islet@0.0.18",
+      "jsr:@bureaudouble/deno-dom@0.1.39": "jsr:@bureaudouble/deno-dom@0.1.39",
+      "jsr:@bureaudouble/islet@0.0.26": "jsr:@bureaudouble/islet@0.0.26",
       "jsr:@bureaudouble/outils@0.0.13": "jsr:@bureaudouble/outils@0.0.13",
-      "jsr:@bureaudouble/outils@0.0.39": "jsr:@bureaudouble/outils@0.0.39",
+      "jsr:@bureaudouble/outils@0.0.42": "jsr:@bureaudouble/outils@0.0.42",
       "jsr:@bureaudouble/outils@0.0.9": "jsr:@bureaudouble/outils@0.0.9",
       "jsr:@bureaudouble/scripted@0.0.2": "jsr:@bureaudouble/scripted@0.0.2",
-      "jsr:@luca/esbuild-deno-loader@0.9.0": "jsr:@luca/esbuild-deno-loader@0.9.0",
       "jsr:@std/assert@^0.213.1": "jsr:@std/assert@0.213.1",
       "jsr:@std/assert@^0.216.0": "jsr:@std/assert@0.216.0",
       "jsr:@std/assert@^0.217.0": "jsr:@std/assert@0.217.0",
@@ -60,7 +59,6 @@
       "npm:cmdk@^0.2.1": "npm:cmdk@0.2.1_react@18.2.0_react-dom@18.2.0__react@18.2.0_@types+react@18.2.0",
       "npm:codemirror@6.0.1": "npm:codemirror@6.0.1_@codemirror+language@6.10.1_@codemirror+state@6.4.1_@codemirror+view@6.24.1",
       "npm:cssnano@6.0.3": "npm:cssnano@6.0.3_postcss@8.4.33",
-      "npm:esbuild@0.20": "npm:esbuild@0.20.1",
       "npm:esbuild@0.20.1": "npm:esbuild@0.20.1",
       "npm:happy-dom@13.8.2": "npm:happy-dom@13.8.2",
       "npm:jsdom": "npm:jsdom@24.0.0",
@@ -81,18 +79,20 @@
       "npm:vaul@^0.9.0": "npm:vaul@0.9.0_react@18.2.0_react-dom@18.2.0__react@18.2.0_@types+react@18.2.0_@types+react-dom@18.2.0"
     },
     "jsr": {
-      "@bureaudouble/deno-dom@0.1.38": {
-        "integrity": "34a39ae56f84da2e6daf6e632ffbe6001ca98da4f5ae7332a0a84d2a2a003be8"
+      "@bureaudouble/deno-dom@0.1.39": {
+        "integrity": "9b74e50287f02922d8fac5a8d447ee360d90fea209355b34acc0c8876534d40a"
       },
-      "@bureaudouble/islet@0.0.18": {
-        "integrity": "07e0b149bd946c175db828042e8195a7f2d584e6f7eb5e84ecaa0533d6dcc6ad",
+      "@bureaudouble/islet@0.0.26": {
+        "integrity": "df6da63cb00450506e6603cf8d6986f7b2ca39c087c871e169ab0fb7aac642a2",
         "dependencies": [
           "jsr:@bureaudouble/outils@0.0.13",
           "jsr:@bureaudouble/scripted@0.0.2",
-          "jsr:@luca/esbuild-deno-loader@0.9.0",
           "jsr:@std/crypto@0.216",
+          "jsr:@std/encoding@0.213",
           "jsr:@std/encoding@0.216",
           "jsr:@std/fs@0.216",
+          "jsr:@std/jsonc@0.213",
+          "jsr:@std/path@0.213",
           "jsr:@std/path@0.216",
           "npm:@types/react@18.2.0",
           "npm:esbuild@0.20.1",
@@ -102,10 +102,10 @@
       "@bureaudouble/outils@0.0.13": {
         "integrity": "351999b11bbbc3696a84f2bf4f6d134a732e8e2dd4c3d51f9699d9906b875180"
       },
-      "@bureaudouble/outils@0.0.39": {
-        "integrity": "bf16e5073fecd18bc489b8cc49c973f5f680e12354899d0b97a4f29b06cb4f6e",
+      "@bureaudouble/outils@0.0.42": {
+        "integrity": "5cd0a2d2194530201c79e2ac1f5c05946dd9758e8accfc12dfd30bf474a266e9",
         "dependencies": [
-          "jsr:@bureaudouble/deno-dom@0.1.38",
+          "jsr:@bureaudouble/deno-dom@0.1.39",
           "jsr:@std/path@0.216",
           "npm:autoprefixer@10.4.17",
           "npm:cssnano@6.0.3",
@@ -123,15 +123,6 @@
       },
       "@bureaudouble/scripted@0.0.2": {
         "integrity": "6ba53621ed24438e28f9949301f39eb0241e8746433b1465479b91c29475b58b"
-      },
-      "@luca/esbuild-deno-loader@0.9.0": {
-        "integrity": "288bbcede5c8a6f97e635f8fa4df779b13440ee0c0506d9e478fb6537789dc93",
-        "dependencies": [
-          "jsr:@std/encoding@0.213",
-          "jsr:@std/jsonc@0.213",
-          "jsr:@std/path@0.213",
-          "npm:esbuild@0.20"
-        ]
       },
       "@std/assert@0.213.1": {
         "integrity": "24c28178b30c8e0782c18e8e94ea72b16282207569cdd10ffb9d1d26f2edebfe"
@@ -2887,8 +2878,8 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@bureaudouble/islet@0.0.18",
-      "jsr:@bureaudouble/outils@0.0.39",
+      "jsr:@bureaudouble/islet@0.0.26",
+      "jsr:@bureaudouble/outils@0.0.42",
       "jsr:@bureaudouble/scripted@0.0.2",
       "jsr:@std/encoding@0.217",
       "jsr:@std/http@0.217",
