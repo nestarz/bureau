@@ -35,6 +35,7 @@ import {
   BreadcrumbLink,
 } from "@/src/components/bureau-ui/breadcrumb.tsx";
 import { Badge } from "@/src/components/ui/badge.tsx";
+import { Checkbox } from "@/src/components/ui/checkbox.tsx";
 
 interface MediaCardProps {
   className?: string;
@@ -145,17 +146,46 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
     <Fragment>
       <DialogHeader>
         <DialogTitle>Media Library</DialogTitle>
-        <DialogDescription>
-          Anyone who has this link will be able to view this.
-        </DialogDescription>
+        {path?.split("/").length > 1 && (
+          <DialogDescription>
+            <Breadcrumb separator="/">
+              {path.split("/").map((folder, i, arr) => (
+                <BreadcrumbItem
+                  key={folder}
+                  onClick={() => goTo(arr.slice(0, i + 1).join("/"))}
+                >
+                  <BreadcrumbLink as="div">{folder}</BreadcrumbLink>
+                </BreadcrumbItem>
+              ))}
+            </Breadcrumb>
+          </DialogDescription>
+        )}
       </DialogHeader>
       <div className="flex flex-col gap-2 overflow-x-hidden">
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="shadow-none"
+            disabled={currentFiles.length === 0 ||
+              (currentFiles.length === 0 && (value?.length ?? 0) > 0)}
+          >
+            <Checkbox
+              checked={((value?.length ?? 0) > 0 &&
+                  (value?.length ?? 0) < currentFiles.length)
+                ? "indeterminate"
+                : (currentFiles.length > 0 &&
+                  currentFiles.length === (value?.length ?? 0))}
+              onCheckedChange={(value) => onChange?.(value ? currentFiles : [])}
+              aria-label="Select all"
+            />
+          </Button>
           <Label htmlFor="search" className="sr-only">
             Search
           </Label>
           <Input
             id="search"
+            className="shadow-none"
+            placeholder="Search..."
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setIlike(
                 e.target.value.length > 1 ? `%${e.target.value}%` : null,
@@ -163,6 +193,7 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
           />
           <Button
             variant="outline"
+            className="shadow-none"
             onClick={() => {
               const name = prompt("Choose a name");
               if (name?.trim()) addFolder(name, (v) => slugify(v)!);
@@ -183,67 +214,16 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
             <Button>Upload</Button>
           </Uploader>
         </div>
-        <div className="flex overflow-x-auto max-w-full gap-2 min-h-10">
-          <DraggableArray
-            onMove={(prevPosition, newPosition) => {
-              onChange?.(
-                value?.toSpliced(prevPosition, 1).toSpliced(
-                  newPosition,
-                  0,
-                  value[prevPosition],
-                ),
-              );
-            }}
-          >
-            {value?.map((media) => (
-              <div key={media.key}>
-                <MediaCard
-                  media={media}
-                  checked={value?.some((v) => v.key === media.key)}
-                  onChecked={(selected) => toggleMedia(media, selected)}
-                  maxWidth={50}
-                  className="w-10 min-w-[2.5rem]"
-                  size="small"
-                />
-              </div>
-            ))}
-          </DraggableArray>
-        </div>
-        {path?.split("/").length > 1 && (
-          <Breadcrumb separator="/">
-            {path.split("/").map((folder, i, arr) => (
-              <BreadcrumbItem
-                key={folder}
-                onClick={() => goTo(arr.slice(0, i + 1).join("/"))}
-              >
-                <BreadcrumbLink as="div">{folder}</BreadcrumbLink>
-              </BreadcrumbItem>
-            ))}
-          </Breadcrumb>
-        )}
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onChange?.(currentFiles)}
-          >
-            Select All
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onChange?.([])}
-          >
-            Unselect All
-          </Button>
-        </div>
         <div className="max-h-[60vh] overflow-auto flex flex-col gap-1">
           {currentFolders.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+              <div className="col-span-full text-sm text-muted-foreground">
+                Folders ({currentFolders.length})
+              </div>
               {currentFolders.map((folder) => (
                 <Button
                   key={getFolderName(folder)}
-                  className="w-full"
+                  className="w-full shadow-none"
                   variant="outline"
                   size="sm"
                   onClick={() => goTo(getFolder(folder))}
@@ -253,7 +233,10 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
               ))}
             </div>
           )}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-1 mt-1">
+            <div className="col-span-full text-sm text-muted-foreground">
+              Assets ({currentFiles.length})
+            </div>
             {currentFiles.map((media) => (
               <MediaCard
                 key={media.key}
@@ -262,6 +245,7 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
                 checked={value?.some((v) => v.key === media.key)}
                 onChecked={(selected) => toggleMedia(media, selected)}
                 maxWidth={200}
+                className="shadow-none"
                 onDelete={async () => {
                   const reply = globalThis.prompt(
                     [
@@ -287,11 +271,48 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
         </div>
       </div>
       <DialogFooter className="sm:justify-start mt-auto">
-        <DialogClose asChild>
-          <Button type="button" variant="secondary">
-            Close
-          </Button>
-        </DialogClose>
+        <div className="flex flex-col gap-4">
+          {(value?.length ?? 0 > 0) && (
+            <div className="flex flex-col gap-3">
+              <div className="col-span-full text-sm text-muted-foreground">
+                Selected ({value?.length ?? 0})
+              </div>
+              <div className="flex overflow-x-auto max-w-full gap-2 min-h-10">
+                <DraggableArray
+                  onMove={(prevPosition, newPosition) => {
+                    onChange?.(
+                      value?.toSpliced(prevPosition, 1).toSpliced(
+                        newPosition,
+                        0,
+                        value[prevPosition],
+                      ),
+                    );
+                  }}
+                >
+                  {value?.map((media) => (
+                    <div key={media.key}>
+                      <MediaCard
+                        media={media}
+                        checked={value?.some((v) => v.key === media.key)}
+                        onChecked={(selected) => toggleMedia(media, selected)}
+                        maxWidth={50}
+                        className="w-10 min-w-[2.5rem]"
+                        size="small"
+                      />
+                    </div>
+                  ))}
+                </DraggableArray>
+              </div>
+            </div>
+          )}
+          <div className="mt-2">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </div>
+        </div>
       </DialogFooter>
     </Fragment>
   );
