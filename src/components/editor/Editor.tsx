@@ -16,6 +16,10 @@ const { AutoFocusPlugin } = (
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary.js";
 import { InputHiddenPlugin } from "./plugins/InputHiddenPlugin.tsx";
 import ToolbarPlugin from "./plugins/ToolbarPlugin.tsx";
+import YouTubePlugin from "./plugins/YouTubePlugin.tsx";
+import { YouTubeNode } from "./nodes/YouTubeNode.tsx";
+import VimeoPlugin from "./plugins/VimeoPlugin.tsx";
+import { VimeoNode } from "./nodes/VimeoNode.tsx";
 const { HeadingNode, QuoteNode } = (await import("@lexical/rich-text")).default;
 const { TableCellNode, TableNode, TableRowNode } = (
   await import("@lexical/table")
@@ -37,6 +41,7 @@ import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin.tsx";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin.tsx";
 
 import { cn } from "@/src/lib/utils.ts";
+import AutoEmbedPlugin from "@/src/components/editor/plugins/AutoEmbedPlugin.tsx";
 
 function Placeholder() {
   return (
@@ -67,6 +72,8 @@ const editorConfig = {
     TableRowNode,
     AutoLinkNode,
     LinkNode,
+    YouTubeNode,
+    VimeoNode,
   ],
 };
 
@@ -92,7 +99,7 @@ export function Editor({
       <div
         className={cn(
           "relative leading-5 font-normal text-left rounded-md w-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm",
-          className
+          className,
         )}
       >
         <InputHiddenPlugin
@@ -105,7 +112,7 @@ export function Editor({
         <div className="editor-inner">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="min-h-40 outline-none resize-none text-sm caret-primary relative px-3 py-4 prose prose-black min-w-none" />
+              <ContentEditable className="[&_iframe]:max-w-full min-h-40 outline-none resize-none text-sm caret-primary relative px-3 py-4 prose prose-black min-w-none" />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary as any}
@@ -114,8 +121,11 @@ export function Editor({
           <AutoFocusPlugin />
           <CodeHighlightPlugin />
           <ListPlugin />
+          <YouTubePlugin />
+          <VimeoPlugin />
           <LinkPlugin />
           <AutoLinkPlugin />
+          <AutoEmbedPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>

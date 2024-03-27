@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/components/ui/dialog.tsx";
+import DraggableArray from "@/src/components/DraggableArray.tsx";
 import { Input } from "@/src/components/ui/input.tsx";
 import { Label } from "@/src/components/ui/label.tsx";
 import { Fragment, useState } from "react";
@@ -183,17 +184,30 @@ const MediaManagerContent: React.FC<MediaManagerContentProps> = ({
           </Uploader>
         </div>
         <div className="flex overflow-x-auto max-w-full gap-2 min-h-10">
-          {value?.map((media) => (
-            <MediaCard
-              key={media.key}
-              media={media}
-              checked={value?.some((v) => v.key === media.key)}
-              onChecked={(selected) => toggleMedia(media, selected)}
-              maxWidth={50}
-              className="w-10 min-w-[2.5rem]"
-              size="small"
-            />
-          ))}
+          <DraggableArray
+            onMove={(prevPosition, newPosition) => {
+              onChange?.(
+                value?.toSpliced(prevPosition, 1).toSpliced(
+                  newPosition,
+                  0,
+                  value[prevPosition],
+                ),
+              );
+            }}
+          >
+            {value?.map((media) => (
+              <div key={media.key}>
+                <MediaCard
+                  media={media}
+                  checked={value?.some((v) => v.key === media.key)}
+                  onChecked={(selected) => toggleMedia(media, selected)}
+                  maxWidth={50}
+                  className="w-10 min-w-[2.5rem]"
+                  size="small"
+                />
+              </div>
+            ))}
+          </DraggableArray>
         </div>
         {path?.split("/").length > 1 && (
           <Breadcrumb separator="/">

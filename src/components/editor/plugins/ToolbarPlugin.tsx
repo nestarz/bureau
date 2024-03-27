@@ -15,22 +15,26 @@ import {
   RiListOrdered,
   RiListUnordered,
   RiParagraph,
+  RiPencilLine,
   RiQuoteText,
   RiStrikethrough,
   RiUnderline,
-  RiPencilLine,
 } from "react-icons/ri";
 
+const { INSERT_EMBED_COMMAND } = (await import(
+  "@lexical/react/LexicalAutoEmbedPlugin.js"
+)).default;
 const { useLexicalComposerContext } = (
   await import("@lexical/react/LexicalComposerContext.js")
 ).default;
+// @deno-types="@types/react"
 import {
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  Fragment,
 } from "react";
 const {
   $createParagraphNode,
@@ -70,6 +74,15 @@ const {
   getCodeLanguages,
   getDefaultCodeLanguage,
 } = (await import("@lexical/code")).default;
+import { EmbedConfigs } from "./AutoEmbedPlugin.tsx";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu.tsx";
+import { PlusIcon } from "@radix-ui/react-icons";
 
 interface FloatingLinkEditorProps {
   editor: ReturnType<typeof useLexicalComposerContext>[0]; // Assuming you have a specific type for this in your actual codebase
@@ -120,7 +133,7 @@ function Divider(): JSX.Element {
 
 function positionEditorElement(
   editor: HTMLDivElement,
-  rect: DOMRect | null
+  rect: DOMRect | null,
 ): void {
   if (rect === null) {
     editor.style.opacity = "0";
@@ -128,9 +141,9 @@ function positionEditorElement(
     editor.style.left = "-1000px";
   } else {
     editor.style.opacity = "1";
-    editor.style.top = `${rect.top + rect.height + window.pageYOffset + 10}px`;
+    editor.style.top = `${rect.top + rect.height + globalThis.scrollY + 10}px`;
     editor.style.left = `${
-      rect.left + window.pageXOffset - editor.offsetWidth / 2 + rect.width / 2
+      rect.left + globalThis.scrollX - editor.offsetWidth / 2 + rect.width / 2
     }px`;
   }
 }
@@ -157,7 +170,7 @@ function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): JSX.Element {
       }
     }
     const editorElem = editorRef.current;
-    const nativeSelection = window.getSelection();
+    const nativeSelection = globalThis.getSelection();
     const activeElement = document.activeElement;
 
     if (editorElem === null) {
@@ -210,8 +223,8 @@ function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): JSX.Element {
           updateLinkEditor();
           return true;
         },
-        LowPriority
-      )
+        LowPriority,
+      ),
     );
   }, [editor, updateLinkEditor]);
 
@@ -229,49 +242,51 @@ function FloatingLinkEditor({ editor }: FloatingLinkEditorProps): JSX.Element {
 
   return (
     <div ref={editorRef} className="link-editor">
-      {isEditMode ? (
-        <input
-          ref={inputRef}
-          className="link-input"
-          value={linkUrl}
-          onChange={(event) => {
-            setLinkUrl(event.target.value);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              event.preventDefault();
-              if (lastSelection !== null) {
-                if (linkUrl !== "") {
-                  editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+      {isEditMode
+        ? (
+          <input
+            ref={inputRef}
+            className="link-input"
+            value={linkUrl}
+            onChange={(event) => {
+              setLinkUrl(event.target.value);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                if (lastSelection !== null) {
+                  if (linkUrl !== "") {
+                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+                  }
+                  setEditMode(false);
                 }
+              } else if (event.key === "Escape") {
+                event.preventDefault();
                 setEditMode(false);
               }
-            } else if (event.key === "Escape") {
-              event.preventDefault();
-              setEditMode(false);
-            }
-          }}
-        />
-      ) : (
-        <Fragment>
-          <div className="link-input">
-            <a href={linkUrl} target="_blank" rel="noopener noreferrer">
-              {linkUrl}
-            </a>
-            <div
-              className="w-[35px] absolute cursor-pointer right-0 inset-y-0 align-[-0.25em] flex items-center justify-center"
-              role="button"
-              tabIndex={0}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => {
-                setEditMode(true);
-              }}
-            >
-              <RiPencilLine className="w-5 h-5" />
+            }}
+          />
+        )
+        : (
+          <Fragment>
+            <div className="link-input">
+              <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                {linkUrl}
+              </a>
+              <div
+                className="w-[35px] absolute cursor-pointer right-0 inset-y-0 align-[-0.25em] flex items-center justify-center"
+                role="button"
+                tabIndex={0}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  setEditMode(true);
+                }}
+              >
+                <RiPencilLine className="w-5 h-5" />
+              </div>
             </div>
-          </div>
-        </Fragment>
-      )}
+          </Fragment>
+        )}
     </div>
   );
 }
@@ -488,13 +503,15 @@ export default function ToolbarPlugin(): JSX.Element {
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
-  const [blockType, setBlockType] =
-    useState<keyof typeof blockTypesIcons>("paragraph");
-  const [selectedElementKey, setSelectedElementKey] = useState<string | null>(
-    null
+  const [blockType, setBlockType] = useState<keyof typeof blockTypesIcons>(
+    "paragraph",
   );
-  const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] =
-    useState(false);
+  const [selectedElementKey, setSelectedElementKey] = useState<string | null>(
+    null,
+  );
+  const [showBlockOptionsDropDown, setShowBlockOptionsDropDown] = useState(
+    false,
+  );
   const [codeLanguage, setCodeLanguage] = useState("");
   const [isRTL, setIsRTL] = useState(false);
   const [isLink, setIsLink] = useState(false);
@@ -508,10 +525,9 @@ export default function ToolbarPlugin(): JSX.Element {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode();
-      const element =
-        anchorNode.getKey() === "root"
-          ? anchorNode
-          : anchorNode.getTopLevelElementOrThrow();
+      const element = anchorNode.getKey() === "root"
+        ? anchorNode
+        : anchorNode.getTopLevelElementOrThrow();
       const elementKey = element.getKey();
       const elementDOM = editor.getElementByKey(elementKey);
       if (elementDOM !== null) {
@@ -549,8 +565,13 @@ export default function ToolbarPlugin(): JSX.Element {
     }
   }, [editor]);
 
+  const [isEditable, setIsEditable] = useState(() => editor.isEditable());
+
   useEffect((): ReturnType<typeof mergeRegister> => {
     return mergeRegister(
+      editor.registerEditableListener((editable) => {
+        setIsEditable(editable);
+      }),
       editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           updateToolbar();
@@ -562,7 +583,7 @@ export default function ToolbarPlugin(): JSX.Element {
           updateToolbar();
           return false;
         },
-        LowPriority
+        LowPriority,
       ),
       editor.registerCommand(
         CAN_UNDO_COMMAND,
@@ -570,7 +591,7 @@ export default function ToolbarPlugin(): JSX.Element {
           setCanUndo(payload);
           return false;
         },
-        LowPriority
+        LowPriority,
       ),
       editor.registerCommand(
         CAN_REDO_COMMAND,
@@ -578,8 +599,8 @@ export default function ToolbarPlugin(): JSX.Element {
           setCanRedo(payload);
           return false;
         },
-        LowPriority
-      )
+        LowPriority,
+      ),
     );
   }, [editor, updateToolbar]);
 
@@ -595,7 +616,7 @@ export default function ToolbarPlugin(): JSX.Element {
         }
       });
     },
-    [editor, selectedElementKey]
+    [editor, selectedElementKey],
   );
 
   const insertLink = useCallback((): void => {
@@ -642,8 +663,7 @@ export default function ToolbarPlugin(): JSX.Element {
             type="button"
             className="toolbar-item block-controls"
             onClick={() =>
-              setShowBlockOptionsDropDown(!showBlockOptionsDropDown)
-            }
+              setShowBlockOptionsDropDown(!showBlockOptionsDropDown)}
             aria-label="Formatting Options"
           >
             <BlockTypeIcon className="icon block-type" />
@@ -658,128 +678,165 @@ export default function ToolbarPlugin(): JSX.Element {
                 toolbarRef={toolbarRef}
                 setShowBlockOptionsDropDown={setShowBlockOptionsDropDown}
               />,
-              document.body
+              document.body,
             )}
           <Divider />
         </Fragment>
       )}
-      {blockType === "code" ? (
-        <Fragment>
-          <Select
-            className="toolbar-item code-language"
-            onChange={onCodeLanguageSelect}
-            options={codeLanguges}
-            value={codeLanguage}
-          />
-          <RiArrowDropDownLine className="chevron-down inside" />
-        </Fragment>
-      ) : (
-        <Fragment>
+      {blockType === "code"
+        ? (
+          <Fragment>
+            <Select
+              className="toolbar-item code-language"
+              onChange={onCodeLanguageSelect}
+              options={codeLanguges}
+              value={codeLanguage}
+            />
+            <RiArrowDropDownLine className="chevron-down inside" />
+          </Fragment>
+        )
+        : (
+          <Fragment>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+              }}
+              className={"toolbar-item spaced " + (isBold ? "active" : "")}
+              aria-label="Format Bold"
+            >
+              <RiBold className="format bold" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+              }}
+              className={"toolbar-item spaced " + (isItalic ? "active" : "")}
+              aria-label="Format Italics"
+            >
+              <RiItalic className="format italic" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
+              }}
+              className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
+              aria-label="Format Underline"
+            >
+              <RiUnderline className="format underline" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
+              }}
+              className={"toolbar-item spaced " +
+                (isStrikethrough ? "active" : "")}
+              aria-label="Format Strikethrough"
+            >
+              <RiStrikethrough className="format strikethrough" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
+              }}
+              className={"toolbar-item spaced " + (isCode ? "active" : "")}
+              aria-label="Insert Code"
+            >
+              <RiCodeLine className="format code" />
+            </button>
+            <button
+              type="button"
+              onClick={insertLink}
+              className={"toolbar-item spaced " + (isLink ? "active" : "")}
+              aria-label="Insert Link"
+            >
+              <RiLink className="format link" />
+            </button>
+            {isLink &&
+              createPortal(
+                <FloatingLinkEditor editor={editor} />,
+                document.body,
+              )}
+            <Divider />
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
+              }}
+              className="toolbar-item spaced"
+              aria-label="Left Align"
+            >
+              <RiAlignLeft className="format left-align" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
+              }}
+              className="toolbar-item spaced"
+              aria-label="Center Align"
+            >
+              <RiAlignCenter className="format center-align" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
+              }}
+              className="toolbar-item spaced"
+              aria-label="Right Align"
+            >
+              <RiAlignRight className="format right-align" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
+              }}
+              className="toolbar-item"
+              aria-label="Justify Align"
+            >
+              <RiAlignJustify className="format justify-align" />
+            </button>
+            {" "}
+          </Fragment>
+        )}
+      <DropdownMenu>
+        <DropdownMenuTrigger>
           <button
             type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-            }}
-            className={"toolbar-item spaced " + (isBold ? "active" : "")}
-            aria-label="Format Bold"
+            className="toolbar-item block-controls"
+            onClick={() =>
+              setShowBlockOptionsDropDown(!showBlockOptionsDropDown)}
+            aria-label="Formatting Options"
           >
-            <RiBold className="format bold" />
+            <PlusIcon className="icon block-type" />
+            <span className="text">Insert</span>
+            <RiArrowDropDownLine className="chevron-down" />
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
-            }}
-            className={"toolbar-item spaced " + (isItalic ? "active" : "")}
-            aria-label="Format Italics"
-          >
-            <RiItalic className="format italic" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-            }}
-            className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
-            aria-label="Format Underline"
-          >
-            <RiUnderline className="format underline" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-            }}
-            className={
-              "toolbar-item spaced " + (isStrikethrough ? "active" : "")
-            }
-            aria-label="Format Strikethrough"
-          >
-            <RiStrikethrough className="format strikethrough" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-            }}
-            className={"toolbar-item spaced " + (isCode ? "active" : "")}
-            aria-label="Insert Code"
-          >
-            <RiCodeLine className="format code" />
-          </button>
-          <button
-            type="button"
-            onClick={insertLink}
-            className={"toolbar-item spaced " + (isLink ? "active" : "")}
-            aria-label="Insert Link"
-          >
-            <RiLink className="format link" />
-          </button>
-          {isLink &&
-            createPortal(<FloatingLinkEditor editor={editor} />, document.body)}
-          <Divider />
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Left Align"
-          >
-            <RiAlignLeft className="format left-align" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Center Align"
-          >
-            <RiAlignCenter className="format center-align" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
-            }}
-            className="toolbar-item spaced"
-            aria-label="Right Align"
-          >
-            <RiAlignRight className="format right-align" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
-            }}
-            className="toolbar-item"
-            aria-label="Justify Align"
-          >
-            <RiAlignJustify className="format justify-align" />
-          </button>{" "}
-        </Fragment>
-      )}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {EmbedConfigs.map((embedConfig) => (
+            <DropdownMenuItem
+              key={embedConfig.type}
+              onClick={() => {
+                editor.dispatchCommand(
+                  INSERT_EMBED_COMMAND,
+                  embedConfig.type,
+                );
+              }}
+              className="item"
+            >
+              {embedConfig.icon}
+              <span className="text">{embedConfig.contentName}</span>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
