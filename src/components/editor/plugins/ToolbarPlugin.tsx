@@ -27,7 +27,7 @@ const { INSERT_EMBED_COMMAND } = (await import(
 const { useLexicalComposerContext } = (
   await import("@lexical/react/LexicalComposerContext.js")
 ).default;
-// @deno-types="@types/react"
+// @deno-types="npm:@types/react@18.2.0"
 import {
   Fragment,
   useCallback,
