@@ -27,7 +27,7 @@ export default ({
       <span className="max-w-[300px] truncate font-medium">
         {type === "html"
           ? (
-            convertToPlain(value)
+            value ? convertToPlain(value) : null
           )
           : type === "order"
           ? <DragHandleDots2Icon className="mx-auto" />
