@@ -1,6 +1,6 @@
 {
   "name": "@bureaudouble/bureau",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "nodeModulesDir": false,
   "tasks": {
     "test": "deno run --unstable-hmr -A --config=./deno.json --env=test/.env ./test/main.ts"
