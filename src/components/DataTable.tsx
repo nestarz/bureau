@@ -6,7 +6,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   PaginationState,
   SortingState,
@@ -73,8 +72,13 @@ interface DataTableProps<TData> {
   references?: { [key: string]: { [key: string]: any }[] };
 }
 
-const usePagination = () => {
-  const [pagination, setPagination] = useState({
+const usePagination: () => {
+  limit: number;
+  onPaginationChange: (p: PaginationState) => void;
+  pagination: PaginationState;
+  offset: number;
+} = () => {
+  const [pagination, setPagination] = useState<PaginationState>({
     pageSize: 12,
     pageIndex: 0,
   });
