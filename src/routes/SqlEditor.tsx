@@ -51,7 +51,7 @@ export default (
   reqs.delete(reqId);
 
   return (
-    <form className="col-span-4 p-4 flex flex-col gap-2" method="POST">
+    <form className="col-span-4 p-4 grid gap-2" method="POST">
       <div className="grid grid-cols-4 gap-2 max-h-[50vh]">
         <SqlInput
           name="sql"

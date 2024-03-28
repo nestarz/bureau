@@ -13,7 +13,6 @@ export function DraggableArray({
 
   // The event type here should technically be React.DragEvent to properly type React's version of the event
   const handleDragStart = (index: number) => {
-    console.log(Children.toArray(children)[index]);
     draggedIndex.current = index;
   };
 

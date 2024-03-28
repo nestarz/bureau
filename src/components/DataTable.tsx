@@ -50,7 +50,7 @@ import DisplayValue from "@/src/components/DisplayValue.tsx";
 import HeaderName from "@/src/components/bureau-ui/header-name.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
@@ -99,7 +99,6 @@ export default <TData = Record<string, unknown>>({
   const { limit, onPaginationChange, offset, pagination } = usePagination();
   const data = rawData.slice(offset, offset + limit);
 
-  useEffect(() => console.log("change, page", pagination), [pagination]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -110,7 +109,6 @@ export default <TData = Record<string, unknown>>({
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowOrder, setRowOrder] = React.useState<[number, number][]>([]);
   const reorderedData = useMemo(() => {
-    console.log("okk");
     return rowOrder.reduce(
       (data, [a, b]) =>
         data.map((current, idx) => {
