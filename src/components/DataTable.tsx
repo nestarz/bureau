@@ -50,11 +50,12 @@ import DisplayValue from "@/src/components/DisplayValue.tsx";
 import HeaderName from "@/src/components/bureau-ui/header-name.tsx";
 import getExtendedType from "@/src/lib/getExtendedType.ts";
 import formatColumnName from "@/src/lib/formatColumnName.ts";
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Column } from "@/src/middlewares/client.ts";
 
 import type { UseClient } from "@/src/lib/useClient.ts";
+
 const useClient: UseClient = await import("@/src/lib/useClient.ts").then((v) =>
   v.default(import.meta.url)
 );
@@ -72,18 +73,33 @@ interface DataTableProps<TData> {
   references?: { [key: string]: { [key: string]: any }[] };
 }
 
+const usePagination = () => {
+  const [pagination, setPagination] = useState({
+    pageSize: 12,
+    pageIndex: 0,
+  });
+  const { pageSize, pageIndex } = pagination;
+
+  return {
+    limit: pageSize,
+    onPaginationChange: setPagination,
+    pagination,
+    offset: pageSize * pageIndex,
+  };
+};
+
 export default <TData = Record<string, unknown>>({
   name,
   columns,
-  data,
+  data: rawData,
   children,
   references,
 }: DataTableProps<TData>): JSX.Element => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [pagination, setPagination] = React.useState<PaginationState>({
-    pageSize: 12,
-    pageIndex: 0,
-  });
+  const { limit, onPaginationChange, offset, pagination } = usePagination();
+  const data = rawData.slice(offset, offset + limit);
+
+  useEffect(() => console.log("change, page", pagination), [pagination]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
@@ -93,19 +109,18 @@ export default <TData = Record<string, unknown>>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowOrder, setRowOrder] = React.useState<[number, number][]>([]);
-  const reorderedData = useMemo(
-    () =>
-      rowOrder.reduce(
-        (data, [a, b]) =>
-          data.map((current, idx) => {
-            if (idx === a) return data[b];
-            if (idx === b) return data[a];
-            return current;
-          }),
-        data,
-      ),
-    [JSON.stringify({ rowOrder, data })],
-  );
+  const reorderedData = useMemo(() => {
+    console.log("okk");
+    return rowOrder.reduce(
+      (data, [a, b]) =>
+        data.map((current, idx) => {
+          if (idx === a) return data[b];
+          if (idx === b) return data[a];
+          return current;
+        }),
+      data,
+    );
+  }, [JSON.stringify({ rowOrder, data })]);
 
   const orderKey = columns?.find(
     (d) => formatColumnName(d.name) === "Order",
@@ -114,9 +129,14 @@ export default <TData = Record<string, unknown>>({
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
-    onPaginationChange: setPagination,
+    onPaginationChange,
+    manualPagination: true,
+    rowCount: rawData.length,
+    getRowId: (row) =>
+      JSON.stringify(
+        columns.filter((d) => d.pk).map((c) => ({ [c.name]: row[c.name] })),
+      ),
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -303,10 +323,14 @@ export default <TData = Record<string, unknown>>({
                   Object.fromEntries([
                     ...columns
                       .filter((column) => column.pk === 1)
-                      .map((
-                        column,
-                      ) => [column.name, (data as any)[column.name]]),
-                    [orderKey, index],
+                      .map((column) => [
+                        column.name,
+                        (data as any)[column.name],
+                      ]),
+                    [
+                      orderKey,
+                      index + offset,
+                    ],
                   ])
                 ),
               ),
@@ -314,8 +338,10 @@ export default <TData = Record<string, unknown>>({
             await fetch(urlcat("/admin/api/reorder/:name", { name }), {
               method: "POST",
               body: formData,
-            });
-            toast("Row order has been updated");
+            }).then((r) => r.json()).then((results) => {
+              console.log(results);
+              toast("Row order has been updated");
+            }).catch(() => toast("ERROR: Row order has errored"));
           }}
         >
           Save

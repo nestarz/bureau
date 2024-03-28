@@ -55,7 +55,12 @@ export default async (
         .with("cte_target_cte", (wb) =>
           wb
             .selectFrom(tableName)
-            .$if(!!orderKey, (wb) => wb.orderBy(orderKey!))
+            .$if(!!orderKey, (wb) => wb.orderBy(`${orderKey!} asc`))
+            .orderBy(
+              tableConfig.columns
+                .filter((c) => !!c.pk)
+                .map((c) => `${c.name} desc`),
+            )
             .selectAll())
         .selectNoFrom((qb) =>
           [

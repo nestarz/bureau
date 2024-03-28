@@ -36,22 +36,57 @@ export const handler: Handlers<
                   eb.ref("value", "->>").key(key).as(key)
                 )
               ))
+          .with("cte_null_orders", (wb) =>
+            wb
+              .selectFrom(tableConfig.name)
+              .select((eb) => [
+                ...primaryKeys.map((key) => key),
+                eb.fn
+                  .agg<number>("ROW_NUMBER")
+                  .over((ob) => {
+                    for (const key of primaryKeys) ob = ob.orderBy(key, "desc");
+                    return ob;
+                  })
+                  .as(orderKey),
+              ])
+              .where(orderKey, "is", null)
+              // .where(
+              //   primaryKeys.map((key) => eb.ref(key)).pop(),
+              //   "not in",
+              //   qb.selectFrom("cte_reordered").select(primaryKeys),
+              // )
+              .where((qb) => {
+                let wb = qb.selectFrom("cte_reordered").select(primaryKeys);
+                for (const pk of primaryKeys) {
+                  wb = wb.whereRef(
+                    sql.ref(`cte_reordered.${pk}`),
+                    "=",
+                    sql.ref(`${tableConfig.name}.${pk}`),
+                  );
+                }
+                return qb.not(qb.exists(wb));
+              }))
+          .with("cte_combined", (qb) =>
+            qb
+              .selectFrom("cte_reordered")
+              .selectAll()
+              .unionAll(qb.selectFrom("cte_null_orders").selectAll()))
           .updateTable(tableConfig.name)
-          .from("cte_reordered")
-          .$if(true, (wb) => {
-            for (const key of primaryKeys) {
+          .$if(true, (qb) => {
+            let wb = qb.from("cte_combined");
+            for (const pk of primaryKeys) {
               wb = wb.whereRef(
-                sql.ref(`${tableConfig.name}.${key}`),
+                sql.ref(`cte_combined.${pk}`),
                 "=",
-                sql.ref(`cte_reordered.${key}`),
+                sql.ref(`${tableConfig.name}.${pk}`),
               );
             }
             return wb;
           })
           .set((eb) => ({
-            [orderKey]: eb.ref(`cte_reordered.${orderKey}`),
+            [orderKey]: eb.ref(`cte_combined.${orderKey}`),
           }))
-          .returningAll()
+          .returning([...primaryKeys, orderKey])
           .compile()
       )
       .then((data) => ({ data }))

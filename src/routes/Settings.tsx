@@ -27,8 +27,6 @@ export default async (
   _req: Request,
   ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
 ) => {
-  const data = ctx.state.session.flash("x-data");
-
   return (
     <form
       className="flex flex-col gap-4 bg-background p-6 col-span-4"

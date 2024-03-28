@@ -41,7 +41,7 @@ export const SqlInput = ({
 
     const editor = new EditorView({
       state: EditorState.create({
-        doc: "",
+        doc: defaultValue,
         extensions: [
           basicSetup,
           language.of(

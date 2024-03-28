@@ -16,16 +16,17 @@ export const handler: Handlers<
 > = {
   POST: async (req, ctx) => {
     const formData = await req.formData();
-    const returning = await ctx.state.clientQuery
+    const sql = formData.get("sql") as string;
+    const result = await ctx.state.clientQuery
       .default(() => ({
-        sql: formData.get("sql") as string,
+        sql,
         query: null!,
         parameters: [],
       }))
       .then((data) => ({ data }))
       .catch((error) => ({ error: error.toString() }));
 
-    ctx.state.session.flash("x-data", returning);
+    ctx.state.session.flash("x-data", { result, sql });
     return new Response(null, {
       status: 302,
       headers: { Location: req.url },
@@ -35,38 +36,37 @@ export const handler: Handlers<
 
 export default (
   _req: Request,
-  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>
+  ctx: FreshContext<ClientMiddleware & SqliteMiddlewareState<any>>,
 ): JSX.Element => {
-  const { data, error } = ctx.state.session.flash("x-data") ?? {};
-  console.log(data);
+  const { sql, result } = ctx.state.session.flash("x-data") ?? {};
+  console.log(sql, result);
 
   return (
     <form className="col-span-4 p-4 flex flex-col gap-2" method="POST">
       <SqlInput
         name="sql"
+        defaultValue={sql}
         sqlConfig={{
           schema: Object.fromEntries(
             ctx.state.tables.map((table) => [
               table.name,
               table.columns.map((column) => column.name),
-            ])
+            ]),
           ),
         }}
         className="[&_.cm-editor]:h-full [&_.cm-editor]:!outline-none min-h-64 relative leading-5 font-normal text-left rounded-md w-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm"
       />
       <div className="flex flex-wrap gap-2 items-center">
         <Button type="submit">Submit</Button>
-        <div className="text-muted-foreground text-xs">{error}</div>
+        <div className="text-muted-foreground text-xs">{result?.error}</div>
       </div>
       <DataTable
         name={"query"}
-        columns={
-          Object.entries(data?.[0] ?? {}).map(([key, value]) => ({
-            name: key,
-            type: typeof value as any,
-          })) as any
-        }
-        data={data ?? []}
+        columns={Object.entries(result?.data?.[0] ?? {}).map(([key, value]) => ({
+          name: key,
+          type: typeof value as any,
+        })) as any}
+        data={result?.data ?? []}
       />
     </form>
   );
