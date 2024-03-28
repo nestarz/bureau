@@ -28,7 +28,7 @@ export const handler: Handlers<
     const returning = await ctx.state.clientQuery
       .default((qb) =>
         qb
-          .with("cte_reordered", (wb) =>
+          .with("cte_values", (wb) =>
             wb
               .selectFrom(sql`json_each(json(${formData.get("order")}))` as any)
               .select((eb: any) =>
@@ -36,47 +36,33 @@ export const handler: Handlers<
                   eb.ref("value", "->>").key(key).as(key)
                 )
               ))
-          .with("cte_null_orders", (wb) =>
-            wb
-              .selectFrom(tableConfig.name)
-              .select((eb) => [
-                ...primaryKeys.map((key) => key),
-                eb.fn
-                  .agg<number>("ROW_NUMBER")
-                  .over((ob) => {
-                    for (const key of primaryKeys) ob = ob.orderBy(key, "desc");
-                    return ob;
-                  })
-                  .as(orderKey),
-              ])
-              .where(orderKey, "is", null)
-              // .where(
-              //   primaryKeys.map((key) => eb.ref(key)).pop(),
-              //   "not in",
-              //   qb.selectFrom("cte_reordered").select(primaryKeys),
-              // )
-              .where((qb) => {
-                let wb = qb.selectFrom("cte_reordered").select(primaryKeys);
-                for (const pk of primaryKeys) {
-                  wb = wb.whereRef(
-                    sql.ref(`cte_reordered.${pk}`),
-                    "=",
-                    sql.ref(`${tableConfig.name}.${pk}`),
-                  );
-                }
-                return qb.not(qb.exists(wb));
-              }))
-          .with("cte_combined", (qb) =>
-            qb
-              .selectFrom("cte_reordered")
-              .selectAll()
-              .unionAll(qb.selectFrom("cte_null_orders").selectAll()))
+          .with("cte_row_number", (wb) =>
+            wb.selectFrom(tableConfig.name).select((eb) => [
+              ...primaryKeys.map((key) =>
+                key
+              ),
+              eb.fn
+                .agg<number>("ROW_NUMBER")
+                .over((ob) => {
+                  ob.orderBy(orderKey, "desc");
+                  for (const key of primaryKeys) ob = ob.orderBy(key, "desc");
+                  return ob;
+                })
+                .as(orderKey),
+            ]))
           .updateTable(tableConfig.name)
           .$if(true, (qb) => {
-            let wb = qb.from("cte_combined");
+            let wb = qb.from("cte_row_number");
+            for (const pk of primaryKeys) {
+              wb = wb.leftJoin(
+                "cte_values",
+                `cte_row_number.${pk}`,
+                `cte_values.${pk}`,
+              );
+            }
             for (const pk of primaryKeys) {
               wb = wb.whereRef(
-                sql.ref(`cte_combined.${pk}`),
+                sql.ref(`cte_row_number.${pk}`),
                 "=",
                 sql.ref(`${tableConfig.name}.${pk}`),
               );
@@ -84,7 +70,11 @@ export const handler: Handlers<
             return wb;
           })
           .set((eb) => ({
-            [orderKey]: eb.ref(`cte_combined.${orderKey}`),
+            [orderKey]: eb.fn.coalesce(
+              eb.ref(`cte_values.${orderKey}`),
+              eb.ref(`${tableConfig.name}.${orderKey}`),
+              eb.ref(`cte_row_number.${orderKey}`),
+            ),
           }))
           .returning([...primaryKeys, orderKey])
           .compile()
